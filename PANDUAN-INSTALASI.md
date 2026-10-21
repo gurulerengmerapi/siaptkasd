@@ -1,6 +1,6 @@
-# Siap TKA SD T6.4 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
+# Siap TKA SD T7.0 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
 
-Versi aplikasi: `1.6.4-t6.4` (skema data 8, sama dengan T5 dan T6; **tidak ada migrasi data**).
+Versi aplikasi: `1.7.0-t7.0` (**skema data 9**: dua kolom baru di tabel Soal; **ada migrasi ringan**, jalankan `pasangAwal` sekali sesudah mengganti `Kode.gs`; langkah U3b).
 
 > **Sudah memasang T6?** Lompat ke bagian **"Mulai di sini bila T6 sudah terpasang"** di bawah (langkah U1–U8). Bagian 0 dan A–H ditujukan untuk pemasangan pertama dari T5 dan tetap berlaku sebagai rujukan.
 
@@ -24,36 +24,50 @@ Panduan ini untuk Anda yang **belum pernah memakai Git/GitHub**. Anda tidak perl
 
 ---
 
-## Mulai di sini bila T6.3 (atau yang lebih lama) sudah terpasang: perbarui ke T6.4 (± 15 menit)
+## Mulai di sini bila T6.4 (atau yang lebih lama) sudah terpasang: perbarui ke T7.0 (± 20 menit)
 
-T6.4 hanya memperbaiki **gambar soal yang tidak tampil saat halaman mengerjakan soal pertama kali dibuka** (baru tampil setelah halaman di-refresh). Sekarang, bila ada gambar soal yang alamatnya belum diterima, aplikasi memuat ulang ujian sekali dari server (cara yang sama dengan refresh) lalu menggambar ulang soalnya, sehingga gambar langsung tampil tanpa Anda refresh. Jawaban yang sudah dipilih tidak terpengaruh. **Skema data tidak berubah dan tidak ada migrasi**; `appsscript.json` **tidak berubah**. Di `Kode.gs` hanya nomor versi yang berganti (langkah U2–U4 hanya menyamakan nomor versi; perbaikannya ada di situs, U5–U6). Perubahan T6.3 (beranda, banner, dan halaman soal) ikut terbawa di ZIP yang sama; bila Anda masih di T6.2 atau T6.1, langkah yang sama bekerja karena ZIP berisi seluruh situs.
+T7.0 menambah **impor soal dari berkas teks hasil konversi Claude** (bacaan bersama, jenis soal, kunci, dan pembahasan per soal ikut terbaca), **pembahasan per soal** (diisi di editor soal, tampil kepada siswa di halaman hasil bila paket menampilkan hasil penuh), dan **penanda kunci tebakan Claude**: paket yang masih berisi kunci tebakan yang belum Anda periksa **tidak bisa diterbitkan**. Cara memakainya ada di `PANDUAN.md` bagian 6.6.
 
-**Catatan jujur:** penyebab pasti mengapa muatan pembuka tidak membawa alamat gambar belum saya temukan dari membaca kode (alur server dan klien sama di buka-pertama dan refresh). Perbaikan ini menutup gejalanya di klien dan terbukti di uji tiruan, tetapi belum dicoba di Google dan GitHub asli.
+**Ada perubahan skema (9).** Tabel **Soal** mendapat dua kolom baru di sebelah kanan (`pembahasan`, `kunci_status`). Data lama tidak diubah; soal lama otomatis berstatus kunci kosong dan tetap bisa terbit. Kolom ditambahkan oleh fungsi `pasangAwal` (langkah **U3b**) dan sebelumnya aplikasi membuat backup pengaman. `appsscript.json` **tidak berubah**, `js/config.js` **tidak perlu diubah**.
+
+**Catatan jujur:** semua ini baru diuji dengan Google *tiruan* (Node) dan peramban Chromium tanpa kepala. Migrasi di Spreadsheet Google asli, dan situs di perangkat sungguhan, belum pernah dicoba. Itu sebabnya U1 (backup) jangan dilewati.
 
 Kerjakan berurutan, satu langkah satu waktu. Alamat `/exec` Anda **tidak berubah**, jadi `js/config.js` tidak perlu diisi ulang (langkah U5 menjaganya).
 
 ### U1. Buat backup dulu
-Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang** → tunggu **Terverifikasi**. (Jaring pengaman saja; T6.4 tidak mengubah isi data.)
+Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang** → tunggu **Terverifikasi**. (**Jangan dilewati**: T7.0 menambah kolom di tabel Soal. Aplikasi juga membuat backup pengaman sendiri saat migrasi, tetapi backup Anda adalah jalan mundur yang paling mudah.)
 
 ### U2. Ganti kode backend (`Kode.gs`)
 1. Buka berkas `Kode.gs` yang baru dengan Notepad (Mac: TextEdit, teks polos). Jangan memakai Word.
 2. Buka proyek Apps Script Anda di <https://script.google.com> → di daftar berkas klik **Kode**.
 3. Klik di dalam kotak kode, **Ctrl+A**, **Delete**. Lalu di Notepad: **Ctrl+A**, **Ctrl+C**; kembali ke editor: **Ctrl+V**. (Berkasnya ± 600 KB; tunggu beberapa detik.)
-4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **10.932** dan tulisannya `}`. Bila angkanya jauh lebih kecil, tempelan terpotong: ulangi langkah 3.
+4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.117** dan tulisannya `}`. Bila angkanya jauh lebih kecil, tempelan terpotong: ulangi langkah 3.
 5. Tekan **Ctrl+S**.
 
 ### U3. Terapkan sebagai versi baru dari penerapan yang sama
 1. **Terapkan** (Deploy) → **Kelola penerapan** (Manage deployments).
 2. Klik ikon **pensil** pada penerapan Anda yang aktif.
-3. Pada **Versi** (Version) pilih **Versi baru** (New version). Deskripsi boleh `T6.4`.
+3. Pada **Versi** (Version) pilih **Versi baru** (New version). Deskripsi boleh `T7.0`.
 4. Klik **Terapkan** (Deploy).
 
 URL `/exec` tetap sama. **Jalan mundur:** versi sebelumnya tetap tersimpan di riwayat; lihat U8.
 
-### U4. Periksa backend langsung di peramban
-Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.6.4-t6.4"`:
+### U3b. Jalankan `pasangAwal` sekali (migrasi skema 9)
+1. Di editor Apps Script, di kotak pilihan fungsi pilih **`pasangAwal`**, lalu klik **Jalankan** (Run).
+2. Tunggu **Log eksekusi** muncul. Harus ada baris seperti:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.4-t6.4","api":true},"message":"OK"}
+[PASANG] Tabel baru: 0 | sudah ada: 23
+[PASANG] Skema dimigrasi: Soal (+2 kolom). Backup pengaman: ... Data lama tidak diubah.
+[PASANG] Akun sudah ada; Admin Utama tidak dibuat ulang dan tidak ada data yang ditimpa. ...
+```
+3. Buka Spreadsheet database → tab **Soal**: di ujung kanan harus ada dua kolom baru, `pembahasan` dan `kunci_status`. Isi kolom lama **tidak berubah**.
+
+Fungsi ini aman diulang. Bila ada pesan galat merah, **berhenti** dan kirimkan tangkapan layar log; jangan melanjutkan ke U4 sebelum jelas.
+
+### U4. Periksa backend langsung di peramban
+Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.7.0-t7.0"`:
+```text
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.7.0-t7.0","api":true},"message":"OK"}
 ```
 Bila `versi` masih `1.6.0-t6`, penerapan belum memakai versi baru: ulangi U3 dan pastikan Anda memilih **Versi baru**.
 
@@ -65,7 +79,7 @@ Folder situs lama Anda (tempat dulu `git init`) adalah yang tersambung ke GitHub
 Copy-Item -Path "$HOME\siap-tka-sd-situs\js\config.js" -Destination "$HOME\config-simpanan.js" -Force
 ```
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.4-t6.4.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.7.0-t7.0.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
 ```
 ```powershell
 Copy-Item -Path "$HOME\siap-tka-sd-situs-baru\*" -Destination "$HOME\siap-tka-sd-situs" -Recurse -Force
@@ -79,7 +93,7 @@ Copy-Item -Path "$HOME\config-simpanan.js" -Destination "$HOME\siap-tka-sd-situs
 cp ~/siap-tka-sd-situs/js/config.js ~/config-simpanan.js
 ```
 ```bash
-mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.4-t6.4.zip -d ~/siap-tka-sd-situs-baru
+mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.7.0-t7.0.zip -d ~/siap-tka-sd-situs-baru
 ```
 ```bash
 cp -R ~/siap-tka-sd-situs-baru/. ~/siap-tka-sd-situs/
@@ -118,28 +132,30 @@ Di folder situs yang sama, tiga perintah, satu per satu:
 git add .
 ```
 ```bash
-git commit -m "Pembaruan T6.4"
+git commit -m "Pembaruan T7.0"
 ```
 ```bash
 git push
 ```
 GitHub Pages memperbarui dalam 1–2 menit (lihat tab **Actions** di repo sampai ✓ hijau). Buka situs lalu tekan **Ctrl+Shift+R** (Mac: **Cmd+Shift+R**). Bila `git push` meminta tanda pengenal dan token lama sudah kedaluwarsa, buat token baru seperti B8g.
 
-### U7. Uji T6.4 (hanya perlu beberapa menit)
+### U7. Uji T7.0 (± 15 menit)
 Hasil ini belum pernah dicoba di Google dan GitHub asli; kirimkan tangkapan layar bila ada yang tidak sesuai.
 
 | No | Uji | Yang benar | Hasil Anda |
 |---|---|---|---|
-| 1 | Buka alamat `/exec` | `"versi":"1.6.4-t6.4"` | |
-| 2 | Tekan **Ctrl+Shift+R** di situs, masuk sebagai siswa, buka paket yang soalnya bergambar (teks bacaan dan pilihan jawaban) lewat **Mulai** atau **Lanjutkan** | Gambar langsung tampil di halaman soal pertama kali, tanpa refresh. Bila sesaat tampil tulisan "[gambar]", ia berganti gambar dalam sekitar 1–3 detik | |
-| 3 | Pindah beberapa soal bergambar, lalu buka **Daftar Soal** | Semua gambar tampil; jawaban yang sudah dipilih tetap | |
-| 4 | Ulangi no. 2 lewat **Ujian dengan kode** (token) | Sama: gambar tampil tanpa refresh | |
+| 1 | Buka alamat `/exec` | `"versi":"1.7.0-t7.0"` | |
+| 2 | Tab **Soal** di Spreadsheet database | Dua kolom baru di ujung kanan: `pembahasan`, `kunci_status` | |
+| 3 | Masuk sebagai guru, buka paket Terbit lama, ubah satu soal | Soal terbuka; ada kolom **Pembahasan** di formulir; paket lama tetap bisa diubah/terbit seperti biasa | |
+| 4 | Buat paket Draf baru → **Impor** → pilih berkas contoh `.txt` (lihat `PANDUAN.md` 6.6) | Soal terbaca, pembahasan dan catatan kunci tebakan tampil; tidak ada yang tersimpan sebelum Anda mengonfirmasi | |
+| 5 | Simpan hasil impor yang berisi kunci tebakan, lalu coba **Terbitkan** | Ditolak dengan pesan "masih tebakan dari Claude"; sesudah tiap soal ditandai **Kunci sudah saya periksa**, paket bisa terbit | |
+| 6 | Siswa mengerjakan paket tadi sampai selesai (hasil penuh) | Pembahasan tampil di halaman hasil per soal; **tidak** tampil saat mengerjakan | |
 
-### U8. Jalan mundur dari T6.3 ke T6.2
-Data tidak perlu dipulihkan: skemanya sama. 
+### U8. Jalan mundur dari T7.0 ke T6.4
+Dua kolom baru di tabel **Soal** boleh dibiarkan: kode T6.4 tidak memakainya. **Belum saya uji** bahwa kode T6.4 lama membaca tabel yang punya kolom ekstra di Google asli. Bila sesudah mundur ada yang aneh, pulihkan backup yang Anda buat di U1 (**Backup & Pulihkan**). Pembahasan dan penanda kunci yang sudah Anda isi di T7.0 tidak terlihat di T6.4.
 
-- **Backend:** **Terapkan → Kelola penerapan →** ikon pensil **→ Versi** → pilih nomor versi yang dulu aktif (versi sebelum yang dibuat di U3) **→ Terapkan**. (Bila daftar versi tidak menampilkannya, tempel `Kode.gs` T6.3 lama lalu ulangi U3.) Tampilan Google bisa berbeda sedikit dari uraian ini; yang dicari adalah *maksud* tombolnya.
-- **Situs:** ulangi U5 dan U6 memakai ZIP T6.3 yang lama (`siap-tka-sd-situs-1.6.3-t6.3.zip`).
+- **Backend:** **Terapkan → Kelola penerapan →** ikon pensil **→ Versi** → pilih nomor versi yang dulu aktif (versi sebelum yang dibuat di U3) **→ Terapkan**. (Bila daftar versi tidak menampilkannya, tempel `Kode.gs` T6.4 lama lalu ulangi U3; tidak perlu `pasangAwal` lagi.) Tampilan Google bisa berbeda sedikit dari uraian ini; yang dicari adalah *maksud* tombolnya.
+- **Situs:** ulangi U5 dan U6 memakai ZIP T6.4 yang lama (`siap-tka-sd-situs-1.6.4-t6.4.zip`).
 
 ---
 
@@ -160,8 +176,8 @@ Data tidak perlu dipulihkan: skemanya sama.
 |---|---|
 | `Kode.gs` | Ditempel ke editor Apps Script (bagian A). Berkas terpisah, **bukan** di dalam ZIP. |
 | `appsscript.json` | Ditempel ke manifes proyek Apps Script (bagian A). **Bukan** di dalam ZIP. |
-| `siap-tka-sd-situs-1.6.4-t6.4.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
-| `siap-tka-sd-uji-beban-1.6.1-t6.1.zip` (tidak berubah di T6.4) | Alat uji beban (dijalankan di komputer; `README.md` di dalamnya). Tidak dipasang ke Apps Script atau GitHub. |
+| `siap-tka-sd-situs-1.7.0-t7.0.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
+| `siap-tka-sd-uji-beban-1.6.1-t6.1.zip` (tidak berubah di T7.0) | Alat uji beban (dijalankan di komputer; `README.md` di dalamnya). Tidak dipasang ke Apps Script atau GitHub. |
 | `PANDUAN-MIGRASI-GITHUB.md` | Panduan ini (salinannya juga ada di dalam ZIP, bernama `PANDUAN-INSTALASI.md`). |
 
 **Isian Anda** — siapkan Notepad (atau Catatan) dan catat nilai-nilai ini begitu Anda memperolehnya. Nanti tinggal disalin dari catatan itu.
@@ -208,7 +224,7 @@ Yang benar: isinya 16 baris, baris pertama `{`, ada tulisan `"timeZone": "Asia/J
 1. Di daftar berkas editor, klik berkas kode utama (biasanya bernama **Kode**).
 2. Klik di dalam kotak kode, **Ctrl+A**, **Delete**.
 3. Di Notepad berkas `Kode.gs`: **Ctrl+A**, **Ctrl+C**. Kembali ke editor: **Ctrl+V**. (Berkasnya besar, ± 600 KB; tunggu beberapa detik sampai editor selesai menampilkan.)
-4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **10.932**, dan tulisannya `}`. Di bagian atas, baris 1 berisi `/**` dan baris 2 berbunyi `* Kode.gs — Siap TKA SD (gabungan otomatis dari ...`. Bila nomor baris terakhirnya jauh lebih kecil, tempelan terpotong: ulangi langkah 2–3. Tempelan terpotong adalah kegagalan yang paling mudah terjadi.
+4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.117**, dan tulisannya `}`. Di bagian atas, baris 1 berisi `/**` dan baris 2 berbunyi `* Kode.gs — Siap TKA SD (gabungan otomatis dari ...`. Bila nomor baris terakhirnya jauh lebih kecil, tempelan terpotong: ulangi langkah 2–3. Tempelan terpotong adalah kegagalan yang paling mudah terjadi.
 5. Tekan **Ctrl+S**.
 6. File HTML lama (`Index`, `Stylesheet`, `JavaScript`) **tidak dipakai lagi**. Boleh dihapus (titik tiga di sampingnya → **Hapus**) atau dibiarkan; keduanya aman. Penerapan lama (T5) tidak terpengaruh karena ia menyimpan salinan versinya sendiri.
 
@@ -259,12 +275,12 @@ Buka tab peramban baru, tempel URL `/exec` tadi (dari catatan), Enter. Yang bena
 
 Harus muncul:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.4-t6.4","api":true},"message":"OK"}
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.7.0-t7.0","api":true},"message":"OK"}
 ```
 
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
-| JSON dengan `"versi":"1.6.4-t6.4"` | Benar | Lanjut ke B |
+| JSON dengan `"versi":"1.7.0-t7.0"` | Benar | Lanjut ke B |
 | Halaman login Google | Akses bukan "Siapa saja" | Buat penerapan baru dengan akses **Siapa saja** (A6) |
 | Tampilan aplikasi T5 yang lama | Itu URL penerapan lama | Pakai URL dari penerapan **baru** |
 | `"versi":"1.5.0-t5"` atau halaman galat | Kode baru belum terpasang di penerapan itu | Ulangi A4 lalu A6 |
@@ -337,7 +353,7 @@ Harus muncul: nama dan email yang baru Anda ketik, masing-masing satu baris.
 
 **[Windows] Cara 1: dengan perintah** (bila ZIP ada di folder Downloads dan Windows Anda tidak memakai OneDrive untuk Downloads). Dua kotak, satu per satu.
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.4-t6.4.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.7.0-t7.0.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
 ```
 ```powershell
 cd "$HOME\siap-tka-sd-situs"
@@ -350,7 +366,7 @@ cd "$HOME\siap-tka-sd-situs"
 
 **[Mac / Linux] Cara 1: dengan perintah** (bila ZIP ada di `Downloads`). Satu kotak.
 ```bash
-mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.4-t6.4.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
+mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.7.0-t7.0.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
 ```
 Tidak ada keluaran bila berhasil.
 
@@ -447,7 +463,7 @@ find . -name "*.gs" -o -name "appsscript.json"
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
 | `index.html`, `css`, `js` terlihat | Benar | Lanjut ke B8 |
-| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.6.4-t6.4`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
+| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.7.0-t7.0`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
 | `index.html` tidak ada sama sekali | Salah folder, atau ekstraksi gagal | Ulangi B5 |
 | Berkas `.gs` atau `appsscript.json` muncul | Bukan milik frontend | Pindahkan keluar dari folder ini |
 

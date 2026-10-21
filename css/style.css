@@ -1252,6 +1252,9 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
 .panel-koreksi[open] > summary::after { transform: rotate(-135deg); }
 .catatan-butir { display: flex; gap: .4rem; align-items: flex-start; margin: .5rem 0; }
 .catatan-butir .ikon { flex: none; margin-top: .15rem; }
+.pembahasan-butir { margin-top: .75rem; padding: .75rem 1rem; border-radius: .5rem; background: var(--info-bg); color: var(--info-text); }
+.pembahasan-judul { display: flex; align-items: center; gap: .4rem; margin: 0 0 .25rem; font-weight: 700; }
+.pembahasan-isi { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
 .opsi-hasil { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
 .opsi-hasil li {
   display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: .625rem .875rem; min-height: 44px;

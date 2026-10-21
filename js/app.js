@@ -3543,6 +3543,7 @@ function htmlButir(b, untukStaf) {
         return h`<li class="${cocok ? 'kunci' : (kosongJ ? 'tanpa' : 'salah')}"><span class="huruf angka" aria-hidden="true">${i + 1}</span><span class="teks ky">${kayaHtml(teks)}</span>
           <span class="lencana ${cocok ? 'lencana-sukses' : (kosongJ ? '' : 'lencana-bahaya')}">${kosongJ ? '' : ikon(cocok ? 'check' : 'x', 'ikon-sm')} Anda: ${teksBS(ja)}</span><span class="lencana">Kunci: ${teksBS(kc)}</span></li>`;
       })}</ul>`}
+    ${b.pembahasan ? h`<div class="pembahasan-butir" data-uji="pembahasan-butir"><p class="pembahasan-judul">${ikon('book-open', 'ikon-sm')} Pembahasan</p><p class="pembahasan-isi">${b.pembahasan}</p></div>` : ''}
   </li>`;
 }
 
@@ -6529,17 +6530,17 @@ function gambarEditor() {
     ${htmlKartuPembahasanStaf(pk, edSt.pembahasan)}
     ${h`<div class="kartu-judul"><h3 class="tanpa-margin">Soal <span class="teks-redam angka">(${formatAngka(soal.length)}/100)</span></h3>
       <div class="baris-bungkus rata-kanan"><button type="button" class="tombol tombol-garis" data-aksi="soal-ambil"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('copy')}<span>Ambil dari paket lain</span></button>
-      ${pk.status === 'Draf' && bisaUbahSoal ? h`<button type="button" class="tombol tombol-garis" data-aksi="impor-buka" data-uji="im-buka"${soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('upload')}<span>Impor dari DOCX (prototipe)</span></button>` : ''}
+      ${pk.status === 'Draf' && bisaUbahSoal ? h`<button type="button" class="tombol tombol-garis" data-aksi="impor-buka" data-uji="im-buka"${soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('upload')}<span>Impor soal (prototipe)</span></button>` : ''}
       <button type="button" class="tombol" data-aksi="soal-baru"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('plus')}<span>Tambah soal</span></button></div></div>`}
     ${soal.length ? h`<ol class="daftar-soal">${soal.map(function (s, i) {
       return h`<li class="soal-butir"><span class="nomor">${i + 1}</span>
-        <div><div class="pertanyaan ky">${kayaHtml(s.pertanyaan)}</div><div class="meta"><span class="lencana lencana-primer">${LABEL_JENIS_PENDEK[s.jenis]}</span><span class="lencana lencana-sukses">Kunci: ${kunciTeks(s)}</span></div></div>
+        <div><div class="pertanyaan ky">${kayaHtml(s.pertanyaan)}</div><div class="meta"><span class="lencana lencana-primer">${LABEL_JENIS_PENDEK[s.jenis]}</span><span class="lencana lencana-sukses">Kunci: ${kunciTeks(s)}</span>${s.kunciStatus === 'claude' ? h`<span class="lencana lencana-peringatan" data-uji="kunci-belum-diperiksa">${ikon('alert-triangle', 'ikon-sm')} Kunci tebakan Claude, belum diperiksa</span>` : ''}${s.pembahasan ? h`<span class="lencana lencana-info" data-uji="ada-pembahasan">Ada pembahasan</span>` : ''}</div></div>
         ${bisaUbahSoal ? h`<div class="aksi">
           <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="soal-geser" data-id="${s.id}" data-arah="naik" aria-label="Naikkan soal nomor ${i + 1}"${i === 0 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-up')}</button>
           <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="soal-geser" data-id="${s.id}" data-arah="turun" aria-label="Turunkan soal nomor ${i + 1}"${i === soal.length - 1 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-down')}</button>
           <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="soal-ubah" data-id="${s.id}" aria-label="Ubah soal nomor ${i + 1}">${ikon('edit')}</button>
           <button type="button" class="tombol tombol-bahaya-garis tombol-ikon" data-aksi="soal-hapus" data-id="${s.id}" aria-label="Hapus soal nomor ${i + 1}">${ikon('trash')}</button></div>` : ''}</li>`;
-    })}</ol>` : h`<div class="kartu kosong"><span class="ikon-bulat netral">${ikon('list')}</span><h3>Belum ada soal</h3><p>Tambahkan soal pilihan ganda, MCMA, atau Benar–Salah, atau ambil dari paket lain. Paket tanpa soal tidak bisa diterbitkan.</p>${bisaUbahSoal ? h`<div class="baris-bungkus"><button type="button" class="tombol tombol-garis" data-aksi="soal-ambil">${ikon('copy')}<span>Ambil dari paket lain</span></button>${pk.status === 'Draf' ? h`<button type="button" class="tombol tombol-garis" data-aksi="impor-buka" data-uji="im-buka-kosong">${ikon('upload')}<span>Impor dari DOCX (prototipe)</span></button>` : ''}</div>` : ''}</div>`}
+    })}</ol>` : h`<div class="kartu kosong"><span class="ikon-bulat netral">${ikon('list')}</span><h3>Belum ada soal</h3><p>Tambahkan soal pilihan ganda, MCMA, atau Benar–Salah, atau ambil dari paket lain. Paket tanpa soal tidak bisa diterbitkan.</p>${bisaUbahSoal ? h`<div class="baris-bungkus"><button type="button" class="tombol tombol-garis" data-aksi="soal-ambil">${ikon('copy')}<span>Ambil dari paket lain</span></button>${pk.status === 'Draf' ? h`<button type="button" class="tombol tombol-garis" data-aksi="impor-buka" data-uji="im-buka-kosong">${ikon('upload')}<span>Impor soal (prototipe)</span></button>` : ''}</div>` : ''}</div>`}
     ${adaPercobaan ? htmlPanelKoreksi(pk, soal, edSt.soalDibatalkan) : ''}`);
   if (adaJalurToken(pk)) muatPanelToken();
 }
@@ -6679,6 +6680,10 @@ function bukaFormSoal(s) {
       <div class="isian"><label id="so-tanya-l" for="so-tanya">Pertanyaan</label>${htmlIsianKaya({ nama: 'pertanyaan', id: 'so-tanya', labelId: 'so-tanya-l', nilai: s ? s.pertanyaan : '', placeholder: 'Tulis pertanyaan', fokusAwal: !baru, utama: true })}</div>
       <div id="soal-opsi">${htmlOpsiSoal(jenis, s ? s.opsi : [], s ? s.kunci : '')}</div>
       <div id="soal-status-kunci" aria-live="polite"></div>
+      ${s && s.kunciStatus === 'claude' ? h`<label class="saklar im-paham" data-uji="so-diperiksa-label"><input type="checkbox" id="so-diperiksa" name="kunci_diperiksa" data-uji="so-diperiksa"><span class="jalur"></span><span>Kunci sudah saya periksa. Kunci soal ini awalnya tebakan Claude, dan paket belum bisa diterbitkan sebelum Anda mencentang ini (atau mengubah kuncinya sendiri).</span></label>` : ''}
+      <div class="isian"><label for="so-pembahasan">Pembahasan <span class="opsional">(opsional)</span></label>
+        <textarea class="kontrol" id="so-pembahasan" name="pembahasan" rows="4" maxlength="1500" data-uji="so-pembahasan" placeholder="Penjelasan singkat jawaban yang benar">${s ? s.pembahasan || '' : ''}</textarea>
+        <p class="bantu">Tampil kepada siswa di halaman hasil, setelah ujian selesai dan hanya bila paket memakai tingkat hasil "penuh". Maksimal 1.500 karakter.</p></div>
     </form>`,
     aksi: [{ id: 'batal', label: 'Batal', gaya: 'diam' }, { id: 'simpan', label: 'Simpan soal', gaya: 'utama', tipe: 'submit', form: 'f-soal' }]
   });
@@ -6719,7 +6724,10 @@ KIRIM['soal-simpan'] = function (form) {
   const st = statusKunci(jenis, kunci);
   if (!st.ok) { perbaruiStatusKunci(form); toast(st.teks, 'galat'); return; }
   const id = form.getAttribute('data-id');
-  const data = { id_paket: edSt.paket.id, jenis: jenis, pertanyaan: tanya.nilai, stimulus: st1.nilai, opsi: opsi, kunci: kunci };
+  const pem = el('#so-pembahasan', form);
+  const data = { id_paket: edSt.paket.id, jenis: jenis, pertanyaan: tanya.nilai, stimulus: st1.nilai, opsi: opsi, kunci: kunci, pembahasan: pem ? pem.value : '' };
+  const dip = el('#so-diperiksa', form);
+  if (dip && dip.checked) data.kunci_diperiksa = true;
   if (id) data.id_soal = id;
   form.setAttribute('data-sibuk', 'ya');
   kerjakan(tombolKirim(form), function () {
@@ -8344,7 +8352,10 @@ KIRIM['kr-hitung-ulang'] = function (form) {
 };
 
 
-const imSt = { tahap: 'pilih', idPaket: '', berkas: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false };
+const imSt = { tahap: 'pilih', idPaket: '', berkas: null, teks: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false };
+const IM_TEKS_MAKS = 300000;
+const IM_STIMULUS_MAKS = 5000;
+const IM_PEMBAHASAN_MAKS = 1500;
 const IM_UNGGAH_BYTE_MAKS = 5 * 1048576;
 const IM_PERTANYAAN_MAKS = 2000;
 const IM_OPSI_MAKS = 500;
@@ -8357,10 +8368,18 @@ function imBuatModel(x) {
   const s = {
     no: x.no, jenis: x.jenis || '', pertanyaan: x.pertanyaan || '', opsi: (x.opsi || []).slice(),
     kunciPg: x.kunci || '', kunciBs: [bs[0] || '', bs[1] || '', bs[2] || ''],
-    catatan: x.catatan || [], gambar: !!x.gambar, rumus: !!x.rumus, dariTabel: !!x.dariTabel, duplikat: x.duplikat || '', dipilih: false
+    catatan: x.catatan || [], gambar: !!x.gambar, rumus: !!x.rumus, dariTabel: !!x.dariTabel, duplikat: x.duplikat || '', dipilih: false,
+    dariFormat: !!x.dariFormat, stimulus: x.stimulus || '', pembahasan: x.pembahasan || '', kunciSumber: x.kunciSumber || '', keyakinan: x.keyakinan || ''
   };
+  s.kunciAsli = imKunciSekarang(s);
   s.dipilih = !!x.lengkap && !x.duplikat && !s.catatan.length;
   return s;
+}
+function imKunciSekarang(s) { return s.jenis === 'PG' ? s.kunciPg : s.kunciBs.slice(0, 3).join(','); }
+function imKunciStatus(s) {
+  if (s.kunciSumber === 'dokumen') return 'dokumen';
+  if (s.kunciSumber === 'claude' && imKunciSekarang(s) === s.kunciAsli) return 'claude';
+  return '';
 }
 function imJumlahButir(s) { return s.jenis === 'PG' ? 4 : 3; }
 function imOpsiN(s) { const n = imJumlahButir(s); const o = []; for (let i = 0; i < n; i++) o.push(s.opsi[i] || ''); return o; }
@@ -8372,6 +8391,8 @@ function imKurang(s) {
   const p = s.pertanyaan.trim();
   if (p.length < 3) k.push('Isi pertanyaan (minimal 3 karakter).');
   else if (p.length > IM_PERTANYAAN_MAKS) k.push('Pertanyaan terlalu panjang (maksimal ' + formatAngka(IM_PERTANYAAN_MAKS) + ' karakter).');
+  if (s.stimulus.trim().length > IM_STIMULUS_MAKS) k.push('Bacaan terlalu panjang (maksimal ' + formatAngka(IM_STIMULUS_MAKS) + ' karakter).');
+  if (s.pembahasan.trim().length > IM_PEMBAHASAN_MAKS) k.push('Pembahasan terlalu panjang (maksimal ' + formatAngka(IM_PEMBAHASAN_MAKS) + ' karakter).');
   imOpsiN(s).forEach(function (t, i) {
     const x = t.trim();
     if (!x) k.push(imNamaButir(s, i) + ' masih kosong.');
@@ -8394,21 +8415,27 @@ function imRuang() { return imSt.hasil ? imSt.hasil.ruang : 0; }
 function imBentukKirim(s) {
   return {
     no: s.no, jenis: s.jenis, pertanyaan: s.pertanyaan.trim(), opsi: imOpsiN(s).map(function (t) { return t.trim(); }),
-    kunci: s.jenis === 'PG' ? s.kunciPg : s.kunciBs.slice(0, 3).join(',')
+    kunci: imKunciSekarang(s), stimulus: s.stimulus.trim(), pembahasan: s.pembahasan.trim(), kunciStatus: imKunciStatus(s)
   };
 }
 
 function htmlImPilih(pk) {
   return h`<div class="peringatan peringatan-waspada jarak-bawah" data-uji="im-prototipe">${ikon('alert-triangle')}<div>
-      <p><strong>Fitur prototipe.</strong> Pembaca dokumen ini baru diuji dengan dokumen contoh buatan pengembang, jadi ketepatannya pada dokumen Anda belum diketahui. Karena itu <strong>tidak ada soal yang tersimpan sebelum Anda memeriksanya satu per satu</strong>, dan kunci jawaban tidak pernah ditebak.</p></div></div>
+      <p><strong>Fitur prototipe.</strong> Pembaca dokumen ini baru diuji dengan dokumen contoh buatan pengembang, jadi ketepatannya pada dokumen Anda belum diketahui. Karena itu <strong>tidak ada soal yang tersimpan sebelum Anda memeriksanya satu per satu</strong>, dan kunci jawaban tidak pernah ditebak oleh aplikasi. Pada berkas teks hasil konversi Claude, kunci yang dikarang Claude ditandai sebagai tebakan dan harus Anda periksa sebelum paket diterbitkan.</p></div></div>
     <form id="f-impor" novalidate>
       <div data-galat aria-live="polite"></div>
-      <div class="isian"><label for="im-berkas">Pilih berkas Word (.docx)</label>
-        <input class="kontrol" id="im-berkas" name="berkas" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-masuk="im-berkas" aria-describedby="im-berkas-b">
-        <p class="bantu" id="im-berkas-b">Hanya .docx, maksimal ${formatAngka(IM_UNGGAH_BYTE_MAKS / 1048576)} MB. Dokumen dengan kata sandi, makro, atau objek tertanam ditolak. Hasil impor masuk ke paket <strong>${pk.nama}</strong> (${MAPEL[pk.mapel] || pk.mapel}) sebagai soal baru di urutan paling akhir.</p></div>
+      <div class="isian"><label for="im-berkas">Pilih berkas</label>
+        <input class="kontrol" id="im-berkas" name="berkas" type="file" accept=".txt,.md,text/plain,text/markdown,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-masuk="im-berkas" aria-describedby="im-berkas-b">
+        <p class="bantu" id="im-berkas-b"><strong>Cara yang disarankan:</strong> kirim dokumen soal Anda ke Claude dengan skill konversi soal Siap TKA SD, lalu unggah berkas <strong>.txt</strong> hasilnya di sini (maksimal ${formatAngka(IM_TEKS_MAKS)} karakter). Bacaan, jenis soal, kunci, dan pembahasan ikut terbaca. Berkas Word (.docx) langsung juga masih bisa, maksimal ${formatAngka(IM_UNGGAH_BYTE_MAKS / 1048576)} MB, tetapi pembacanya kurang pintar. Hasil impor masuk ke paket <strong>${pk.nama}</strong> (${MAPEL[pk.mapel] || pk.mapel}) sebagai soal baru di urutan paling akhir.</p></div>
       <div id="im-pilihan" class="pb-pilihan" aria-live="polite"></div>
     </form>
-    <details class="im-panduan" data-uji="im-panduan"><summary>Format dokumen yang dikenali</summary>
+    <details class="im-panduan" data-uji="im-panduan-teks"><summary>Tentang berkas teks hasil konversi Claude</summary>
+      <ul>
+        <li>Baris pertama harus <code>#FORMAT-IMPOR v1</code>. Berkas lain ditolak dengan pesan yang jelas.</li>
+        <li>Kunci yang tertulis di dokumen asli ditandai <strong>dari dokumen</strong>. Kunci yang dikarang Claude ditandai <strong>tebakan Claude</strong>: tetap bisa diimpor, tetapi paket <strong>tidak bisa diterbitkan</strong> sebelum Anda memeriksa tiap soalnya dan mencentang "Kunci sudah saya periksa" di editor soal.</li>
+        <li>Pembahasan dari Claude juga perlu Anda baca dulu; siswa melihatnya di halaman hasil.</li>
+        <li>Gambar tidak ikut. Soal yang memerlukan gambar diberi catatan, dan gambarnya Anda tambahkan lewat editor soal.</li></ul></details>
+    <details class="im-panduan" data-uji="im-panduan"><summary>Format dokumen Word yang dikenali</summary>
       <ul>
         <li>Nomor soal di awal baris: <code>1.</code> atau <code>1)</code>, berurutan. Penomoran otomatis Word ikut dibaca.</li>
         <li>Pilihan ganda: empat opsi <code>A.</code> sampai <code>D.</code> (boleh <code>a)</code> atau <code>(B)</code>, boleh satu baris).</li>
@@ -8424,6 +8451,7 @@ MASUKAN['im-berkas'] = function (r, e) {
   const kotak = el('#im-pilihan', form);
   bersihGalat(form);
   imSt.berkas = null;
+  imSt.teks = null;
   const nomor = ++imSt.urut;
   const file = r.files && r.files[0];
   if (!file) { pasang(kotak, h``); return; }
@@ -8434,11 +8462,29 @@ MASUKAN['im-berkas'] = function (r, e) {
     pasang(kotak, h``);
     galatIsian(form, 'berkas', pesan);
   };
+  if (/\.(txt|md)$/i.test(file.name)) {
+    if (file.size === 0) { tolak('Berkas ini kosong.'); return; }
+    if (file.size > IM_TEKS_MAKS * 4) { tolak('Berkas teks terlalu besar (' + gbUkuranTeks(file.size) + '). Pecah menjadi beberapa berkas, maksimal ' + formatAngka(IM_TEKS_MAKS) + ' karakter.'); return; }
+    pasang(kotak, h`<p class="bantu"><span class="spinner" aria-hidden="true"></span> Memeriksa berkas…</p>`);
+    const bacaTeks = new FileReader();
+    bacaTeks.onerror = function () { tolak('Berkas tidak bisa dibaca. Coba pilih lagi.'); };
+    bacaTeks.onload = function () {
+      if (nomor !== imSt.urut) return;
+      const isi = String(bacaTeks.result || '');
+      if (isi.length > IM_TEKS_MAKS) { tolak('Berkas teks berisi ' + formatAngka(isi.length) + ' karakter; batasnya ' + formatAngka(IM_TEKS_MAKS) + '. Pecah menjadi beberapa berkas.'); return; }
+      if (isi.replace(/^\uFEFF/, '').trimStart().slice(0, 15).toUpperCase().indexOf('#FORMAT-IMPOR') !== 0) { tolak('Berkas ini bukan format impor Siap TKA SD (baris pertamanya harus #FORMAT-IMPOR v1). Buat berkasnya lewat skill konversi soal di Claude.'); return; }
+      imSt.berkas = file;
+      imSt.teks = isi;
+      pasang(kotak, h`<p class="bantu pb-dipilih" data-uji="im-dipilih">${ikon('file-text', 'ikon-sm')} <strong>${file.name}</strong> · berkas teks format impor · ${formatAngka(isi.length)} karakter</p>`);
+    };
+    bacaTeks.readAsText(file, 'utf-8');
+    return;
+  }
   if (!/\.docx$/i.test(file.name)) {
     tolak(/\.docm$/i.test(file.name) ? 'Berkas .docm (berpotensi bermakro) tidak diterima. Simpan sebagai .docx biasa.'
       : /\.doc$/i.test(file.name) ? 'Format .doc lama belum didukung. Buka di Word lalu simpan sebagai .docx.'
         : /\.pdf$/i.test(file.name) ? 'Impor dari PDF belum tersedia pada prototipe ini. Gunakan berkas .docx.'
-          : 'Hanya berkas .docx yang dapat diimpor.');
+          : 'Hanya berkas .txt (hasil konversi Claude) atau .docx yang dapat diimpor.');
     return;
   }
   if (file.size === 0) { tolak('Berkas ini kosong.'); return; }
@@ -8492,8 +8538,10 @@ function htmlImBadanKartu(s, i) {
   return h`${htmlImSelectJenis(i, s)}
     ${bantuJenis}
     ${s.jenis && s.opsi.length > n ? h`<p class="bantu tanpa-margin" data-uji="im-lebih">Dokumen punya ${formatAngka(s.opsi.length)} butir; hanya ${formatAngka(n)} pertama yang disimpan untuk jenis ini.</p>` : ''}
+    ${s.dariFormat ? h`<div class="isian"><label for="im-st-${i}">Bacaan atau konteks <span class="opsional">(opsional)</span></label><textarea class="kontrol" id="im-st-${i}" rows="4" data-masuk="impor-isi" data-i="${i}" data-bidang="stimulus" data-uji="im-stimulus">${s.stimulus}</textarea></div>` : ''}
     <div class="isian"><label for="im-p-${i}">Pertanyaan</label><textarea class="kontrol" id="im-p-${i}" rows="3" data-masuk="impor-isi" data-i="${i}" data-bidang="pertanyaan" data-uji="im-pertanyaan">${s.pertanyaan}</textarea></div>
-    ${butir}`;
+    ${butir}
+    ${s.dariFormat ? h`<div class="isian"><label for="im-pb-${i}">Pembahasan <span class="opsional">(opsional, tampil ke siswa setelah ujian)</span></label><textarea class="kontrol" id="im-pb-${i}" rows="3" data-masuk="impor-isi" data-i="${i}" data-bidang="pembahasan" data-uji="im-pembahasan">${s.pembahasan}</textarea></div>` : ''}`;
 }
 
 function htmlImStatus(s) {
@@ -8547,7 +8595,7 @@ function imPerbaruiKaki() {
   if (!ulang || !utama) return;
   if (imSt.tahap === 'pilih') {
     ulang.hidden = true;
-    utama.textContent = 'Periksa dokumen';
+    utama.textContent = 'Periksa berkas';
     utama.removeAttribute('aria-disabled');
     return;
   }
@@ -8593,6 +8641,8 @@ MASUKAN['impor-isi'] = function (t) {
     s.dipilih = t.checked && imLengkap(s);
     if (t.checked && !s.dipilih) t.checked = false;
   } else if (bidang === 'pertanyaan') s.pertanyaan = t.value;
+  else if (bidang === 'stimulus') s.stimulus = t.value;
+  else if (bidang === 'pembahasan') s.pembahasan = t.value;
   else if (bidang === 'opsi') s.opsi[k] = t.value;
   else if (bidang === 'kunciPg') s.kunciPg = t.value;
   else if (bidang === 'kunciBs') s.kunciBs[k] = t.value;
@@ -8637,7 +8687,7 @@ AKSI['impor-kosongkan'] = function () {
 
 function imKePilih() {
   const api = imSt.modal; if (!api) return;
-  Object.assign(imSt, { tahap: 'pilih', berkas: null, hasil: null, soal: [], kotor: false });
+  Object.assign(imSt, { tahap: 'pilih', berkas: null, teks: null, hasil: null, soal: [], kotor: false });
   imSt.urut++;
   api.ganti(htmlImPilih(edSt.paket));
   imPerbaruiKaki();
@@ -8655,11 +8705,12 @@ function imAnalisis(tombol) {
   if (!form) return;
   bersihGalat(form);
   const file = imSt.berkas;
-  if (!file) { galatIsian(form, 'berkas', 'Pilih berkas .docx dulu.'); return; }
+  if (!file) { galatIsian(form, 'berkas', 'Pilih berkas dulu.'); return; }
   kerjakan(tombol, function () {
-    return gbBase64(file).then(function (b64) {
-      return panggil('impor.analisis', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), data: b64 });
-    }).then(function (d) {
+    const minta = imSt.teks !== null
+      ? panggil('impor.teks', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), teks: imSt.teks })
+      : gbBase64(file).then(function (b64) { return panggil('impor.analisis', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), data: b64 }); });
+    return minta.then(function (d) {
       if (!imSt.modal) return;
       imSt.hasil = d;
       imSt.soal = d.soal.map(imBuatModel);
@@ -8679,14 +8730,15 @@ function imAnalisis(tombol) {
 
 function imSimpan(tombol) {
   const pilih = imDipilih();
-  const muatan = { id_paket: imSt.idPaket, nama: pbNamaKirim(imSt.berkas ? imSt.berkas.name : 'impor.docx'), soal: pilih.map(imBentukKirim) };
+  const muatan = { id_paket: imSt.idPaket, nama: pbNamaKirim(imSt.berkas ? imSt.berkas.name : 'impor'), soal: pilih.map(imBentukKirim) };
   const wadahGalat = el('#im-galat');
   if (wadahGalat) pasang(wadahGalat, h``);
   kerjakan(tombol, function () {
     return panggil('impor.simpan', muatan).then(function (r) {
       imSt.kotor = false;
       if (imSt.modal) imSt.modal.tutup('disimpan');
-      toast(formatAngka(r.tersimpan) + ' soal diimpor sebagai Draf. Periksa sekali lagi di daftar soal sebelum menerbitkan.', 'sukses');
+      const tebakan = muatan.soal.filter(function (x) { return x.kunciStatus === 'claude'; }).length;
+      toast(formatAngka(r.tersimpan) + ' soal diimpor sebagai Draf.' + (tebakan ? ' ' + formatAngka(tebakan) + ' di antaranya berkunci tebakan Claude dan harus Anda periksa dulu sebelum paket bisa diterbitkan.' : ' Periksa sekali lagi di daftar soal sebelum menerbitkan.'), 'sukses');
       return segarkanEditor();
     });
   }).catch(function (e) {
@@ -8703,15 +8755,15 @@ function imSimpan(tombol) {
 AKSI['impor-buka'] = function () {
   const pk = edSt.paket;
   if (!pk || pk.status !== 'Draf') return;
-  Object.assign(imSt, { tahap: 'pilih', idPaket: pk.id, berkas: null, hasil: null, soal: [], kotor: false });
+  Object.assign(imSt, { tahap: 'pilih', idPaket: pk.id, berkas: null, teks: null, hasil: null, soal: [], kotor: false });
   imSt.urut++;
   const api = modal({
-    judul: 'Impor soal dari DOCX (prototipe)', lebar: true,
+    judul: 'Impor soal (prototipe)', lebar: true,
     badan: htmlImPilih(pk),
     aksi: [
       { id: 'tutup', label: 'Tutup', gaya: 'diam' },
       { id: 'ulang', label: 'Pilih berkas lain', gaya: 'garis', onKlik: function () { imKePilih(); } },
-      { id: 'utama', label: 'Periksa dokumen', gaya: 'utama', onKlik: function (a, tombol) { if (imSt.tahap === 'pilih') imAnalisis(tombol); else imSimpan(tombol); } }
+      { id: 'utama', label: 'Periksa berkas', gaya: 'utama', onKlik: function (a, tombol) { if (imSt.tahap === 'pilih') imAnalisis(tombol); else imSimpan(tombol); } }
     ]
   });
   imSt.modal = api;

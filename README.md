@@ -1,6 +1,6 @@
 # Siap TKA SD — frontend (GitHub Pages)
 
-Versi aplikasi: 1.6.4-t6.4
+Versi aplikasi: 1.7.0-t7.0
 
 Berkas-berkas ini adalah **frontend statis** Siap TKA SD. Backend-nya (Google Apps Script) dikirim terpisah dan **tidak** ada di repository ini.
 
