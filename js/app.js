@@ -2916,6 +2916,22 @@ function renderUjian(p, c) {
 }
 AKSI['ke-dasbor'] = function () { navigateTo('dasbor', {}, { tanpaRiwayat: true }); };
 
+function pastikanGambarUjian(ref) {
+  if (ref.pulihGambar) return;
+  let hilang = false;
+  const lihat = function (v) {
+    if (hilang || typeof v !== 'string' || v.indexOf('"img"') === -1) return;
+    Kaya.gambar(v).forEach(function (id) { if (!mediaInfo(id)) hilang = true; });
+  };
+  ref.soal.forEach(function (s) { lihat(s.stimulus); lihat(s.pertanyaan); (Array.isArray(s.opsi) ? s.opsi : []).forEach(lihat); });
+  if (!hilang) return;
+  ref.pulihGambar = true;
+  panggilLangsung('ujian.muat', { id_percobaan: ref.id }, { ulang: true, senyap: true }).then(function () {
+    if (UJ !== ref || ref.mati || ref.selesai) return;
+    gambarSoal();
+  }).catch(function () {   });
+}
+
 function mulaiLayarUjian(m, c) {
   bersihUjian();
   bersihkanCadanganLama();
@@ -2960,6 +2976,7 @@ function mulaiLayarUjian(m, c) {
   lpPerbaruiTombol();
   ref.tTik = setInterval(tik, 500);
   jadwalSimpan();
+  pastikanGambarUjian(ref);
   const judul = el('#uj-judul'); if (judul) { try { judul.focus({ preventScroll: true }); } catch (e) {   } }
 }
 
