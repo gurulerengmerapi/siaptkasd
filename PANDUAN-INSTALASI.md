@@ -1,6 +1,6 @@
-# Siap TKA SD T6.2 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
+# Siap TKA SD T6.3 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
 
-Versi aplikasi: `1.6.2-t6.2` (skema data 8, sama dengan T5 dan T6; **tidak ada migrasi data**).
+Versi aplikasi: `1.6.3-t6.3` (skema data 8, sama dengan T5 dan T6; **tidak ada migrasi data**).
 
 > **Sudah memasang T6?** Lompat ke bagian **"Mulai di sini bila T6 sudah terpasang"** di bawah (langkah U1–U8). Bagian 0 dan A–H ditujukan untuk pemasangan pertama dari T5 dan tetap berlaku sebagai rujukan.
 
@@ -24,14 +24,14 @@ Panduan ini untuk Anda yang **belum pernah memakai Git/GitHub**. Anda tidak perl
 
 ---
 
-## Mulai di sini bila T6.1 sudah terpasang: perbarui ke T6.2 (± 15 menit)
+## Mulai di sini bila T6.2 (atau T6.1) sudah terpasang: perbarui ke T6.3 (± 15 menit)
 
-T6.2 hanya mengubah **masa berlaku kode ujian (token)**: batas maksimal kini **1 tahun** (sebelumnya 120 hari), dan di kotak *Buat kode ujian* ada pilihan baru **Aktif selamanya** (tanpa masa berlaku). Kode lama tetap berlaku seperti biasa. **Skema data tidak berubah dan tidak ada migrasi**; `appsscript.json` juga **tidak berubah**, jadi tidak perlu ditempel ulang. Yang diganti hanya `Kode.gs` (backend) dan isi situs (tampilan).
+T6.3 hanya mengubah **tampilan**: (1) di beranda, paragraf di atas banner dihapus sehingga banner naik dan tampak lebih besar; (2) banner tidak lagi punya bilah kendali di bawahnya (tombol sebelumnya/berikutnya, titik, dan tombol jeda dihapus); sebagai gantinya ada dua **panah kecil** di kiri dan kanan banner yang muncul saat kursor berada di atas banner (di layar sentuh panah selalu tampak samar, dan geser dengan jari tetap bisa); (3) di halaman mengerjakan soal, dua baris menu atas digabung menjadi **satu baris ramping**, dan bilah tombol bawah dibuat lebih tipis, supaya area soal lebih luas; (4) soal **tanpa teks bacaan** kini memakai seluruh lebar halaman, dengan batang gulir di tepi kanan. **Skema data tidak berubah dan tidak ada migrasi**; `appsscript.json` juga **tidak berubah**. Di `Kode.gs` hanya nomor versi yang berganti, jadi langkah U2–U4 sebenarnya hanya menyamakan nomor versi; situs tetap berjalan bila Anda hanya memperbarui situs (U5–U6), tetapi sebaiknya kerjakan semuanya supaya nomor versinya sama. Bila Anda masih di T6.1, langkah yang sama bekerja (ZIP berisi seluruh situs; `Kode.gs` yang baru juga memuat perubahan T6.2: masa berlaku kode ujian sampai 1 tahun dan pilihan *Aktif selamanya*).
 
 Kerjakan berurutan, satu langkah satu waktu. Alamat `/exec` Anda **tidak berubah**, jadi `js/config.js` tidak perlu diisi ulang (langkah U5 menjaganya).
 
 ### U1. Buat backup dulu
-Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang** → tunggu **Terverifikasi**. (Jaring pengaman saja; T6.2 tidak mengubah isi data.)
+Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang** → tunggu **Terverifikasi**. (Jaring pengaman saja; T6.3 tidak mengubah isi data.)
 
 ### U2. Ganti kode backend (`Kode.gs`)
 1. Buka berkas `Kode.gs` yang baru dengan Notepad (Mac: TextEdit, teks polos). Jangan memakai Word.
@@ -43,15 +43,15 @@ Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang**
 ### U3. Terapkan sebagai versi baru dari penerapan yang sama
 1. **Terapkan** (Deploy) → **Kelola penerapan** (Manage deployments).
 2. Klik ikon **pensil** pada penerapan Anda yang aktif.
-3. Pada **Versi** (Version) pilih **Versi baru** (New version). Deskripsi boleh `T6.2`.
+3. Pada **Versi** (Version) pilih **Versi baru** (New version). Deskripsi boleh `T6.3`.
 4. Klik **Terapkan** (Deploy).
 
 URL `/exec` tetap sama. **Jalan mundur:** versi sebelumnya tetap tersimpan di riwayat; lihat U8.
 
 ### U4. Periksa backend langsung di peramban
-Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.6.2-t6.2"`:
+Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.6.3-t6.3"`:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.2-t6.2","api":true},"message":"OK"}
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.3-t6.3","api":true},"message":"OK"}
 ```
 Bila `versi` masih `1.6.0-t6`, penerapan belum memakai versi baru: ulangi U3 dan pastikan Anda memilih **Versi baru**.
 
@@ -63,7 +63,7 @@ Folder situs lama Anda (tempat dulu `git init`) adalah yang tersambung ke GitHub
 Copy-Item -Path "$HOME\siap-tka-sd-situs\js\config.js" -Destination "$HOME\config-simpanan.js" -Force
 ```
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.2-t6.2.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.3-t6.3.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
 ```
 ```powershell
 Copy-Item -Path "$HOME\siap-tka-sd-situs-baru\*" -Destination "$HOME\siap-tka-sd-situs" -Recurse -Force
@@ -77,7 +77,7 @@ Copy-Item -Path "$HOME\config-simpanan.js" -Destination "$HOME\siap-tka-sd-situs
 cp ~/siap-tka-sd-situs/js/config.js ~/config-simpanan.js
 ```
 ```bash
-mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.2-t6.2.zip -d ~/siap-tka-sd-situs-baru
+mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.3-t6.3.zip -d ~/siap-tka-sd-situs-baru
 ```
 ```bash
 cp -R ~/siap-tka-sd-situs-baru/. ~/siap-tka-sd-situs/
@@ -116,30 +116,32 @@ Di folder situs yang sama, tiga perintah, satu per satu:
 git add .
 ```
 ```bash
-git commit -m "Pembaruan T6.2"
+git commit -m "Pembaruan T6.3"
 ```
 ```bash
 git push
 ```
 GitHub Pages memperbarui dalam 1–2 menit (lihat tab **Actions** di repo sampai ✓ hijau). Buka situs lalu tekan **Ctrl+Shift+R** (Mac: **Cmd+Shift+R**). Bila `git push` meminta tanda pengenal dan token lama sudah kedaluwarsa, buat token baru seperti B8g.
 
-### U7. Uji T6.2 (hanya perlu beberapa menit)
-Hasil ini belum pernah dicoba di Google dan GitHub asli; kirimkan tangkapan layar bila ada yang tidak sesuai.
+### U7. Uji T6.3 (hanya perlu beberapa menit)
+Hasil ini belum pernah dicoba di Google dan GitHub asli, dan tampilannya baru saya lihat di Chromium tanpa kepala; kirimkan tangkapan layar bila ada yang tidak sesuai.
 
 | No | Uji | Yang benar | Hasil Anda |
 |---|---|---|---|
-| 1 | Buka alamat `/exec` | `"versi":"1.6.2-t6.2"` | |
-| 2 | Editor paket (paket berstatus Terbit, jalur Token atau Keduanya) → **Buat kode ujian**. Biarkan tanggal bawaan | Kode dibuat; tertulis "Berlaku sampai …" | |
-| 3 | Buat kode lagi, centang **Aktif selamanya** (kotak tanggal menjadi abu-abu) | Kode dibuat; di daftar tertulis **Aktif selamanya**, statusnya *Aktif* | |
-| 4 | Pakai kode "Aktif selamanya" itu di halaman **Ujian dengan kode** | Ujian bisa dimulai seperti biasa | |
-| 5 | Buat kode dengan tanggal lebih dari 1 tahun dari sekarang (tanpa mencentang) | Ditolak dengan pesan "Masa berlaku maksimal 1 tahun…" | |
-| 6 | Cabut kode "Aktif selamanya" lewat tombol **Cabut** | Status berubah menjadi *Dicabut*; kode tidak bisa dipakai lagi | |
+| 1 | Buka alamat `/exec` | `"versi":"1.6.3-t6.3"` | |
+| 2 | Buka beranda (tekan **Ctrl+Shift+R** dulu) | Di bawah judul besar tidak ada lagi paragraf "Bahasa Indonesia, Matematika, dan IPA dalam satu tempat…"; banner langsung di bawah judul | |
+| 3 | Arahkan kursor ke banner | Dua panah bulat kecil muncul di kiri dan kanan banner; tidak ada lagi bilah titik dan tombol jeda di bawah banner | |
+| 4 | Klik panah kanan lalu kiri | Banner berganti ke yang berikutnya lalu kembali; saat kursor di atas banner, banner tidak berganti sendiri | |
+| 5 | Masuk sebagai siswa, mulai ujian (paket yang soalnya punya teks bacaan) | Menu atas satu baris: Soal nomor, Ukuran font (A A A), status simpan, Informasi Soal, Sisa Waktu, Daftar Soal, tombol layar penuh; tombol bawah (Sebelumnya, Ragu-ragu, Berikutnya) lebih tipis | |
+| 6 | Pindah ke soal yang **tidak** punya teks bacaan (mis. tabel Benar/Salah) | Isi soal memenuhi seluruh lebar; tidak ada ruang kosong di kanan; batang gulir (bila ada) di tepi kanan kartu | |
+| 7 | Ulangi no. 5 dan 6 di layar HP | Menu atas membungkus menjadi beberapa baris yang rapi; tidak ada yang terpotong | |
+| 8 | Tekan tombol layar penuh (ikon di kanan atas menu) | Masuk dan keluar layar penuh seperti di T6.1; bila layar Anda lebih sempit dari 1500 px, tombolnya hanya ikon (nama muncul saat kursor diam di atasnya) | |
 
-### U8. Jalan mundur dari T6.2 ke T6.1
-Data tidak perlu dipulihkan: skemanya sama. Kode yang dibuat dengan "Aktif selamanya" tetap tersimpan, tetapi T6.1 tidak mengenal pilihan itu: tampilan tanggalnya di T6.1 bisa kosong atau janggal (belum dicoba). Bila Anda berniat mundur, cabut dulu kode semacam itu lewat tombol **Cabut**.
+### U8. Jalan mundur dari T6.3 ke T6.2
+Data tidak perlu dipulihkan: skemanya sama. 
 
-- **Backend:** **Terapkan → Kelola penerapan →** ikon pensil **→ Versi** → pilih nomor versi yang dulu aktif (versi sebelum yang dibuat di U3) **→ Terapkan**. (Bila daftar versi tidak menampilkannya, tempel `Kode.gs` T6.1 lama lalu ulangi U3.) Tampilan Google bisa berbeda sedikit dari uraian ini; yang dicari adalah *maksud* tombolnya.
-- **Situs:** ulangi U5 dan U6 memakai ZIP T6.1 yang lama (`siap-tka-sd-situs-1.6.1-t6.1.zip`).
+- **Backend:** **Terapkan → Kelola penerapan →** ikon pensil **→ Versi** → pilih nomor versi yang dulu aktif (versi sebelum yang dibuat di U3) **→ Terapkan**. (Bila daftar versi tidak menampilkannya, tempel `Kode.gs` T6.2 lama lalu ulangi U3.) Tampilan Google bisa berbeda sedikit dari uraian ini; yang dicari adalah *maksud* tombolnya.
+- **Situs:** ulangi U5 dan U6 memakai ZIP T6.2 yang lama (`siap-tka-sd-situs-1.6.2-t6.2.zip`).
 
 ---
 
@@ -160,8 +162,8 @@ Data tidak perlu dipulihkan: skemanya sama. Kode yang dibuat dengan "Aktif selam
 |---|---|
 | `Kode.gs` | Ditempel ke editor Apps Script (bagian A). Berkas terpisah, **bukan** di dalam ZIP. |
 | `appsscript.json` | Ditempel ke manifes proyek Apps Script (bagian A). **Bukan** di dalam ZIP. |
-| `siap-tka-sd-situs-1.6.2-t6.2.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
-| `siap-tka-sd-uji-beban-1.6.1-t6.1.zip` (tidak berubah di T6.2) | Alat uji beban (dijalankan di komputer; `README.md` di dalamnya). Tidak dipasang ke Apps Script atau GitHub. |
+| `siap-tka-sd-situs-1.6.3-t6.3.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
+| `siap-tka-sd-uji-beban-1.6.1-t6.1.zip` (tidak berubah di T6.3) | Alat uji beban (dijalankan di komputer; `README.md` di dalamnya). Tidak dipasang ke Apps Script atau GitHub. |
 | `PANDUAN-MIGRASI-GITHUB.md` | Panduan ini (salinannya juga ada di dalam ZIP, bernama `PANDUAN-INSTALASI.md`). |
 
 **Isian Anda** — siapkan Notepad (atau Catatan) dan catat nilai-nilai ini begitu Anda memperolehnya. Nanti tinggal disalin dari catatan itu.
@@ -259,12 +261,12 @@ Buka tab peramban baru, tempel URL `/exec` tadi (dari catatan), Enter. Yang bena
 
 Harus muncul:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.2-t6.2","api":true},"message":"OK"}
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.6.3-t6.3","api":true},"message":"OK"}
 ```
 
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
-| JSON dengan `"versi":"1.6.2-t6.2"` | Benar | Lanjut ke B |
+| JSON dengan `"versi":"1.6.3-t6.3"` | Benar | Lanjut ke B |
 | Halaman login Google | Akses bukan "Siapa saja" | Buat penerapan baru dengan akses **Siapa saja** (A6) |
 | Tampilan aplikasi T5 yang lama | Itu URL penerapan lama | Pakai URL dari penerapan **baru** |
 | `"versi":"1.5.0-t5"` atau halaman galat | Kode baru belum terpasang di penerapan itu | Ulangi A4 lalu A6 |
@@ -337,7 +339,7 @@ Harus muncul: nama dan email yang baru Anda ketik, masing-masing satu baris.
 
 **[Windows] Cara 1: dengan perintah** (bila ZIP ada di folder Downloads dan Windows Anda tidak memakai OneDrive untuk Downloads). Dua kotak, satu per satu.
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.2-t6.2.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.6.3-t6.3.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
 ```
 ```powershell
 cd "$HOME\siap-tka-sd-situs"
@@ -350,7 +352,7 @@ cd "$HOME\siap-tka-sd-situs"
 
 **[Mac / Linux] Cara 1: dengan perintah** (bila ZIP ada di `Downloads`). Satu kotak.
 ```bash
-mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.2-t6.2.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
+mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.6.3-t6.3.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
 ```
 Tidak ada keluaran bila berhasil.
 
@@ -447,7 +449,7 @@ find . -name "*.gs" -o -name "appsscript.json"
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
 | `index.html`, `css`, `js` terlihat | Benar | Lanjut ke B8 |
-| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.6.2-t6.2`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
+| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.6.3-t6.3`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
 | `index.html` tidak ada sama sekali | Salah folder, atau ekstraksi gagal | Ulangi B5 |
 | Berkas `.gs` atau `appsscript.json` muncul | Bukan milik frontend | Pindahkan keluar dari folder ini |
 

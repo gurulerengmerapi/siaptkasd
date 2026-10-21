@@ -1896,7 +1896,6 @@ function renderBeranda(p, c) {
           <div class="hero-teks">
             <span class="lencana lencana-primer">${ikon('target', 'ikon-sm')} Latihan TKA SD</span>
             <h1 id="judul-hero" tabindex="-1" class="jarak-atas-kecil">Latihan TKA SD yang <em>rapi, terukur,</em> dan mudah dipantau</h1>
-            <p class="lead">Bahasa Indonesia, Matematika, dan IPA dalam satu tempat. Guru menyusun paket soal, siswa memiliki akun pribadi, dan setiap perubahan penting tercatat.</p>
           </div>
           <div class="hero-banner" id="bn-wadah" data-uji="banner-wadah">${ruangBanner()}</div>
           <div class="hero-form">${htmlKartuMulai()}</div>
@@ -2060,14 +2059,8 @@ function htmlBanner(daftar, o) {
         ${b.judul || b.teks || tautan ? h`<div class="banner-teks">${b.judul ? h`<h3>${b.judul}</h3>` : ''}${b.teks ? h`<p>${b.teks}</p>` : ''}${tautan ? h`<a class="tombol tombol-garis tombol-kecil" href="${tautan}" target="_blank" rel="noopener noreferrer" data-uji="banner-tautan">${b.labelTautan || 'Buka tautan'}${ikon('external-link', 'ikon-sm')}<span class="sr-only"> (dibuka di tab baru)</span></a>` : ''}</div>` : ''}
       </article>`;
     })}</div>
-    ${banyak ? h`<div class="banner-kendali">
-      <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="bn-sebelumnya" aria-label="Banner sebelumnya">${ikon('chevron-left')}</button>
-      <div class="banner-titik" role="group" aria-label="Pilih banner">${adaGambar.map(function (b, i) {
-        return h`<button type="button" class="banner-titik-btn" data-aksi="bn-ke" data-no="${i}" aria-label="${'Tampilkan banner ' + (i + 1) + ' dari ' + n}"${i === 0 ? mentah(' aria-current="true"') : ''}><span class="titik" aria-hidden="true"></span></button>`;
-      })}</div>
-      <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="bn-putar" data-bn-putar aria-label="Jeda pemutaran otomatis">${ikon('pause')}</button>
-      <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="bn-berikutnya" aria-label="Banner berikutnya">${ikon('chevron-right')}</button>
-    </div>` : ''}
+    ${banyak ? h`<button type="button" class="banner-panah banner-panah-kiri" data-aksi="bn-sebelumnya" aria-label="Banner sebelumnya">${ikon('chevron-left')}</button>
+    <button type="button" class="banner-panah banner-panah-kanan" data-aksi="bn-berikutnya" aria-label="Banner berikutnya">${ikon('chevron-right')}</button>` : ''}
   </section>`;
 }
 
@@ -2114,7 +2107,6 @@ function bnKe(inst, i, pengguna, arah) {
     slaid[lama].style.transition = ''; slaid[lama].style.transform = 'translateX(' + (-arahGeser * 100) + '%)';
   }
   slaid.forEach(function (s, k) { bnTandai(s, k === baru); });
-  semua('.banner-titik-btn', inst.root).forEach(function (b, k) { if (k === baru) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
   inst.idx = baru;
   bnMuatBerikut(inst);
 }
@@ -2124,13 +2116,6 @@ function bnMuatBerikut(inst) {
   const im = s && s.querySelector('img[loading="lazy"]');
   if (im) im.loading = 'eager';
 }
-function bnSinkronTombol(inst) {
-  const b = el('[data-bn-putar]', inst.root);
-  if (!b) return;
-  b.setAttribute('aria-label', inst.jalan ? 'Jeda pemutaran otomatis' : 'Putar otomatis');
-  pasang(b, ikon(inst.jalan ? 'pause' : 'play'));
-}
-
 function pasangBanner(root) {
   if (!root || !root.hasAttribute || !root.hasAttribute('data-banner')) return null;
   const lama = bnCari(root);
@@ -2138,7 +2123,6 @@ function pasangBanner(root) {
   const n = semua('[data-bn-slaid]', root).length;
   const inst = { root: root, idx: 0, n: n, jalan: n > 1, pewaktu: null, tertahan: false };
   bnInstans.push(inst);
-  bnSinkronTombol(inst);
   bnMuatBerikut(inst);
   const tahan = function (ya) { inst.tertahan = ya; };
   root.addEventListener('mouseenter', function () { tahan(true); });
@@ -2179,16 +2163,6 @@ function pasangBanner(root) {
 
 AKSI['bn-sebelumnya'] = function (b) { const i = bnCari(b.closest('[data-banner]')); if (i) bnKe(i, i.idx - 1, true, -1); };
 AKSI['bn-berikutnya'] = function (b) { const i = bnCari(b.closest('[data-banner]')); if (i) bnKe(i, i.idx + 1, true, 1); };
-AKSI['bn-ke'] = function (b) { const i = bnCari(b.closest('[data-banner]')); if (i) bnKe(i, parseInt(b.getAttribute('data-no'), 10) || 0, true); };
-AKSI['bn-putar'] = function (b) {
-  const i = bnCari(b.closest('[data-banner]'));
-  if (!i) return;
-  i.jalan = !i.jalan;
-  bnSinkronTombol(i);
-  bnAtur(i);
-  const l = el('[data-bn-lintasan]', i.root);
-  if (l) l.setAttribute('aria-live', i.jalan && !i.tertahan ? 'off' : 'polite');
-};
 
 
 const prSt = { mapel: 'BIN', data: null };
@@ -2715,6 +2689,7 @@ function lpPerbaruiTombol() {
   const aktif = lpAktif();
   b.setAttribute('data-aktif', aktif ? 'true' : 'false');
   b.setAttribute('aria-label', aktif ? 'Keluar dari layar penuh' : 'Layar penuh');
+  b.setAttribute('title', aktif ? 'Keluar dari layar penuh' : 'Layar penuh');
   pasang(b, h`${ikon(aktif ? 'minimize' : 'maximize')}<span class="teks-penuh">${aktif ? 'Keluar layar penuh' : 'Layar penuh'}</span>`);
 }
 
@@ -3005,20 +2980,18 @@ function kerangkaUjian(ref) {
       <div class="ujian-kartu">
         <section class="ujian-bar" aria-label="Kendali ujian">
           <h2 class="ujian-no angka" id="uj-no" tabindex="-1"></h2>
-          <div class="ujian-kanan">
-            <button type="button" class="tombol tombol-pil ujian-info" data-aksi="uj-info" aria-haspopup="dialog">${ikon('info')}<span>Informasi Soal</span></button>
-            <div class="ujian-pewaktu" id="uj-pewaktu" role="timer" aria-label="Sisa waktu">${ikon('clock')}<span class="label-waktu">Sisa Waktu :</span><span id="uj-waktu" class="angka">--:--:--</span></div>
-            <button type="button" class="tombol tombol-pil ujian-daftar" data-aksi="uj-daftar" aria-haspopup="dialog">${ikon('grid')}<span>Daftar Soal</span></button>
-          </div>
-        </section>
-        <div class="ujian-subbar">
           <div class="ujian-zoom" role="group" aria-label="Ukuran font soal"><span class="zoom-label" aria-hidden="true">Ukuran font soal:</span>${SKALA_UJIAN.map(function (n) {
             return h`<button type="button" class="tombol-zoom zoom-${n}" data-aksi="uj-zoom" data-skala="${n}" aria-label="Huruf ${NAMA_SKALA_UJIAN[n]}" aria-pressed="${ref.skala === n ? 'true' : 'false'}">A</button>`;
           })}</div>
           <div class="ujian-status" id="uj-status"></div>
           <p class="ujian-paket-label potong" aria-hidden="true" title="${label}">${label}</p>
-          <button type="button" class="tombol tombol-garis tombol-pil ujian-penuh" id="uj-penuh" data-aksi="uj-penuh" data-aktif="false" aria-label="Layar penuh">${ikon('maximize')}<span class="teks-penuh">Layar penuh</span></button>
-        </div>
+          <div class="ujian-kanan">
+            <button type="button" class="tombol tombol-pil ujian-info" data-aksi="uj-info" aria-haspopup="dialog">${ikon('info')}<span>Informasi Soal</span></button>
+            <div class="ujian-pewaktu" id="uj-pewaktu" role="timer" aria-label="Sisa waktu">${ikon('clock')}<span class="label-waktu">Sisa Waktu :</span><span id="uj-waktu" class="angka">--:--:--</span></div>
+            <button type="button" class="tombol tombol-pil ujian-daftar" data-aksi="uj-daftar" aria-haspopup="dialog">${ikon('grid')}<span>Daftar Soal</span></button>
+            <button type="button" class="tombol tombol-garis tombol-pil ujian-penuh" id="uj-penuh" data-aksi="uj-penuh" data-aktif="false" aria-label="Layar penuh" title="Layar penuh">${ikon('maximize')}<span class="teks-penuh">Layar penuh</span></button>
+          </div>
+        </section>
         <div id="uj-banner"></div>
         <main id="uj-isi" class="ujian-soal" tabindex="-1" aria-label="Soal"></main>
         <footer class="ujian-kaki" id="uj-kaki"></footer>
