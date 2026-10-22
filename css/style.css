@@ -907,6 +907,19 @@ dl.data { margin: 0; }
 .ky-gambar-gagal-judul { display: inline-flex; align-items: center; gap: .375rem; font-weight: 600; }
 .ky-gambar-gagal-alt { color: var(--text-muted); }
 
+#uj-isi .ky-gambar-bungkus[role="button"] { cursor: zoom-in; border-radius: var(--r); }
+#uj-isi .ky-gambar-bungkus[role="button"]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.pembesar-kotak { max-height: 70vh; overflow: auto; text-align: center; background: var(--surface-2); border-radius: var(--r); }
+.pembesar-img { display: inline-block; max-width: 100%; max-height: 68vh; width: auto; height: auto; object-fit: contain; cursor: zoom-in; }
+.pembesar-kotak.asli { text-align: left; }
+.pembesar-kotak.asli .pembesar-img { max-width: none; max-height: none; cursor: zoom-out; }
+.pembesar-petunjuk { margin: .5rem 0 0; color: var(--text-muted); }
+#uj-isi .opsi-ujian .ky-gambar-bungkus[role="button"] { position: relative; z-index: 1; width: fit-content; max-width: 100%; }
+
+.pk-progres { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .625rem .75rem; margin-bottom: .75rem; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface-2); }
+.pk-progres-galat { border-color: var(--danger-text, var(--border-strong)); }
+.pk-galat { margin: .25rem 0 0; padding-left: 1.25rem; flex-basis: 100%; overflow-wrap: anywhere; }
+
 .pb-status { margin-top: .75rem; }
 .pb-status:empty { display: none; }
 .pb-status a { color: var(--primary-text); text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }

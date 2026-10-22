@@ -1088,7 +1088,7 @@ function transport() { return window.SiapHttp && typeof window.SiapHttp.kirim ==
 
 const BATAS_PANJANG_MS = 180000;
 const BATAS_BIASA_MS = 90000;
-const AKSI_MUATAN_BESAR = { 'media.unggah': 1, 'pembahasan.unggah': 1, 'materi.berkas': 1, 'impor.analisis': 1, 'impor.simpan': 1, 'berizin.ujiKirim': 1, 'banner.simpan': 1 };
+const AKSI_MUATAN_BESAR = { 'media.unggah': 1, 'pustaka.unggah': 1, 'pembahasan.unggah': 1, 'materi.berkas': 1, 'impor.analisis': 1, 'impor.simpan': 1, 'berizin.ujiKirim': 1, 'banner.simpan': 1 };
 
 const ULANG_OTOMATIS = { 'sesi.masuk': 8, 'ujian.mulai': 14, 'token.mulai': 14, 'pembahasan.unduh': 6 };
 const GALAT_SERVER_ULANG_MAKS = 3;
@@ -1338,7 +1338,7 @@ const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
   'percobaan.detail': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
   'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1,
-  'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'berizin.pdfUji': 1
+  'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
 
 const cacheBaca = new Map();
@@ -2760,6 +2760,66 @@ AKSI['uj-penuh'] = function () {
 });
 
 
+function pembesarTarget(n) {
+  if (!n || !n.closest) return null;
+  const g = n.closest('#uj-isi .ky-gambar-bungkus');
+  return g && el('img.ky-gambar', g) ? g : null;
+}
+
+function pembesarBuka(bungkus) {
+  const img = el('img.ky-gambar', bungkus);
+  if (!img) return;
+  const url = urlHttps(img.getAttribute('src'));
+  if (!url) return;
+  const alt = img.getAttribute('alt') || '';
+  const api = modal({
+    judul: 'Gambar soal',
+    lebar: true,
+    badan: h`<div class="pembesar-gambar" data-uji="pembesar-gambar">
+      <div class="pembesar-kotak"><img class="pembesar-img" src="${url}" alt="${alt}" data-aksi="uj-pembesar-ukuran" title="Ketuk untuk ukuran asli"></div>
+      <p class="teks-kecil pembesar-petunjuk">Ketuk gambar untuk beralih antara muat layar dan ukuran asli.</p>
+    </div>`,
+    aksi: [{ id: 'tutup', label: 'Tutup', gaya: 'utama' }]
+  });
+  return api;
+}
+
+AKSI['uj-pembesar-ukuran'] = function (b) {
+  const kotak = b.closest('.pembesar-kotak');
+  if (!kotak) return;
+  const asli = kotak.classList.toggle('asli');
+  b.setAttribute('title', asli ? 'Ketuk untuk muat layar' : 'Ketuk untuk ukuran asli');
+};
+
+document.addEventListener('click', function (e) {
+  const g = pembesarTarget(e.target);
+  if (!g) return;
+  e.preventDefault();
+  e.stopPropagation();
+  pembesarBuka(g);
+}, true);
+
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const g = e.target && e.target.classList && e.target.classList.contains('ky-gambar-bungkus') ? pembesarTarget(e.target) : null;
+  if (!g) return;
+  e.preventDefault();
+  pembesarBuka(g);
+});
+
+function pembesarSiapkan(akar) {
+  semua('.ky-gambar-bungkus', akar).forEach(function (g) {
+    if (!el('img.ky-gambar', g)) return;
+    const img = el('img.ky-gambar', g);
+    const alt = img.getAttribute('alt') || '';
+    g.setAttribute('tabindex', '0');
+    g.setAttribute('role', 'button');
+    g.setAttribute('aria-label', 'Perbesar gambar' + (alt ? ': ' + alt : ''));
+    g.setAttribute('data-uji', 'gambar-bisa-diperbesar');
+  });
+}
+
+
 let UJ = null;
 let ujianAwal = null;
 let hasilKumpul = null;
@@ -3188,6 +3248,7 @@ function gambarSoal() {
       </section>
     </div>
   </article>`);
+  pembesarSiapkan(w);
   gambarPraMuat(UJ.soal.slice(UJ.idx + 1, UJ.idx + 3));
 }
 
@@ -6002,12 +6063,16 @@ function gbIsiSaya() {
     <div class="ambil-halaman" id="gb-halaman"></div>`;
 }
 
+let gbModeTerakhir = 'unggah';
+function gbAdaPaket() { return typeof edSt !== 'undefined' && !!(edSt && edSt.paket && edSt.paket.id); }
+
 function gbBadan() {
   return h`<div class="segmen gb-segmen" role="radiogroup" aria-label="Sumber gambar">
+      ${gbAdaPaket() ? h`<label>${ikon('check')}<input type="radio" name="gb-mode" value="pustaka" data-masuk="gb-mode"${gbSt.mode === 'pustaka' ? mentah(' checked') : ''}> Pustaka paket</label>` : ''}
       <label>${ikon('check')}<input type="radio" name="gb-mode" value="unggah" data-masuk="gb-mode"${gbSt.mode === 'unggah' ? mentah(' checked') : ''}> Unggah baru</label>
       <label>${ikon('check')}<input type="radio" name="gb-mode" value="saya" data-masuk="gb-mode"${gbSt.mode === 'saya' ? mentah(' checked') : ''}> Gambar saya</label>
     </div>
-    <div id="gb-isi">${gbSt.mode === 'unggah' ? gbIsiUnggah() : gbIsiSaya()}</div>`;
+    <div id="gb-isi">${gbSt.mode === 'unggah' ? gbIsiUnggah() : (gbSt.mode === 'pustaka' ? pkIsiPilih() : gbIsiSaya())}</div>`;
 }
 
 function gambarBuka(ed, atom) {
@@ -6015,7 +6080,7 @@ function gambarBuka(ed, atom) {
   gbSt.ed = ed;
   gbSt.seleksi = pyBacaSeleksi(ed) || s.seleksi;
   gbSt.atom = atom || null;
-  gbSt.mode = 'unggah';
+  gbSt.mode = gbAdaPaket() && gbModeTerakhir === 'pustaka' ? 'pustaka' : 'unggah';
   gbSt.q = ''; gbSt.halaman = 1; gbSt.data = null; gbSt.hasil = null; gbSt.nama = '';
   gbSt.mapel = (typeof edSt !== 'undefined' && edSt.paket && edSt.paket.mapel) || 'MAT';
   gbSt.api = modal({
@@ -6023,6 +6088,7 @@ function gambarBuka(ed, atom) {
     aksi: [{ id: 'tutup', label: 'Tutup', gaya: 'diam' }]
   });
   const api = gbSt.api;
+  if (gbSt.mode === 'pustaka') pkMuatPilih();
   api.selesai.then(function () {
     if (gbSt.api === api) { gbSt.api = null; gbSt.seq++; }
     try { ed.focus(); } catch (e) {   }
@@ -6032,8 +6098,10 @@ function gambarBuka(ed, atom) {
 MASUKAN['gb-mode'] = function (r) {
   if (!r.checked || !gbSt.api) return;
   gbSt.mode = r.value;
-  pasang(el('#gb-isi', gbSt.api.el), r.value === 'unggah' ? gbIsiUnggah() : gbIsiSaya());
+  if (r.value === 'pustaka' || r.value === 'unggah') gbModeTerakhir = r.value;
+  pasang(el('#gb-isi', gbSt.api.el), r.value === 'unggah' ? gbIsiUnggah() : (r.value === 'pustaka' ? pkIsiPilih() : gbIsiSaya()));
   if (r.value === 'saya') gbMuatDaftar();
+  if (r.value === 'pustaka') pkMuatPilih();
 };
 
 MASUKAN['gb-hiasan'] = function (r) {
@@ -6080,9 +6148,10 @@ KIRIM['gb-unggah'] = function (form) {
   form.setAttribute('data-sibuk', 'ya');
   kerjakan(el('#gb-kirim', form), function () {
     return gbBase64(hsl.blob).then(function (b64) {
-      return panggil('media.unggah', { mapel: gbSt.mapel, nama: gbSt.nama, tipe: hsl.tipe, alt: alt, data: b64 });
-    }).then(function (res) {
-      gbSisipkan(res.media, alt);
+      if (gbAdaPaket()) return panggil('pustaka.unggah', { id_paket: edSt.paket.id, nama: gbSt.nama, tipe: hsl.tipe, alt: alt, data: b64 }).then(function (r) { return r.gambar; });
+      return panggil('media.unggah', { mapel: gbSt.mapel, nama: gbSt.nama, tipe: hsl.tipe, alt: alt, data: b64 }).then(function (r) { return r.media; });
+    }).then(function (info) {
+      gbSisipkan(info, alt);
     });
   }).catch(function (e) {
     if (['VALIDASI', 'FORMAT', 'UKURAN', 'UKURAN_PIKSEL', 'BATAS', 'DRIVE', 'BAGI_DITOLAK', 'BELUM_PASANG', 'PERMINTAAN'].indexOf(e.kode) >= 0) galatForm(form, e.message); else gagalUmum(e);
@@ -6323,6 +6392,256 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 }
 
 
+const PK_SERENTAK = 2;
+const pkSt = { api: null, idPaket: '', data: null, q: '', mode: 'kelola', seq: 0, sibuk: false };
+
+function pkUrut(a, b) {
+  return String(a.nama).localeCompare(String(b.nama), 'id', { numeric: true, sensitivity: 'base' }) || String(a.id).localeCompare(String(b.id));
+}
+
+function pkMuatPeta(daftar) {
+  const peta = {};
+  daftar.forEach(function (m) { peta[m.id] = { u: m.url, w: m.lebar, h: m.tinggi }; });
+  mediaGabung(peta);
+}
+
+function pkMuat(idPaket) {
+  const nomor = ++pkSt.seq;
+  pkSt.idPaket = idPaket;
+  const w = el('#pk-daftar');
+  if (w) w.setAttribute('aria-busy', 'true');
+  return panggil('pustaka.daftar', { id_paket: idPaket }, { ulang: true }).then(function (d) {
+    if (nomor !== pkSt.seq) return;
+    pkSt.data = d;
+    pkMuatPeta(d.gambar);
+    pkGambar();
+  }).catch(function (e) {
+    if (nomor !== pkSt.seq) return;
+    const x = el('#pk-daftar');
+    if (x) { x.removeAttribute('aria-busy'); pasang(x, h`<p class="galat-isian" role="alert">${ikon('alert-circle')}<span>${e.message}</span></p>`); }
+  });
+}
+
+function pkDisaring() {
+  const d = pkSt.data;
+  if (!d) return [];
+  const q = pkSt.q.toLowerCase();
+  return d.gambar.filter(function (m) { return !q || (String(m.nama) + ' ' + String(m.alt || '')).toLowerCase().indexOf(q) >= 0; });
+}
+
+function pkGambar() {
+  const wadah = el('#pk-daftar');
+  const d = pkSt.data;
+  if (!wadah || !d) return;
+  wadah.removeAttribute('aria-busy');
+  const hit = el('#pk-hitung');
+  const daftar = pkDisaring();
+  if (hit) hit.textContent = formatAngka(d.total, 0) + ' gambar · batas ' + formatAngka(d.batas, 0) + ' per paket' + (pkSt.q ? ' · ' + formatAngka(daftar.length, 0) + ' cocok' : '');
+  if (!daftar.length) {
+    pasang(wadah, h`<div class="kosong"><span class="ikon-bulat netral">${ikon('image')}</span><h3>${pkSt.q ? 'Tidak ada gambar yang cocok' : 'Pustaka paket ini masih kosong'}</h3><p>${pkSt.q ? 'Ubah kata kunci pencarian.' : (pkSt.mode === 'kelola' ? 'Pilih beberapa gambar sekaligus dengan tombol di atas. Setelah itu gambar tinggal dipilih saat menyunting soal.' : 'Tambahkan gambar lewat "Unggah baru", atau lewat tombol "Pustaka gambar" di halaman paket untuk mengunggah banyak sekaligus.')}</p></div>`);
+    return;
+  }
+  const kelola = pkSt.mode === 'kelola';
+  pasang(wadah, h`<ul class="gb-daftar" aria-label="Gambar pustaka paket" data-uji="pk-daftar-isi">${daftar.map(function (m) {
+    const pakai = m.soal || [];
+    return h`<li class="gb-butir" data-uji="pk-butir">
+      <div class="gb-kecil"><img src="${urlHttps(m.url)}" alt="" width="${m.lebar}" height="${m.tinggi}" loading="lazy" decoding="async"></div>
+      <div class="gb-info">
+        <strong class="gb-nama">${m.nama}</strong>
+        <span class="bantu">${formatAngka(m.lebar, 0)} × ${formatAngka(m.tinggi, 0)} piksel · ${gbUkuranTeks(m.ukuran)}</span>
+        ${m.alt ? h`<span class="bantu gb-alt">Teks pengganti bawaan: ${m.alt}</span>` : h`<span class="bantu gb-alt">Belum ada teks pengganti bawaan</span>`}
+        <span class="lencana ${pakai.length ? 'lencana-info' : ''}">${pakai.length ? 'Dipakai di soal nomor ' + pakai.join(', ') : 'Belum dipakai'}</span>
+      </div>
+      <div class="gb-tindak">
+        ${kelola ? h`<button type="button" class="tombol tombol-diam" data-aksi="pk-ubah" data-id="${m.id}" aria-label="Ubah keterangan gambar ${m.nama}">${ikon('edit')}<span>Ubah</span></button>
+        <button type="button" class="tombol tombol-diam" data-aksi="pk-hapus" data-id="${m.id}" aria-label="${pakai.length ? 'Hapus gambar ' + m.nama + ' (tidak bisa: masih dipakai)' : 'Hapus gambar ' + m.nama}"${pakai.length ? mentah(' data-dipakai="ya"') : ''}>${ikon('trash')}<span>Hapus</span></button>`
+        : h`<button type="button" class="tombol tombol-utama" data-aksi="pk-sisip" data-id="${m.id}" aria-label="Sisipkan gambar ${m.nama}">${ikon('plus')}<span>Sisipkan</span></button>`}
+      </div>
+    </li>`;
+  })}</ul>`);
+}
+
+let pkPewaktuCari = null;
+MASUKAN['pk-cari'] = function (r) {
+  pkSt.q = r.value.trim().slice(0, 100);
+  if (pkPewaktuCari) clearTimeout(pkPewaktuCari);
+  pkPewaktuCari = setTimeout(function () { pkPewaktuCari = null; pkGambar(); }, 150);
+};
+
+
+AKSI['pustaka-buka'] = function () {
+  if (typeof edSt === 'undefined' || !edSt.paket) return;
+  pkSt.mode = 'kelola'; pkSt.q = ''; pkSt.data = null; pkSt.sibuk = false;
+  const api = modal({
+    judul: 'Pustaka gambar paket', lebar: true,
+    badan: h`<p class="bantu tanpa-margin">Gambar di sini khusus paket <strong>${edSt.paket.nama}</strong>. Unggah semua gambar sekali, lalu pilih saat menyunting soal. Gambar yang dipakai beberapa soal tetap satu berkas.</p>
+      <div class="isian"><label for="pk-berkas">Tambah gambar (boleh pilih banyak sekaligus)</label>
+        <input class="kontrol" id="pk-berkas" type="file" multiple accept="image/jpeg,image/png,image/webp" data-masuk="pk-berkas" data-uji="pk-berkas" aria-describedby="pk-berkas-b">
+        <p class="bantu" id="pk-berkas-b">JPG, PNG, atau WebP. Dikecilkan otomatis hingga ${GB_SISI} piksel. Nama berkas menjadi nama gambar dan teks pengganti sementara; bisa diubah lewat tombol Ubah.</p></div>
+      <div id="pk-progres" aria-live="polite" data-uji="pk-progres"></div>
+      <div class="gb-alat">
+        <div class="isian tanpa-margin"><label for="pk-cari" class="sr-only">Cari gambar</label><input class="kontrol" id="pk-cari" type="search" maxlength="100" placeholder="Cari nama atau teks pengganti" autocomplete="off" data-masuk="pk-cari"></div>
+        <span class="bantu" id="pk-hitung" aria-live="polite"></span>
+      </div>
+      <div id="pk-daftar" aria-busy="true"></div>`,
+    aksi: [{ id: 'tutup', label: 'Tutup', gaya: 'utama' }]
+  });
+  pkSt.api = api;
+  api.selesai.then(function () { if (pkSt.api === api) { pkSt.api = null; pkSt.seq++; } });
+  pkMuat(edSt.paket.id);
+};
+
+function pkSisip(m) {
+  const peta = {}; peta[m.id] = { u: m.url, w: m.lebar, h: m.tinggi };
+  mediaGabung(peta);
+}
+
+function pkTambahLokal(g) {
+  if (!pkSt.data) return;
+  if (!pkSt.data.gambar.some(function (x) { return x.id === g.id; })) {
+    pkSt.data.gambar.push(g);
+    pkSt.data.gambar.sort(pkUrut);
+    pkSt.data.total = pkSt.data.gambar.length;
+  }
+  pkSisip(g);
+}
+
+MASUKAN['pk-berkas'] = function (r) {
+  const files = Array.prototype.slice.call(r.files || []);
+  r.value = '';
+  if (!files.length || pkSt.sibuk || !pkSt.api) return;
+  pkUnggahBanyak(files);
+};
+
+function pkUnggahBanyak(files) {
+  const api = pkSt.api;
+  const idPaket = pkSt.idPaket;
+  const total = files.length;
+  let indeks = 0, selesai = 0, berhasil = 0, berhenti = false;
+  const galatan = [];
+  pkSt.sibuk = true;
+  const hidup = function () { return pkSt.api === api && document.body.contains(api.el); };
+  const tulis = function (akhir) {
+    if (!hidup()) return;
+    const w = el('#pk-progres', api.el);
+    if (!w) return;
+    if (!akhir) {
+      pasang(w, h`<div class="pk-progres"><span class="spinner" aria-hidden="true"></span><span>Mengunggah ${formatAngka(Math.min(selesai + 1, total), 0)} dari ${formatAngka(total, 0)}… Jangan tutup jendela ini.</span></div>`);
+      return;
+    }
+    pasang(w, h`<div class="pk-progres ${galatan.length ? 'pk-progres-galat' : ''}" role="status">
+      <strong>${formatAngka(berhasil, 0)} dari ${formatAngka(total, 0)} gambar berhasil ditambahkan.</strong>
+      ${galatan.length ? h`<ul class="pk-galat" data-uji="pk-galat">${galatan.map(function (g) { return h`<li><strong>${g.nama}</strong>: ${g.pesan}</li>`; })}</ul>` : ''}
+    </div>`);
+  };
+  const satu = function () {
+    if (berhenti || !hidup() || indeks >= total) return Promise.resolve();
+    const file = files[indeks++];
+    return gbKompres(file).then(function (hsl) {
+      return gbBase64(hsl.blob).then(function (b64) {
+        return panggil('pustaka.unggah', { id_paket: idPaket, nama: file.name || 'gambar', tipe: hsl.tipe, data: b64 });
+      });
+    }).then(function (res) {
+      berhasil++;
+      if (hidup()) { pkTambahLokal(res.gambar); pkGambar(); }
+    }).catch(function (e) {
+      galatan.push({ nama: file.name || 'gambar', pesan: e && e.message ? e.message : 'Gagal diunggah.' });
+      if (e && (e.ditangani || ['BATAS', 'BELUM_PASANG', 'STATUS', 'DITOLAK', 'TIDAK_ADA'].indexOf(e.kode) >= 0)) berhenti = true;
+    }).then(function () {
+      selesai++;
+      tulis(false);
+      return satu();
+    });
+  };
+  tulis(false);
+  const pekerja = [];
+  for (let i = 0; i < PK_SERENTAK; i++) pekerja.push(satu());
+  Promise.all(pekerja).then(function () {
+    pkSt.sibuk = false;
+    if (berhenti && indeks < total) galatan.push({ nama: formatAngka(total - indeks, 0) + ' berkas sisanya', pesan: 'tidak diunggah karena proses dihentikan.' });
+    tulis(true);
+    if (hidup() && berhasil) toast(formatAngka(berhasil, 0) + ' gambar ditambahkan ke pustaka.', 'sukses');
+    if (hidup()) pkMuat(idPaket);
+  });
+}
+
+AKSI['pk-ubah'] = function (b) {
+  const m = pkSt.data && pkSt.data.gambar.filter(function (x) { return x.id === b.getAttribute('data-id'); })[0];
+  if (!m) return;
+  modal({
+    judul: 'Ubah keterangan gambar',
+    badan: h`<form id="f-pk-ubah" data-kirim="pk-ubah" data-id="${m.id}" novalidate>
+      <div data-galat aria-live="polite"></div>
+      <div class="isian"><label for="pku-nama">Nama gambar</label>
+        <input class="kontrol" id="pku-nama" name="nama" type="text" maxlength="60" autocomplete="off" value="${String(m.nama).slice(0, 60)}"></div>
+      <div class="isian"><label for="pku-alt">Teks pengganti bawaan</label>
+        <input class="kontrol" id="pku-alt" name="alt" type="text" maxlength="300" autocomplete="off" value="${m.alt || ''}" aria-describedby="pku-alt-b">
+        <p class="bantu" id="pku-alt-b">Dipakai saat gambar ini disisipkan ke soal berikutnya. Soal yang sudah memuat gambar ini tidak berubah; ubah teks pengganti di soal itu lewat dialog Ubah gambar. Jangan menuliskan kunci jawaban.</p></div>
+    </form>`,
+    aksi: [{ id: 'batal', label: 'Batal', gaya: 'diam' }, { id: 'simpan', label: 'Simpan', gaya: 'utama', tipe: 'submit', form: 'f-pk-ubah' }]
+  });
+};
+
+KIRIM['pk-ubah'] = function (form) {
+  bersihGalat(form);
+  const v = nilaiForm(form);
+  const nama = String(v.nama || '').replace(/\s+/g, ' ').trim();
+  const alt = String(v.alt || '').replace(/\s+/g, ' ').trim();
+  if (!nama) { galatIsian(form, 'nama', 'Nama gambar wajib diisi.'); return; }
+  const id = form.getAttribute('data-id');
+  form.setAttribute('data-sibuk', 'ya');
+  panggil('media.ubah', { id: id, nama: nama, alt: alt }).then(function (res) {
+    const m = pkSt.data && pkSt.data.gambar.filter(function (x) { return x.id === id; })[0];
+    if (m && res.media) { m.nama = res.media.nama; m.alt = res.media.alt; if (pkSt.data) pkSt.data.gambar.sort(pkUrut); }
+    const dlg = form.closest('.modal-latar');
+    const t = modalTeratas();
+    if (t && dlg && t.latar === dlg) t.tutup('ok');
+    pkGambar();
+    toast('Keterangan gambar disimpan.', 'sukses');
+  }).catch(function (e) {
+    if (['VALIDASI', 'TIDAK_ADA', 'DITOLAK'].indexOf(e.kode) >= 0) galatForm(form, e.message); else gagalUmum(e);
+  }).then(function () { form.removeAttribute('data-sibuk'); });
+};
+
+AKSI['pk-hapus'] = function (b) {
+  const id = b.getAttribute('data-id');
+  const m = pkSt.data && pkSt.data.gambar.filter(function (x) { return x.id === id; })[0];
+  if (!m) return;
+  const pakai = m.soal || [];
+  if (pakai.length) { toast('Gambar ini masih dipakai di soal nomor ' + pakai.join(', ') + '. Ganti atau hapus gambar itu dari soalnya lebih dulu.', 'info'); return; }
+  konfirmasi({ judul: 'Hapus gambar "' + m.nama + '" dari pustaka?', ya: 'Hapus gambar', bahaya: true, pesan: 'Gambar dikeluarkan dari pustaka paket ini. Bila tidak dipakai di tempat lain, berkasnya ikut dihapus permanen.' }).then(function (ya) {
+    if (!ya) return;
+    panggil('pustaka.hapus', { id_paket: pkSt.idPaket, id_media: id }).then(function () {
+      toast('Gambar dihapus dari pustaka.', 'sukses');
+      pkMuat(pkSt.idPaket);
+    }).catch(function (e) {
+      if (e.kode === 'DIPAKAI' || e.kode === 'TIDAK_ADA') { toast(e.message, 'galat'); pkMuat(pkSt.idPaket); } else gagalUmum(e);
+    });
+  });
+};
+
+
+function pkIsiPilih() {
+  return h`<div class="gb-alat">
+      <div class="isian tanpa-margin"><label for="pk-cari" class="sr-only">Cari gambar</label><input class="kontrol" id="pk-cari" type="search" maxlength="100" placeholder="Cari nama atau teks pengganti" autocomplete="off" data-masuk="pk-cari" data-uji="pk-cari" value="${pkSt.q}"></div>
+      <span class="bantu" id="pk-hitung" aria-live="polite"></span>
+    </div>
+    <div id="pk-daftar" aria-busy="true" data-uji="pk-pilih"></div>`;
+}
+
+function pkMuatPilih() {
+  pkSt.mode = 'pilih'; pkSt.q = '';
+  if (typeof edSt === 'undefined' || !edSt.paket) return;
+  pkMuat(edSt.paket.id);
+}
+
+AKSI['pk-sisip'] = function (b) {
+  const m = pkSt.data && pkSt.data.gambar.filter(function (x) { return x.id === b.getAttribute('data-id'); })[0];
+  if (!m) return;
+  gbSisipkan(m, m.alt || String(m.nama));
+};
+
+
 const paketSt = { q: '', mapel: '', kategori: '', status: '', data: [], seq: 0 };
 let edSt = { paket: null, soal: [] };
 
@@ -6531,7 +6850,7 @@ function gambarEditor() {
     ${adaJalurToken(pk) ? h`<section class="kartu jarak-bawah" id="token-panel" aria-labelledby="h-token">${kerangkaPanelToken(pk)}</section>` : ''}
     ${htmlKartuPembahasanStaf(pk, edSt.pembahasan)}
     ${h`<div class="kartu-judul"><h3 class="tanpa-margin">Soal <span class="teks-redam angka">(${formatAngka(soal.length)}/100)</span></h3>
-      <div class="baris-bungkus rata-kanan"><button type="button" class="tombol tombol-garis" data-aksi="soal-ambil"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('copy')}<span>Ambil dari paket lain</span></button>
+      <div class="baris-bungkus rata-kanan">${!arsip ? h`<button type="button" class="tombol tombol-garis" data-aksi="pustaka-buka" data-uji="pk-buka">${ikon('image')}<span>Pustaka gambar</span></button>` : ''}<button type="button" class="tombol tombol-garis" data-aksi="soal-ambil"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('copy')}<span>Ambil dari paket lain</span></button>
       ${pk.status === 'Draf' && bisaUbahSoal ? h`<button type="button" class="tombol tombol-garis" data-aksi="impor-buka" data-uji="im-buka"${soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('upload')}<span>Impor soal (prototipe)</span></button>` : ''}
       <button type="button" class="tombol" data-aksi="soal-baru"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('plus')}<span>Tambah soal</span></button></div></div>`}
     ${soal.length ? h`<ol class="daftar-soal">${soal.map(function (s, i) {
