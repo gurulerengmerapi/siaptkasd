@@ -1565,7 +1565,7 @@ const NAMA_MENU_MAPEL = { BIN: 'B.Indonesia', MAT: 'Matematika', IPA: 'IPA' };
 
 const MENU = {
   ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
-  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal Saya', 'package'], ['materi', 'Materi Saya', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['audit', 'Log Aktivitas', 'activity']],
+  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['audit', 'Log Aktivitas', 'activity']],
   SISWA: [['dasbor', 'Beranda', 'home']].concat(MAPEL_URUT.map(function (k) {
     return ['katalog', 'Latihan soal ' + NAMA_MENU_MAPEL[k], IKON_MAPEL[k], { mapel: k }];
   }), [['materi', 'Materi', 'file-text'], ['riwayat', 'Riwayat', 'clock']])
@@ -1581,8 +1581,7 @@ function judulHalaman(nama, params) {
   if (nama === 'katalog') return 'Latihan soal ' + NAMA_MENU_MAPEL[mapelKatalog(params)];
   if (nama === 'dasbor' && peran === PERAN.SISWA) return 'Beranda';
   if (nama === 'audit' && peran === PERAN.GURU) return 'Log Aktivitas Saya';
-  if ((nama === 'paket' || nama === 'paket-edit') && peran === PERAN.GURU) return nama === 'paket' ? 'Paket Soal Saya' : 'Susun Paket';
-  if (nama === 'materi' && peran === PERAN.GURU) return 'Materi Saya';
+  if (nama === 'paket-edit' && peran === PERAN.GURU) return 'Susun Paket';
   return JUDUL_HALAMAN[nama] || '';
 }
 
@@ -6661,7 +6660,7 @@ function kunciTeks(s) {
 function renderPaket(p, c) {
   const admin = S.pengguna.peran === PERAN.ADMIN;
   pasang(c.wadah, h`
-    ${kepalaHalaman(admin ? 'Paket soal' : 'Paket soal saya', admin ? 'Seluruh paket dari semua guru. Admin dapat mengatur urutan dan menghapus.' : 'Paket yang Anda susun. Siswa hanya melihat paket berstatus Terbit.', h`<button type="button" class="tombol" data-aksi="paket-baru">${ikon('plus')}<span>Buat paket</span></button>`)}
+    ${kepalaHalaman('Paket soal', admin ? 'Seluruh paket dari semua guru. Admin dapat mengatur urutan dan menghapus.' : 'Seluruh paket. Paket yang Anda susun bisa diubah; paket milik orang lain hanya bisa dilihat. Siswa hanya melihat paket berstatus Terbit.', h`<button type="button" class="tombol" data-aksi="paket-baru">${ikon('plus')}<span>Buat paket</span></button>`)}
     <div class="saring saring-4" role="search">
       <div class="cari"><label class="sr-only" for="pk-cari">Cari paket</label>${ikon('search')}<input class="kontrol" id="pk-cari" type="search" placeholder="Cari nama paket" value="${paketSt.q}" data-masuk="paket-saring" autocomplete="off"></div>
       <div class="isian"><label class="sr-only" for="pk-mapel">Mata pelajaran</label><select class="kontrol" id="pk-mapel" data-masuk="paket-saring"><option value="">Semua mapel</option>${MAPEL_URUT.map(function (k) { return h`<option value="${k}"${paketSt.mapel === k ? mentah(' selected') : ''}>${MAPEL[k]}</option>`; })}</select></div>
@@ -6713,10 +6712,10 @@ function gambarPaket() {
         const i = sebaris.indexOf(x);
         return h`<article class="kartu kartu-paket-staf">
           <div class="paket-staf-kepala"><h3>${x.nama}</h3>${lencanaStatus(x.status)}</div>
-          <div class="paket-staf-meta"><span class="lencana lencana-primer">${x.kategori}</span><span>${formatAngka(x.jumlahSoal)} soal</span><span aria-hidden="true">·</span><span>${formatAngka(x.durasiMenit)} menit</span><span aria-hidden="true">·</span><span>${formatAngka(x.jumlahPercobaan)} percobaan</span>${admin ? h`<span aria-hidden="true">·</span><span>oleh ${x.namaPemilik}</span>` : ''}</div>
+          <div class="paket-staf-meta"><span class="lencana lencana-primer">${x.kategori}</span><span>${formatAngka(x.jumlahSoal)} soal</span><span aria-hidden="true">·</span><span>${formatAngka(x.durasiMenit)} menit</span><span aria-hidden="true">·</span><span>${formatAngka(x.jumlahPercobaan)} percobaan</span>${admin || x.bisaUbah === false ? h`<span aria-hidden="true">·</span><span>oleh ${x.namaPemilik}</span>` : ''}</div>
           <div class="paket-staf-aksi">
-            <button type="button" class="tombol" data-aksi="paket-buka" data-id="${x.id}">${ikon('edit')}<span>Kelola soal</span></button>
-            <button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${x.id}" aria-label="Duplikat paket ${x.nama}">${ikon('copy')}<span>Duplikat</span></button>
+            ${x.bisaUbah === false ? h`<button type="button" class="tombol tombol-garis" data-aksi="paket-buka" data-id="${x.id}" data-uji="pk-lihat">${ikon('eye')}<span>Lihat soal</span></button>` : h`<button type="button" class="tombol" data-aksi="paket-buka" data-id="${x.id}">${ikon('edit')}<span>Kelola soal</span></button>
+            <button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${x.id}" aria-label="Duplikat paket ${x.nama}">${ikon('copy')}<span>Duplikat</span></button>`}
             ${bisaUrut ? h`<button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="paket-geser" data-id="${x.id}" data-arah="naik" aria-label="Naikkan urutan ${x.nama}"${i === 0 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-up')}</button>
             <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="paket-geser" data-id="${x.id}" data-arah="turun" aria-label="Turunkan urutan ${x.nama}"${i === sebaris.length - 1 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-down')}</button>` : ''}
           </div></article>`;
@@ -6815,10 +6814,26 @@ function segarkanEditor() {
   }).catch(gagalUmum);
 }
 
+function gambarPaketBacaSaja(wadah, pk, soal) {
+  pasang(wadah, h`
+    <div class="remah"><button type="button" class="tombol tombol-polos" data-aksi="kembali" data-ke="paket">${ikon('chevron-left')}<span>Semua paket</span></button></div>
+    ${kepalaHalaman(pk.nama, null)}
+    <div class="baris-bungkus jarak-bawah">${lencanaStatus(pk.status)}<span class="lencana lencana-primer">${MAPEL[pk.mapel] || pk.mapel}</span><span class="lencana">${pk.kategori}</span>
+      <span class="teks-redam">${formatAngka(pk.durasiMenit)} menit · ${formatAngka(soal.length)} soal · ${formatAngka(pk.jumlahPercobaan)} percobaan · oleh ${pk.namaPemilik}</span></div>
+    <div class="peringatan jarak-bawah" data-uji="banner-baca-saja">${ikon('eye')}<div><p><strong>Paket ini milik ${pk.namaPemilik}.</strong> Anda hanya dapat melihatnya; soal, status, dan pengaturannya hanya bisa diubah oleh pemilik atau Admin.</p></div></div>
+    ${soal.length ? h`<ol class="daftar-soal" data-uji="soal-baca-saja">${soal.map(function (s, i) {
+      return h`<li class="soal-butir"><span class="nomor">${i + 1}</span>
+        <div>${kayaKosong(s.stimulus) ? '' : h`<div class="stimulus ky">${kayaHtml(s.stimulus)}</div>`}
+          <div class="pertanyaan ky">${s.pertanyaan ? kayaHtml(s.pertanyaan) : h`<em class="teks-redam">(Pertanyaan belum diisi)</em>`}</div>
+          <div class="meta"><span class="lencana lencana-primer">${LABEL_JENIS_PENDEK[s.jenis]}</span><span class="lencana ${s.kunci ? 'lencana-sukses' : 'lencana-peringatan'}">Kunci: ${kunciTeks(s)}</span></div></div></li>`;
+    })}</ol>` : h`<div class="kartu kosong"><span class="ikon-bulat netral">${ikon('list')}</span><h3>Belum ada soal</h3></div>`}`);
+}
+
 function gambarEditor() {
   const wadah = el('#isi');
   if (!wadah) return;
   const pk = edSt.paket, soal = edSt.soal;
+  if (pk.bisaUbah === false) { gambarPaketBacaSaja(wadah, pk, soal); return; }
   const admin = S.pengguna.peran === PERAN.ADMIN;
   const arsip = pk.status === 'Diarsipkan';
   const adaPercobaan = pk.jumlahPercobaan > 0;
@@ -7733,7 +7748,7 @@ function mtDari(id) { return ((mtSt.data && mtSt.data.materi) || []).filter(func
 function renderMateri(p, c) {
   const admin = S.pengguna.peran === PERAN.ADMIN;
   pasang(c.wadah, h`
-    ${kepalaHalaman(admin ? 'Materi' : 'Materi saya', admin ? 'Materi PDF dan video dari semua guru.' : 'Materi PDF dan video yang Anda kelola.', h`<button type="button" class="tombol" data-aksi="materi-baru" data-uji="mt-baru">${ikon('plus')}<span>Tambah materi</span></button>`)}
+    ${kepalaHalaman('Materi', admin ? 'Materi PDF dan video dari semua guru.' : 'Materi PDF dan video dari semua guru. Materi milik orang lain hanya bisa dilihat.', h`<button type="button" class="tombol" data-aksi="materi-baru" data-uji="mt-baru">${ikon('plus')}<span>Tambah materi</span></button>`)}
     <div class="peringatan peringatan-info jarak-bawah" data-uji="mt-info-siswa">${ikon('info')}<div><p>Materi berstatus <strong>Terbit</strong> tampil kepada siswa di menu Materi. Materi Draf dan Arsip tidak pernah tampil kepada siswa.</p></div></div>
     <div class="saring saring-5" role="search">
       <div class="cari"><label class="sr-only" for="mt-cari">Cari materi</label>${ikon('search')}<input class="kontrol" id="mt-cari" type="search" placeholder="Cari judul materi" value="${mtSt.q}" data-masuk="materi-saring" autocomplete="off"></div>
@@ -7798,10 +7813,17 @@ function gambarMateri() {
     return h`<section aria-labelledby="mtm-${k}"><div class="mapel-judul"><span class="ikon-bulat">${ikon(IKON_MAPEL[k])}</span><h3 id="mtm-${k}">${MAPEL[k]}</h3></div>
       <div class="kisi">${per[k].map(function (m) {
         const tanpaBerkas = m.jenis === 'PDF' && !m.berkas;
+        if (!admin && m.idPemilik !== S.pengguna.id) {
+          return h`<article class="kartu kartu-paket-staf kartu-materi" data-uji="mt-kartu" data-id="${m.id}" data-status="${m.status}" data-baca-saja="ya">
+          <div class="paket-staf-kepala"><span class="ikon-bulat netral" aria-hidden="true">${ikon(mtIkonJenis(m.jenis))}</span><h4>${m.judul}</h4>${lencanaStatus(m.status)}</div>
+          <div class="paket-staf-meta"><span class="lencana lencana-primer">${m.kategori}</span><span class="lencana" data-uji="mt-jenis">${m.jenis}</span></div>
+          <div class="paket-staf-meta">${mtMeta(m, true)}</div>
+          <div class="paket-staf-aksi">${tanpaBerkas ? '' : h`<button type="button" class="tombol tombol-garis" data-aksi="materi-pratinjau" data-id="${m.id}" data-uji="mt-pratinjau">${ikon('eye')}<span>Pratinjau</span></button>`}</div></article>`;
+        }
         return h`<article class="kartu kartu-paket-staf kartu-materi" data-uji="mt-kartu" data-id="${m.id}" data-status="${m.status}">
           <div class="paket-staf-kepala"><span class="ikon-bulat netral" aria-hidden="true">${ikon(mtIkonJenis(m.jenis))}</span><h4>${m.judul}</h4>${lencanaStatus(m.status)}</div>
           <div class="paket-staf-meta"><span class="lencana lencana-primer">${m.kategori}</span><span class="lencana" data-uji="mt-jenis">${m.jenis}</span></div>
-          <div class="paket-staf-meta">${mtMeta(m, admin)}</div>
+          <div class="paket-staf-meta">${mtMeta(m, admin || m.idPemilik !== S.pengguna.id)}</div>
           <div class="paket-staf-aksi">
             ${tanpaBerkas ? h`<button type="button" class="tombol" data-aksi="materi-ganti" data-id="${m.id}" data-uji="mt-unggah">${ikon('upload')}<span>Unggah PDF</span></button>`
               : h`<button type="button" class="tombol" data-aksi="materi-pratinjau" data-id="${m.id}" data-uji="mt-pratinjau">${ikon('eye')}<span>Pratinjau</span></button>`}
@@ -9135,7 +9157,7 @@ AKSI['impor-buka'] = function () {
 };
 
 
-const anSt = { id_paket: '', data: null, paket: [], seq: 0 };
+const anSt = { id_paket: '', sekolah: '', opsiSekolah: [], data: null, paket: [], seq: 0 };
 const AN_KUNCI_SESI = 'siap.analisis.paket';
 const AN_KELAS_KATEGORI = { Mudah: 'lencana-sukses', Sedang: 'lencana-peringatan', Sulit: 'lencana-bahaya' };
 const AN_WARNA_KATEGORI = { Mudah: 'benar', Sedang: 'sebagian', Sulit: 'salah' };
@@ -9146,12 +9168,13 @@ function anPersenTeks(n, total) { const p = anPersen(n, total); return p === nul
 function anCapaianTeks(c) { return typeof c === 'number' ? formatAngka(c, 1) + '%' : '—'; }
 
 function renderAnalisisSoal(p, c) {
-  anSt.data = null;
+  anSt.data = null; anSt.sekolah = ''; anSt.opsiSekolah = [];
   anSt.id_paket = anSt.id_paket || bacaLokal('sesi', AN_KUNCI_SESI) || '';
   pasang(c.wadah, h`
     ${kepalaHalaman('Analisis Soal', 'Soal mana yang paling banyak dijawab benar dan mana yang paling sulit, dihitung dari semua pengerjaan yang sudah selesai pada satu paket.')}
     <div class="saring-analisis" role="search">
       <div class="isian"><label for="an-paket">Paket</label><select class="kontrol" id="an-paket" data-masuk="an-paket"><option value="">Pilih paket…</option></select></div>
+      <div class="isian"><label for="an-sekolah">Sekolah</label><select class="kontrol" id="an-sekolah" data-masuk="an-sekolah"><option value="">Semua sekolah</option></select></div>
     </div>
     <div id="an-hasil" aria-live="polite"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat daftar paket…</span></div></div>`);
   fokusJudul();
@@ -9171,9 +9194,11 @@ function renderAnalisisSoal(p, c) {
 function muatAnalisis(ok) {
   const seq = ++anSt.seq;
   pasang(el('#an-hasil'), h`<div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Menghitung analisis…</span></div>`);
-  return panggil('analisis.paket', { id_paket: anSt.id_paket }, { ulang: true }).then(function (d) {
+  return panggil('analisis.paket', { id_paket: anSt.id_paket, sekolah: anSt.sekolah }, { ulang: true }).then(function (d) {
     if (seq !== anSt.seq || (ok && !ok())) return;
     anSt.data = d;
+    anSt.opsiSekolah = d.opsiSekolah || [];
+    anIsiSekolah();
     gambarAnalisis();
   }).catch(function (e) {
     if (seq !== anSt.seq || (ok && !ok())) return;
@@ -9186,10 +9211,23 @@ function muatAnalisis(ok) {
   });
 }
 
+function anIsiSekolah() {
+  const sel = el('#an-sekolah');
+  if (!sel) return;
+  pasang(sel, h`<option value="">Semua sekolah</option>${anSt.opsiSekolah.map(function (s) { return h`<option value="${s}"${anSt.sekolah === s ? mentah(' selected') : ''}>${s}</option>`; })}`);
+}
+MASUKAN['an-sekolah'] = function () {
+  const sel = el('#an-sekolah');
+  if (!sel) return;
+  anSt.sekolah = sel.value;
+  anSt.data = null;
+  if (anSt.id_paket) muatAnalisis(); else gambarAnalisis();
+};
 MASUKAN['an-paket'] = function () {
   const sel = el('#an-paket');
   if (!sel) return;
   anSt.id_paket = sel.value;
+  anSt.sekolah = ''; anSt.opsiSekolah = []; anIsiSekolah();
   if (anSt.id_paket) simpanLokal('sesi', AN_KUNCI_SESI, anSt.id_paket); else hapusLokal('sesi', AN_KUNCI_SESI);
   anSt.data = null;
   if (anSt.id_paket) muatAnalisis(); else gambarAnalisis();
@@ -9261,7 +9299,7 @@ function anUnduh(tombol, jenis, sulitDulu) {
   kerjakan(tombol, function () {
     return new Promise(function (selesai) { setTimeout(selesai, 0); }).then(function () {
       const bytes = jenis === 'pdf' ? anPdf(d) : anXlsx(d, sulitDulu);
-      ekLapor(wadah, ekNamaBerkas(['analisis-soal', d.paket.nama].concat(sulitDulu ? ['tersulit'] : []), jenis), bytes, jenis === 'pdf' ? 'application/pdf' : XLSX_TIPE);
+      ekLapor(wadah, ekNamaBerkas(['analisis-soal', d.paket.nama].concat(d.sekolah ? [d.sekolah] : []).concat(sulitDulu ? ['tersulit'] : []), jenis), bytes, jenis === 'pdf' ? 'application/pdf' : XLSX_TIPE);
     });
   }).catch(function (e) { ekLaporGalat(wadah, e); });
 }
@@ -9276,7 +9314,7 @@ function anUrutSulit(butir) {
 
 function anRingkasanPasang(d) {
   const r = d.ringkas;
-  return [['Paket', d.paket.nama], ['Mata pelajaran', (MAPEL[d.paket.mapel] || d.paket.mapel) + ' · ' + d.paket.kategori], ['Pengerjaan dianalisis', formatAngka(d.jumlahPercobaan)],
+  return [['Paket', d.paket.nama], ['Sekolah', d.sekolah || 'Semua sekolah'], ['Mata pelajaran', (MAPEL[d.paket.mapel] || d.paket.mapel) + ' · ' + d.paket.kategori], ['Pengerjaan dianalisis', formatAngka(d.jumlahPercobaan)],
     ['Rata-rata nilai', d.rataNilai === null ? '-' : formatAngka(d.rataNilai, 2)], ['Butir soal', formatAngka(r.butir)], ['Rata-rata capaian', anCapaianTeks(r.rerataCapaian)]];
 }
 
