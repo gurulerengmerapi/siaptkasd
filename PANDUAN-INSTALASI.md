@@ -1,6 +1,6 @@
-# Siap TKA SD T7.2 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
+# Siap TKA SD T7.3 — Panduan memasang dan memperbarui: backend di Google Apps Script, tampilan di GitHub Pages
 
-Versi aplikasi: `1.8.0-t7.2` (**skema data 10**: satu tabel baru, `PustakaGambar`; **ada migrasi ringan**, jalankan `pasangAwal` sekali sesudah mengganti `Kode.gs`; langkah U3b).
+Versi aplikasi: `1.8.1-t7.3` (**skema data tetap 10**; bila Anda sudah di T7.2, **tidak perlu `pasangAwal`**, lewati U3b; bila datang dari versi lebih lama, jalankan `pasangAwal` sekali, langkah U3b).
 
 > **Sudah memasang T6?** Lompat ke bagian **"Mulai di sini bila T6 sudah terpasang"** di bawah (langkah U1–U8). Bagian 0 dan A–H ditujukan untuk pemasangan pertama dari T5 dan tetap berlaku sebagai rujukan.
 
@@ -24,9 +24,11 @@ Panduan ini untuk Anda yang **belum pernah memakai Git/GitHub**. Anda tidak perl
 
 ---
 
-## Mulai di sini bila T6.4 (atau yang lebih lama) sudah terpasang: perbarui ke T7.2 (± 20 menit)
+## Mulai di sini bila T6.4 (atau yang lebih lama) sudah terpasang: perbarui ke T7.3 (± 20 menit)
 
-**Sudah memasang 1.7.1-t7.1?** Dari 1.7.1-t7.1 ke 1.8.0-t7.2 **ada perubahan skema (10)**: satu tabel baru, `PustakaGambar`. Kerjakan U1 (backup), U2 (ganti `Kode.gs` dan **Versi baru**), **U3b (`pasangAwal`, wajib sekali)**, lalu U5 (situs). T7.2 menambah **Pustaka gambar** per paket (unggah banyak gambar sekali, lalu dipilih saat menyunting soal) dan **pembesar gambar** di halaman ujian siswa (bagian 6k di `PANDUAN.md`). Bila `pasangAwal` terlewat, aplikasi tetap jalan; hanya tombol **Pustaka gambar** yang menjawab "Tabel PustakaGambar tidak ditemukan. Jalankan pasangAwal."
+**Sudah memasang 1.8.0-t7.2?** Dari 1.8.0-t7.2 ke 1.8.1-t7.3 **tidak ada perubahan skema**: kerjakan U1 (backup), U2 (ganti `Kode.gs` dan **Versi baru**), lewati U3b, lalu U5 (situs). T7.3 membuat akun Guru dapat melihat data semua pembuat (hanya baca) dan menambah pilihan sekolah di Analisis Soal.
+
+**Sudah memasang 1.7.1-t7.1?** Dari 1.7.1-t7.1 ke 1.8.1-t7.3 **ada perubahan skema (10)**: satu tabel baru, `PustakaGambar`. Kerjakan U1 (backup), U2 (ganti `Kode.gs` dan **Versi baru**), **U3b (`pasangAwal`, wajib sekali)**, lalu U5 (situs). T7.2 menambah **Pustaka gambar** per paket (unggah banyak gambar sekali, lalu dipilih saat menyunting soal) dan **pembesar gambar** di halaman ujian siswa (bagian 6k di `PANDUAN.md`). Bila `pasangAwal` terlewat, aplikasi tetap jalan; hanya tombol **Pustaka gambar** yang menjawab "Tabel PustakaGambar tidak ditemukan. Jalankan pasangAwal."
 
 **Dari 1.7.0-t7.0?** Selain perubahan di atas, T7.1 tidak mengubah skema; cukup satu kali `pasangAwal` (U3b) untuk skema 10. T7.1 hanya mengubah aturan paket Draf: soal boleh disimpan **belum lengkap** (pertanyaan, opsi, atau kunci kosong) dan paket tetap tersimpan sebagai Draf; kelengkapan baru diperiksa saat tombol **Terbitkan** ditekan (bagian 6.6 di `PANDUAN.md`).
 
@@ -45,7 +47,7 @@ Masuk sebagai Admin Utama → **Backup & Pulihkan** → **Buat backup sekarang**
 1. Buka berkas `Kode.gs` yang baru dengan Notepad (Mac: TextEdit, teks polos). Jangan memakai Word.
 2. Buka proyek Apps Script Anda di <https://script.google.com> → di daftar berkas klik **Kode**.
 3. Klik di dalam kotak kode, **Ctrl+A**, **Delete**. Lalu di Notepad: **Ctrl+A**, **Ctrl+C**; kembali ke editor: **Ctrl+V**. (Berkasnya ± 600 KB; tunggu beberapa detik.)
-4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.275** dan tulisannya `}`. Bila angkanya jauh lebih kecil, tempelan terpotong: ulangi langkah 3.
+4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.287** dan tulisannya `}`. Bila angkanya jauh lebih kecil, tempelan terpotong: ulangi langkah 3.
 5. Tekan **Ctrl+S**.
 
 ### U3. Terapkan sebagai versi baru dari penerapan yang sama
@@ -69,9 +71,9 @@ URL `/exec` tetap sama. **Jalan mundur:** versi sebelumnya tetap tersimpan di ri
 Fungsi ini aman diulang. Bila ada pesan galat merah, **berhenti** dan kirimkan tangkapan layar log; jangan melanjutkan ke U4 sebelum jelas.
 
 ### U4. Periksa backend langsung di peramban
-Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.8.0-t7.2"`:
+Buka alamat `/exec` Anda (Isian 1). Yang benar, satu baris JSON yang memuat `"versi":"1.8.1-t7.3"`:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.8.0-t7.2","api":true},"message":"OK"}
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.8.1-t7.3","api":true},"message":"OK"}
 ```
 Bila `versi` masih `1.6.0-t6`, penerapan belum memakai versi baru: ulangi U3 dan pastikan Anda memilih **Versi baru**.
 
@@ -83,7 +85,7 @@ Folder situs lama Anda (tempat dulu `git init`) adalah yang tersambung ke GitHub
 Copy-Item -Path "$HOME\siap-tka-sd-situs\js\config.js" -Destination "$HOME\config-simpanan.js" -Force
 ```
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.8.0-t7.2.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.8.1-t7.3.zip" -DestinationPath "$HOME\siap-tka-sd-situs-baru" -Force
 ```
 ```powershell
 Copy-Item -Path "$HOME\siap-tka-sd-situs-baru\*" -Destination "$HOME\siap-tka-sd-situs" -Recurse -Force
@@ -97,7 +99,7 @@ Copy-Item -Path "$HOME\config-simpanan.js" -Destination "$HOME\siap-tka-sd-situs
 cp ~/siap-tka-sd-situs/js/config.js ~/config-simpanan.js
 ```
 ```bash
-mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.8.0-t7.2.zip -d ~/siap-tka-sd-situs-baru
+mkdir -p ~/siap-tka-sd-situs-baru && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.8.1-t7.3.zip -d ~/siap-tka-sd-situs-baru
 ```
 ```bash
 cp -R ~/siap-tka-sd-situs-baru/. ~/siap-tka-sd-situs/
@@ -148,7 +150,7 @@ Hasil ini belum pernah dicoba di Google dan GitHub asli; kirimkan tangkapan laya
 
 | No | Uji | Yang benar | Hasil Anda |
 |---|---|---|---|
-| 1 | Buka alamat `/exec` | `"versi":"1.8.0-t7.2"` | |
+| 1 | Buka alamat `/exec` | `"versi":"1.8.1-t7.3"` | |
 | 2 | Tab **Soal** di Spreadsheet database | Dua kolom baru di ujung kanan: `pembahasan`, `kunci_status` | |
 | 3 | Masuk sebagai guru, buka paket Terbit lama, ubah satu soal | Soal terbuka; ada kolom **Pembahasan** di formulir; paket lama tetap bisa diubah/terbit seperti biasa | |
 | 4 | Buat paket Draf baru → **Impor** → pilih berkas contoh `.txt` (lihat `PANDUAN.md` 6.6) | Soal terbaca, pembahasan dan catatan kunci tebakan tampil; tidak ada yang tersimpan sebelum Anda mengonfirmasi | |
@@ -180,7 +182,7 @@ Dua kolom baru di tabel **Soal** boleh dibiarkan: kode T6.4 tidak memakainya. **
 |---|---|
 | `Kode.gs` | Ditempel ke editor Apps Script (bagian A). Berkas terpisah, **bukan** di dalam ZIP. |
 | `appsscript.json` | Ditempel ke manifes proyek Apps Script (bagian A). **Bukan** di dalam ZIP. |
-| `siap-tka-sd-situs-1.8.0-t7.2.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
+| `siap-tka-sd-situs-1.8.1-t7.3.zip` | Seluruh isi situs untuk GitHub (bagian B atau U5). Tidak ada berkas `.gs` di dalamnya. |
 | `siap-tka-sd-uji-beban-1.6.1-t6.1.zip` (tidak berubah di T7.0) | Alat uji beban (dijalankan di komputer; `README.md` di dalamnya). Tidak dipasang ke Apps Script atau GitHub. |
 | `PANDUAN-MIGRASI-GITHUB.md` | Panduan ini (salinannya juga ada di dalam ZIP, bernama `PANDUAN-INSTALASI.md`). |
 
@@ -228,7 +230,7 @@ Yang benar: isinya 16 baris, baris pertama `{`, ada tulisan `"timeZone": "Asia/J
 1. Di daftar berkas editor, klik berkas kode utama (biasanya bernama **Kode**).
 2. Klik di dalam kotak kode, **Ctrl+A**, **Delete**.
 3. Di Notepad berkas `Kode.gs`: **Ctrl+A**, **Ctrl+C**. Kembali ke editor: **Ctrl+V**. (Berkasnya besar, ± 600 KB; tunggu beberapa detik sampai editor selesai menampilkan.)
-4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.275**, dan tulisannya `}`. Di bagian atas, baris 1 berisi `/**` dan baris 2 berbunyi `* Kode.gs — Siap TKA SD (gabungan otomatis dari ...`. Bila nomor baris terakhirnya jauh lebih kecil, tempelan terpotong: ulangi langkah 2–3. Tempelan terpotong adalah kegagalan yang paling mudah terjadi.
+4. **Periksa tempelan lengkap:** klik di dalam kode, tekan **Ctrl+End**. Nomor baris terakhir yang berisi tulisan harus **11.287**, dan tulisannya `}`. Di bagian atas, baris 1 berisi `/**` dan baris 2 berbunyi `* Kode.gs — Siap TKA SD (gabungan otomatis dari ...`. Bila nomor baris terakhirnya jauh lebih kecil, tempelan terpotong: ulangi langkah 2–3. Tempelan terpotong adalah kegagalan yang paling mudah terjadi.
 5. Tekan **Ctrl+S**.
 6. File HTML lama (`Index`, `Stylesheet`, `JavaScript`) **tidak dipakai lagi**. Boleh dihapus (titik tiga di sampingnya → **Hapus**) atau dibiarkan; keduanya aman. Penerapan lama (T5) tidak terpengaruh karena ia menyimpan salinan versinya sendiri.
 
@@ -279,12 +281,12 @@ Buka tab peramban baru, tempel URL `/exec` tadi (dari catatan), Enter. Yang bena
 
 Harus muncul:
 ```text
-{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.8.0-t7.2","api":true},"message":"OK"}
+{"success":true,"data":{"layanan":"Siap TKA SD","versi":"1.8.1-t7.3","api":true},"message":"OK"}
 ```
 
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
-| JSON dengan `"versi":"1.8.0-t7.2"` | Benar | Lanjut ke B |
+| JSON dengan `"versi":"1.8.1-t7.3"` | Benar | Lanjut ke B |
 | Halaman login Google | Akses bukan "Siapa saja" | Buat penerapan baru dengan akses **Siapa saja** (A6) |
 | Tampilan aplikasi T5 yang lama | Itu URL penerapan lama | Pakai URL dari penerapan **baru** |
 | `"versi":"1.5.0-t5"` atau halaman galat | Kode baru belum terpasang di penerapan itu | Ulangi A4 lalu A6 |
@@ -357,7 +359,7 @@ Harus muncul: nama dan email yang baru Anda ketik, masing-masing satu baris.
 
 **[Windows] Cara 1: dengan perintah** (bila ZIP ada di folder Downloads dan Windows Anda tidak memakai OneDrive untuk Downloads). Dua kotak, satu per satu.
 ```powershell
-Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.8.0-t7.2.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
+Expand-Archive -Path "$HOME\Downloads\siap-tka-sd-situs-1.8.1-t7.3.zip" -DestinationPath "$HOME\siap-tka-sd-situs" -Force
 ```
 ```powershell
 cd "$HOME\siap-tka-sd-situs"
@@ -370,7 +372,7 @@ cd "$HOME\siap-tka-sd-situs"
 
 **[Mac / Linux] Cara 1: dengan perintah** (bila ZIP ada di `Downloads`). Satu kotak.
 ```bash
-mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.8.0-t7.2.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
+mkdir -p ~/siap-tka-sd-situs && unzip -q -o ~/Downloads/siap-tka-sd-situs-1.8.1-t7.3.zip -d ~/siap-tka-sd-situs && cd ~/siap-tka-sd-situs
 ```
 Tidak ada keluaran bila berhasil.
 
@@ -467,7 +469,7 @@ find . -name "*.gs" -o -name "appsscript.json"
 | Yang Anda lihat | Artinya | Perbaikan |
 |---|---|---|
 | `index.html`, `css`, `js` terlihat | Benar | Lanjut ke B8 |
-| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.8.0-t7.2`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
+| Yang terlihat justru satu folder lain (mis. `siap-tka-sd-situs-1.8.1-t7.3`) | Satu tingkat terlalu tinggi | `cd` masuk ke folder itu, ulangi B7 |
 | `index.html` tidak ada sama sekali | Salah folder, atau ekstraksi gagal | Ulangi B5 |
 | Berkas `.gs` atau `appsscript.json` muncul | Bukan milik frontend | Pindahkan keluar dari folder ini |
 

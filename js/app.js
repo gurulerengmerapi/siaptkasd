@@ -2277,7 +2277,7 @@ function formUbahPassword(konteks) {
   const awal = evaluasiSandi('', '', S.pengguna.username);
   return h`<form data-kirim="ubah-password" data-konteks="${konteks}" id="f-ubah-password-${konteks}" novalidate>
     <div data-galat aria-live="polite"></div>
-    ${kolomSandi({ nama: 'password_sekarang', label: wajib ? 'Password sementara' : 'Password saat ini', id: 'sandi-sekarang-' + konteks, autocomplete: 'current-password', bantu: wajib ? 'Password yang diberikan guru atau admin saat akun dibuat atau direset.' : '' })}
+    ${kolomSandi({ nama: 'password_sekarang', label: wajib ? 'Password sementara' : 'Password saat ini', id: 'sandi-sekarang-' + konteks, autocomplete: wajib ? 'current-password' : 'new-password', bantu: wajib ? 'Password yang diberikan guru atau admin saat akun dibuat atau direset.' : '' })}
     <div class="isian"><label for="sandi-baru-${konteks}">Password baru</label>
       <div class="dengan-tombol"><input class="kontrol" type="password" id="sandi-baru-${konteks}" name="password_baru" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="128" required data-masuk="aturan-sandi">
       <button type="button" class="tombol-sisip" data-aksi="lihat-sandi" aria-label="Tampilkan password" aria-pressed="false">${ikon('eye')}</button></div></div>
@@ -2605,7 +2605,7 @@ function renderProfil(p, c) {
         <div class="isian"><label for="un-baru">Username baru</label>
           <input class="kontrol" id="un-baru" name="username_baru" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="30" required aria-describedby="un-baru-b">
           <p class="bantu" id="un-baru-b">3–30 karakter: huruf kecil, angka, titik, garis bawah, atau strip.</p></div>
-        ${kolomSandi({ nama: 'password_sekarang', label: 'Password saat ini (untuk konfirmasi)', id: 'un-sandi', autocomplete: 'current-password' })}
+        ${kolomSandi({ nama: 'password_sekarang', label: 'Password saat ini (untuk konfirmasi)', id: 'un-sandi', autocomplete: 'new-password' })}
         <div class="aksi-form"><button type="submit" class="tombol tombol-garis">${ikon('edit')}<span>Ubah username</span></button></div>
       </form></section>`;
     const kartuSandi = h`<section class="kartu" aria-labelledby="h-sandi"><div class="kartu-judul"><span class="ikon-bulat">${ikon('lock')}</span><h3 id="h-sandi">Ganti password</h3></div>
