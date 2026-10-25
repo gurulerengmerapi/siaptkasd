@@ -1565,7 +1565,7 @@ const NAMA_MENU_MAPEL = { BIN: 'B.Indonesia', MAT: 'Matematika', IPA: 'IPA' };
 
 const MENU = {
   ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
-  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['audit', 'Log Aktivitas', 'activity']],
+  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['audit', 'Log Aktivitas', 'activity']],
   SISWA: [['dasbor', 'Beranda', 'home']].concat(MAPEL_URUT.map(function (k) {
     return ['katalog', 'Latihan soal ' + NAMA_MENU_MAPEL[k], IKON_MAPEL[k], { mapel: k }];
   }), [['materi', 'Materi', 'file-text'], ['riwayat', 'Riwayat', 'clock']])
@@ -1594,7 +1594,7 @@ const HALAMAN = {
   hasil: { peran: [PERAN.SISWA], menu: 'riwayat', render: function (p, c) { renderHasil(p, c, false); } },
   riwayat: { peran: [PERAN.SISWA], render: function (p, c) { renderRiwayat(p, c); } },
   katalog: { peran: [PERAN.SISWA], render: function (p, c) { renderKatalog(p, c); } },
-  percobaan: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPercobaan(p, c); } },
+  percobaan: { peran: [PERAN.ADMIN], render: function (p, c) { renderPercobaan(p, c); } },
   'hasil-nilai': { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderHasilNilai(p, c); } },
   analisis: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderAnalisisSoal(p, c); } },
   wajib: { tanpaRangka: true, render: function (p, c) { renderWajib(p, c); } },
@@ -8509,7 +8509,7 @@ function htmlPanelKoreksi(pk, soal, dibatalkan) {
   const boleh = bolehKoreksi();
   return h`<details class="kartu jarak-bawah panel-koreksi" id="panel-koreksi" aria-labelledby="h-koreksi"${bukaPanelKoreksi ? mentah(' open') : ''}>
     <summary class="kartu-judul"><span class="ikon-bulat peringatan">${ikon('edit')}</span><h3 id="h-koreksi">Koreksi Massal: hitung ulang nilai yang sudah ada</h3></summary>
-    <div class="baris-bungkus"><button type="button" class="tombol tombol-diam" data-aksi="pc-ke-paket">${ikon('bar-chart')}<span>Lihat percobaan paket ini</span></button></div>
+    ${S.pengguna && S.pengguna.peran === PERAN.ADMIN ? h`<div class="baris-bungkus"><button type="button" class="tombol tombol-diam" data-aksi="pc-ke-paket">${ikon('bar-chart')}<span>Lihat percobaan paket ini</span></button></div>` : ''}
     <p class="teks-redam">Mengubah soal di daftar atas <strong>tidak mengubah nilai yang sudah ada</strong>. Bila kunci yang keliru atau soal yang bermasalah harus ikut memperbaiki nilai lama, pakai Koreksi Massal: semua percobaan yang terdampak dihitung ulang, perubahan nilai tercatat, dan peringkat ikut diperbarui. Anda akan melihat dampaknya dulu sebelum menerapkan.</p>
     ${boleh ? '' : h`<div class="peringatan peringatan-waspada jarak-bawah">${ikon('lock')}<div><p><strong>Anda belum diberi izin koreksi.</strong> Minta Admin Utama untuk mengaktifkan izin koreksi massal pada akun Anda.</p></div></div>`}
     <ol class="daftar-soal">${soal.map(function (s, i) {
@@ -9157,7 +9157,7 @@ AKSI['impor-buka'] = function () {
 };
 
 
-const anSt = { id_paket: '', sekolah: '', opsiSekolah: [], data: null, paket: [], seq: 0 };
+const anSt = { id_paket: '', sekolah: '', rentang: 'semua', dari: '', sampai: '', opsiSekolah: [], data: null, paket: [], seq: 0 };
 const AN_KUNCI_SESI = 'siap.analisis.paket';
 const AN_KELAS_KATEGORI = { Mudah: 'lencana-sukses', Sedang: 'lencana-peringatan', Sulit: 'lencana-bahaya' };
 const AN_WARNA_KATEGORI = { Mudah: 'benar', Sedang: 'sebagian', Sulit: 'salah' };
@@ -9168,13 +9168,16 @@ function anPersenTeks(n, total) { const p = anPersen(n, total); return p === nul
 function anCapaianTeks(c) { return typeof c === 'number' ? formatAngka(c, 1) + '%' : '—'; }
 
 function renderAnalisisSoal(p, c) {
-  anSt.data = null; anSt.sekolah = ''; anSt.opsiSekolah = [];
+  anSt.data = null; anSt.sekolah = ''; anSt.rentang = 'semua'; anSt.dari = ''; anSt.sampai = ''; anSt.opsiSekolah = [];
   anSt.id_paket = anSt.id_paket || bacaLokal('sesi', AN_KUNCI_SESI) || '';
   pasang(c.wadah, h`
     ${kepalaHalaman('Analisis Soal', 'Soal mana yang paling banyak dijawab benar dan mana yang paling sulit, dihitung dari semua pengerjaan yang sudah selesai pada satu paket.')}
     <div class="saring-analisis" role="search">
       <div class="isian"><label for="an-paket">Paket</label><select class="kontrol" id="an-paket" data-masuk="an-paket"><option value="">Pilih paket…</option></select></div>
       <div class="isian"><label for="an-sekolah">Sekolah</label><select class="kontrol" id="an-sekolah" data-masuk="an-sekolah"><option value="">Semua sekolah</option></select></div>
+      <div class="isian"><label for="an-rentang">Rentang waktu</label><select class="kontrol" id="an-rentang" data-masuk="an-rentang"><option value="semua" selected>Semua rentang waktu</option><option value="khusus">Rentang waktu khusus</option></select></div>
+      <div class="isian" id="an-dari-bungkus" hidden><label for="an-dari">Selesai dari tanggal</label><input class="kontrol" id="an-dari" type="date" data-masuk="an-tanggal"></div>
+      <div class="isian" id="an-sampai-bungkus" hidden><label for="an-sampai">Sampai tanggal</label><input class="kontrol" id="an-sampai" type="date" data-masuk="an-tanggal"></div>
     </div>
     <div id="an-hasil" aria-live="polite"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat daftar paket…</span></div></div>`);
   fokusJudul();
@@ -9194,7 +9197,7 @@ function renderAnalisisSoal(p, c) {
 function muatAnalisis(ok) {
   const seq = ++anSt.seq;
   pasang(el('#an-hasil'), h`<div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Menghitung analisis…</span></div>`);
-  return panggil('analisis.paket', { id_paket: anSt.id_paket, sekolah: anSt.sekolah }, { ulang: true }).then(function (d) {
+  return panggil('analisis.paket', anParam(), { ulang: true }).then(function (d) {
     if (seq !== anSt.seq || (ok && !ok())) return;
     anSt.data = d;
     anSt.opsiSekolah = d.opsiSekolah || [];
@@ -9211,6 +9214,33 @@ function muatAnalisis(ok) {
   });
 }
 
+function anParam() {
+  const d = { id_paket: anSt.id_paket, sekolah: anSt.sekolah };
+  if (anSt.rentang === 'khusus') { d.dari = anSt.dari; d.sampai = anSt.sampai; }
+  return d;
+}
+MASUKAN['an-rentang'] = function () {
+  const sel = el('#an-rentang');
+  if (!sel) return;
+  anSt.rentang = sel.value === 'khusus' ? 'khusus' : 'semua';
+  const k = anSt.rentang === 'khusus';
+  ['#an-dari-bungkus', '#an-sampai-bungkus'].forEach(function (q) { const n = el(q); if (n) n.hidden = !k; });
+  if (!k) { anSt.dari = ''; anSt.sampai = ''; const a = el('#an-dari'), b = el('#an-sampai'); if (a) a.value = ''; if (b) b.value = ''; }
+  anSt.data = null;
+  if (anSt.id_paket) muatAnalisis(); else gambarAnalisis();
+};
+MASUKAN['an-tanggal'] = function () {
+  const a = el('#an-dari'), b = el('#an-sampai');
+  anSt.dari = a ? a.value : ''; anSt.sampai = b ? b.value : '';
+  anSt.data = null;
+  if (anSt.id_paket) muatAnalisis(); else gambarAnalisis();
+};
+function anRentangTeks(d) {
+  if (d.dari && d.sampai) return d.dari + ' s.d. ' + d.sampai;
+  if (d.dari) return 'sejak ' + d.dari;
+  if (d.sampai) return 'sampai ' + d.sampai;
+  return 'Semua rentang waktu';
+}
 function anIsiSekolah() {
   const sel = el('#an-sekolah');
   if (!sel) return;
@@ -9299,7 +9329,7 @@ function anUnduh(tombol, jenis, sulitDulu) {
   kerjakan(tombol, function () {
     return new Promise(function (selesai) { setTimeout(selesai, 0); }).then(function () {
       const bytes = jenis === 'pdf' ? anPdf(d) : anXlsx(d, sulitDulu);
-      ekLapor(wadah, ekNamaBerkas(['analisis-soal', d.paket.nama].concat(d.sekolah ? [d.sekolah] : []).concat(sulitDulu ? ['tersulit'] : []), jenis), bytes, jenis === 'pdf' ? 'application/pdf' : XLSX_TIPE);
+      ekLapor(wadah, ekNamaBerkas(['analisis-soal', d.paket.nama].concat(d.sekolah ? [d.sekolah] : []).concat(d.dari || d.sampai ? [(d.dari || 'awal') + '_' + (d.sampai || 'akhir')] : []).concat(sulitDulu ? ['tersulit'] : []), jenis), bytes, jenis === 'pdf' ? 'application/pdf' : XLSX_TIPE);
     });
   }).catch(function (e) { ekLaporGalat(wadah, e); });
 }
@@ -9314,7 +9344,7 @@ function anUrutSulit(butir) {
 
 function anRingkasanPasang(d) {
   const r = d.ringkas;
-  return [['Paket', d.paket.nama], ['Sekolah', d.sekolah || 'Semua sekolah'], ['Mata pelajaran', (MAPEL[d.paket.mapel] || d.paket.mapel) + ' · ' + d.paket.kategori], ['Pengerjaan dianalisis', formatAngka(d.jumlahPercobaan)],
+  return [['Paket', d.paket.nama], ['Sekolah', d.sekolah || 'Semua sekolah'], ['Rentang waktu', anRentangTeks(d)], ['Mata pelajaran', (MAPEL[d.paket.mapel] || d.paket.mapel) + ' · ' + d.paket.kategori], ['Pengerjaan dianalisis', formatAngka(d.jumlahPercobaan)],
     ['Rata-rata nilai', d.rataNilai === null ? '-' : formatAngka(d.rataNilai, 2)], ['Butir soal', formatAngka(r.butir)], ['Rata-rata capaian', anCapaianTeks(r.rerataCapaian)]];
 }
 
