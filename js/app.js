@@ -1336,7 +1336,7 @@ const CACHE_BACA = {
 
 const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
-  'percobaan.detail': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
+  'percobaan.detail': 1, 'pantau.sekarang': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
   'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1,
   'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
@@ -1564,15 +1564,15 @@ function pulihkanSnapshot() {
 const NAMA_MENU_MAPEL = { BIN: 'B.Indonesia', MAT: 'Matematika', IPA: 'IPA' };
 
 const MENU = {
-  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
-  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['audit', 'Log Aktivitas', 'activity']],
+  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
+  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['audit', 'Log Aktivitas', 'activity']],
   SISWA: [['dasbor', 'Beranda', 'home']].concat(MAPEL_URUT.map(function (k) {
     return ['katalog', 'Latihan soal ' + NAMA_MENU_MAPEL[k], IKON_MAPEL[k], { mapel: k }];
   }), [['materi', 'Materi', 'file-text'], ['riwayat', 'Riwayat', 'clock']])
 };
 const JUDUL_HALAMAN = {
   beranda: 'Beranda', masuk: 'Masuk', token: 'Ujian dengan kode', wajib: 'Lengkapi akun Anda', dasbor: 'Dasbor', profil: 'Profil Saya', akun: 'Kelola Akun', 'impor-siswa': 'Impor Siswa',
-  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
+  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', pantau: 'Pantauan Ujian', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
   pengaturan: 'Pengaturan', audit: 'Log Audit', backup: 'Backup & Pulihkan'
 };
 
@@ -1597,6 +1597,7 @@ const HALAMAN = {
   percobaan: { peran: [PERAN.ADMIN], render: function (p, c) { renderPercobaan(p, c); } },
   'hasil-nilai': { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderHasilNilai(p, c); } },
   analisis: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderAnalisisSoal(p, c); } },
+  pantau: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPantau(p, c); } },
   wajib: { tanpaRangka: true, render: function (p, c) { renderWajib(p, c); } },
   dasbor: { render: function (p, c) { renderDasbor(p, c); } },
   profil: { render: function (p, c) { renderProfil(p, c); } },
@@ -8377,6 +8378,138 @@ AKSI['token-cabut'] = function (b) {
     panggil('token.cabut', { id: id }).then(function () { toast('Kode dicabut.', 'sukses'); return muatPanelToken(); }).catch(gagalUmum);
   });
 };
+
+
+const PN_JEDA_DETIK = 20;
+const pnSt = { data: null, q: '', paket: '', koneksi: '', terambil: 0, sedang: false, pewaktu: null, c: null, galat: false };
+const PN_KONEKSI = {
+  terhubung: { kelas: 'lencana-sukses', ikon: 'wifi', teks: 'Terhubung' },
+  lambat: { kelas: 'lencana-peringatan', ikon: 'alert-triangle', teks: 'Lambat' },
+  terputus: { kelas: 'lencana-bahaya', ikon: 'wifi-off', teks: 'Terputus' },
+  ditutup: { kelas: '', ikon: 'clock', teks: 'Menunggu ditutup' }
+};
+const PN_URUT = { terputus: 0, lambat: 1, ditutup: 2, terhubung: 3 };
+
+function jamWIBDari(iso) {
+  const d = keWIB(iso);
+  return d ? dua(d.getUTCHours()) + '.' + dua(d.getUTCMinutes()) + '.' + dua(d.getUTCSeconds()) + ' WIB' : '—';
+}
+function kontakTeks(detik) {
+  const d = Math.max(0, Math.floor(detik));
+  return d < 60 ? d + ' dtk lalu' : Math.floor(d / 60) + ' mnt lalu';
+}
+
+function renderPantau(p, c) {
+  pnSt.q = ''; pnSt.paket = ''; pnSt.koneksi = ''; pnSt.data = null; pnSt.terambil = 0; pnSt.galat = false; pnSt.c = c;
+  clearTimeout(pnSt.pewaktu);
+  pasang(c.wadah, h`
+    ${kepalaHalaman('Pantauan Ujian', 'Percobaan yang sedang berjalan sekarang, dari akun siswa maupun peserta dengan kode. Diperbarui otomatis; hanya baca.')}
+    <div id="pn-ringkas" class="kisi-kpi kisi-kpi-2" data-uji="pn-ringkas"></div>
+    <div class="saring" role="search">
+      <div class="cari"><label class="sr-only" for="pn-cari">Cari nama peserta</label>${ikon('search')}<input class="kontrol" id="pn-cari" type="search" placeholder="Cari nama peserta atau sekolah" value="" data-masuk="pantau-saring" autocomplete="off"></div>
+      <div class="isian"><label class="sr-only" for="pn-paket">Paket</label><select class="kontrol" id="pn-paket" data-masuk="pantau-saring"><option value="">Semua paket</option></select></div>
+      <div class="isian"><label class="sr-only" for="pn-koneksi">Koneksi</label><select class="kontrol" id="pn-koneksi" data-masuk="pantau-saring"><option value="">Semua koneksi</option><option value="perhatian">Perlu perhatian</option><option value="terhubung">Terhubung</option></select></div>
+    </div>
+    <div class="baris-bungkus jarak-bawah pn-status"><p class="bantu tanpa-margin" id="pn-diperbarui" aria-live="off" data-uji="pn-diperbarui"></p><button type="button" class="tombol tombol-garis" data-aksi="pantau-segarkan" data-uji="pn-segarkan">${ikon('refresh')}<span>Perbarui sekarang</span></button></div>
+    <div id="pn-daftar" data-uji="pn-daftar"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat pantauan…</span></div></div>
+    <p class="bantu jarak-atas">Status koneksi dibaca dari kontak terakhir peserta ke server (setiap jawaban disimpan, kira-kira tiap 90 detik): <strong>Terhubung</strong> sampai 3 menit, <strong>Lambat</strong> sampai 5 menit, <strong>Terputus</strong> lebih dari itu. Peserta yang terputus dan tidak kembali sampai waktu habis dibatalkan otomatis. Jawaban tidak ditampilkan di sini.</p>`);
+  fokusJudul();
+  ambilPantau(c, false);
+  putarPantau(c);
+}
+
+function ambilPantau(c, senyap) {
+  if (pnSt.sedang) return Promise.resolve();
+  pnSt.sedang = true;
+  return panggil('pantau.sekarang', {}, { senyap: !!senyap }).then(function (d) {
+    pnSt.sedang = false;
+    if (!c.ok()) return;
+    pnSt.data = d; pnSt.terambil = Date.now(); pnSt.galat = false;
+    const t = pnSt.terambil;
+    d.daftar.forEach(function (x) { x.akhirMs = t + x.sisaDetik * 1000; });
+    gambarPantau();
+  }).catch(function (e) {
+    pnSt.sedang = false;
+    if (!c.ok()) return;
+    if (!pnSt.data) { tampilkanGalatMuat(el('#pn-daftar'), e, true); return; }
+    pnSt.galat = true; pnSt.terambil = Date.now();
+    gambarStatusPantau();
+  });
+}
+
+function putarPantau(c) {
+  clearTimeout(pnSt.pewaktu);
+  pnSt.pewaktu = setTimeout(function () {
+    if (!c.ok()) return;
+    semua('[data-akhir]').forEach(function (e) { e.textContent = formatSisa((Number(e.getAttribute('data-akhir')) - Date.now()) / 1000); });
+    if (!document.hidden && !pnSt.sedang && pnSt.data && Date.now() - pnSt.terambil >= PN_JEDA_DETIK * 1000) ambilPantau(c, true);
+    putarPantau(c);
+  }, 1000);
+}
+
+function gambarStatusPantau() {
+  const e = el('#pn-diperbarui');
+  if (!e || !pnSt.data) return;
+  e.textContent = (pnSt.galat ? 'Gagal memperbarui; yang tampil data pukul ' : 'Diperbarui pukul ') + jamWIBDari(pnSt.data.diperbarui) + (pnSt.galat ? '. Mencoba lagi otomatis.' : ' · otomatis tiap ' + PN_JEDA_DETIK + ' detik.');
+}
+
+function gambarPantau() {
+  const d = pnSt.data;
+  const wadah = el('#pn-daftar');
+  if (!d || !wadah) return;
+  const r = d.ringkas;
+  pasang(el('#pn-ringkas'), h`${kpi('eye', 'Sedang mengerjakan', d.jumlah, d.terpotong ? 'Hanya ' + formatAngka(d.daftar.length) + ' pertama yang ditampilkan' : 'Percobaan berjalan sekarang', '')}
+    ${kpi('wifi', 'Terhubung', r.terhubung, 'Kontak terakhir kurang dari 3 menit', 'sukses')}
+    ${kpi('alert-triangle', 'Lambat atau terputus', r.lambat + r.terputus, 'Perlu dicek bila berlangsung lama', (r.lambat + r.terputus) > 0 ? 'peringatan' : '')}
+    ${kpi('clock', 'Menunggu ditutup', r.ditutup, 'Waktu habis, menunggu pemicu waktu', '')}`);
+  const sel = el('#pn-paket');
+  if (sel) {
+    const paket = {};
+    d.daftar.forEach(function (x) { paket[x.idPaket] = x.namaPaket; });
+    const ada = Object.keys(paket).sort(function (a, b) { return String(paket[a]).localeCompare(String(paket[b])); });
+    if (pnSt.paket && !paket[pnSt.paket]) pnSt.paket = '';
+    pasang(sel, h`<option value="">Semua paket</option>${ada.map(function (k) { return h`<option value="${k}"${pnSt.paket === k ? mentah(' selected') : ''}>${paket[k]}</option>`; })}`);
+  }
+  gambarStatusPantau();
+  if (!d.daftar.length) {
+    pasang(wadah, h`<div class="kartu kosong" data-uji="pn-kosong"><span class="ikon-bulat netral">${ikon('eye')}</span><h3>Tidak ada yang sedang mengerjakan</h3><p>Percobaan yang sedang berjalan akan muncul di sini dan hilang sendiri saat selesai.</p></div>`);
+    return;
+  }
+  const q = pnSt.q.toLowerCase();
+  const baris = d.daftar.filter(function (x) {
+    if (pnSt.paket && x.idPaket !== pnSt.paket) return false;
+    if (pnSt.koneksi === 'terhubung' && x.koneksi !== 'terhubung') return false;
+    if (pnSt.koneksi === 'perhatian' && x.koneksi === 'terhubung') return false;
+    if (q && (x.nama + ' ' + x.sekolah).toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  }).sort(function (a, b) { return (PN_URUT[a.koneksi] - PN_URUT[b.koneksi]) || (a.sisaDetik - b.sisaDetik); });
+  if (!baris.length) {
+    pasang(wadah, h`<div class="kartu kosong" data-uji="pn-tidak-cocok"><span class="ikon-bulat netral">${ikon('search')}</span><h3>Tidak ada yang cocok</h3><p>Ubah kata kunci atau penyaring.</p></div>`);
+    return;
+  }
+  pasang(wadah, h`<div class="bungkus-tabel"><table class="tabel" data-uji="pn-tabel"><caption class="sr-only">Percobaan yang sedang berjalan</caption>
+    <thead><tr><th scope="col">Peserta</th><th scope="col">Paket</th><th scope="col">Soal terjawab</th><th scope="col">Sisa waktu</th><th scope="col">Koneksi</th></tr></thead>
+    <tbody>${baris.map(function (x) {
+      const k = PN_KONEKSI[x.koneksi] || PN_KONEKSI.ditutup;
+      const persen = x.soalTotal > 0 ? Math.round(x.terjawab / x.soalTotal * 100) : 0;
+      return h`<tr data-uji="pn-baris" data-koneksi="${x.koneksi}">
+        <td data-label="Peserta" class="pecah"><div class="tebal">${x.nama}</div><div class="sub-sel">${x.sekolah || '—'}${x.kelas ? ' · kelas ' + x.kelas : ''} · ${x.jalur === 'Token' ? 'kode ujian' : 'akun siswa'}</div></td>
+        <td data-label="Paket" class="pecah"><div class="tebal">${x.namaPaket}</div><div class="sub-sel">${MAPEL[x.mapel] || x.mapel} · ${x.kategori} · percobaan ke-${x.nomorUrut}</div></td>
+        <td data-label="Soal terjawab"><div class="pn-progres"><span class="angka" data-uji="pn-terjawab">${formatAngka(x.terjawab)} / ${formatAngka(x.soalTotal)}</span><span class="pn-bar" aria-hidden="true"><span style="width:${persen}%"></span></span></div></td>
+        <td data-label="Sisa waktu" class="angka"><span data-akhir="${x.akhirMs}" data-uji="pn-sisa">${formatSisa(x.sisaDetik)}</span></td>
+        <td data-label="Koneksi"><span class="lencana ${k.kelas}">${ikon(k.ikon, 'ikon-sm')} ${k.teks}</span><div class="sub-sel">Kontak terakhir ${kontakTeks(x.kontakDetik)}${x.pindahTab > 0 ? ' · pindah tab ' + formatAngka(x.pindahTab) + '×' : ''}</div></td></tr>`;
+    })}</tbody></table></div>`);
+}
+
+MASUKAN['pantau-saring'] = tundaKe(function () {
+  const a = el('#pn-cari'), p = el('#pn-paket'), k = el('#pn-koneksi');
+  if (!a || !p || !k) return;
+  pnSt.q = a.value.trim(); pnSt.paket = p.value; pnSt.koneksi = k.value;
+  gambarPantau();
+}, 200);
+AKSI['pantau-segarkan'] = function () { if (pnSt.c && pnSt.c.ok()) ambilPantau(pnSt.c, false); };
+
+if (window.__siapUji && typeof window.__siapUji === 'object') window.__siapUji.pantau = pnSt;
 
 
 const pcSt = { id_paket: '', status: '', jalur: '', q: '', halaman: 1, ukuran: 30, data: null, paket: [], seq: 0 };

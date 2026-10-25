@@ -1793,3 +1793,10 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .cincin-isi, .progres-isi { transition: none; }
 }
+
+.pn-status { align-items: center; justify-content: space-between; }
+.pn-progres { display: grid; gap: .25rem; min-width: 6.5rem; }
+.pn-bar { display: block; height: 8px; border-radius: var(--r-full); background: var(--surface-2); border: 1px solid var(--border-strong); overflow: hidden; }
+.pn-bar > span { display: block; height: 100%; background: var(--primary-text); }
+tr[data-koneksi="terputus"] td:first-child { box-shadow: inset 4px 0 0 var(--danger-border); }
+tr[data-koneksi="lambat"] td:first-child { box-shadow: inset 4px 0 0 var(--warn-border); }
