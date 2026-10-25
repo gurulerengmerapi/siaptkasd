@@ -3607,6 +3607,46 @@ function htmlButir(b, untukStaf) {
   </li>`;
 }
 
+const CINCIN_R = 72;
+const CINCIN_KELILING = 2 * Math.PI * CINCIN_R;
+function pesanHasil(nilai) {
+  if (nilai >= 90) return { ikon: 'star', judul: 'Luar biasa!', isi: 'Nilaimu sangat tinggi. Pertahankan ya!' };
+  if (nilai >= 75) return { ikon: 'star', judul: 'Hebat!', isi: 'Hasil yang bagus. Sedikit lagi bisa lebih tinggi.' };
+  if (nilai >= 60) return { ikon: 'trending-up', judul: 'Bagus, terus berlatih!', isi: 'Pelajari lagi soal yang masih salah, lalu coba lagi.' };
+  if (nilai >= 40) return { ikon: 'target', judul: 'Sedikit lagi!', isi: 'Kamu sudah di jalur yang benar. Belajar lagi sebentar, lalu coba lagi.' };
+  return { ikon: 'graduation-cap', judul: 'Ayo semangat!', isi: 'Belum berhasil kali ini, tidak apa-apa. Setiap latihan membuatmu lebih siap.' };
+}
+function bandingHasil(nilai, sebelumnya) {
+  if (!sebelumnya) return '';
+  const lama = Number(sebelumnya.nilai);
+  if (!isFinite(lama)) return '';
+  const selisih = Math.round((nilai - lama) * 100) / 100;
+  const acuan = ' dari percobaan sebelumnya (' + sebelumnya.nilaiTeks + ')';
+  if (selisih > 0) return h`<p class="hasil-banding naik" data-uji="hasil-banding">${ikon('trending-up', 'ikon-sm')}<span>Naik ${formatAngka(selisih, selisih % 1 === 0 ? 0 : 2)} poin${acuan}</span></p>`;
+  if (selisih < 0) return h`<p class="hasil-banding turun" data-uji="hasil-banding">${ikon('arrow-down', 'ikon-sm')}<span>Turun ${formatAngka(-selisih, selisih % 1 === 0 ? 0 : 2)} poin${acuan}. Tidak apa-apa, coba lagi!</span></p>`;
+  return h`<p class="hasil-banding sama" data-uji="hasil-banding">${ikon('check', 'ikon-sm')}<span>Sama dengan percobaan sebelumnya (${sebelumnya.nilaiTeks})</span></p>`;
+}
+function htmlNilaiMeriah(d) {
+  const nilai = Math.max(0, Math.min(100, Number(d.nilai)));
+  const pesan = pesanHasil(nilai);
+  return h`<div class="nilai-besar hasil-meriah" data-uji="nilai-meriah">
+    <div class="cincin"><svg viewBox="0 0 176 176" aria-hidden="true" focusable="false"><circle class="cincin-jalur" cx="88" cy="88" r="${CINCIN_R}"></circle><circle class="cincin-isi" cx="88" cy="88" r="${CINCIN_R}" stroke-dasharray="${CINCIN_KELILING.toFixed(2)}" stroke-dashoffset="${CINCIN_KELILING.toFixed(2)}" data-ke="${nilai}" data-uji="cincin"></circle></svg>
+      <div class="cincin-isi-teks"><span class="nilai-label">Nilai</span><span class="nilai-angka angka" data-uji="nilai">${d.nilaiTeks}</span></div></div>
+    ${d.skor !== undefined ? h`<span class="teks-redam angka">Skor ${angkaSkor(d.skor)} dari ${angkaSkor(d.skorMaks)}</span>` : ''}
+    <div class="hasil-pesan" data-uji="hasil-pesan"><h3>${ikon(pesan.ikon)}<span>${pesan.judul}</span></h3><p>${pesan.isi}</p></div>
+    ${bandingHasil(nilai, d.sebelumnya)}
+  </div>`;
+}
+function isiCincin() {
+  const isi = function () {
+    semua('.cincin-isi[data-ke]').forEach(function (e) {
+      const n = Number(e.getAttribute('data-ke')) || 0;
+      e.style.strokeDashoffset = String(CINCIN_KELILING * (1 - n / 100));
+    });
+  };
+  if (window.requestAnimationFrame) window.requestAnimationFrame(function () { window.requestAnimationFrame(isi); }); else isi();
+}
+
 function htmlHasil(d, staf) {
   const pk = d.percobaan;
   const lencanaStatus = pk.status === 'Waktu habis' ? h`<span class="lencana lencana-peringatan">${ikon('clock', 'ikon-sm')} Waktu habis</span>`
@@ -3617,7 +3657,9 @@ function htmlHasil(d, staf) {
   const kepala = h`<section class="kartu hasil-ringkas" aria-labelledby="hasil-judul">
     <div class="baris-bungkus"><h2 id="hasil-judul" class="tanpa-margin">${d.paket.nama}</h2>${lencanaStatus}</div>
     <p class="teks-redam tanpa-margin">${MAPEL[d.paket.mapel] || d.paket.mapel} · ${d.paket.kategori}${pk.nomorUrut > 1 || !staf ? ' · percobaan ke-' + pk.nomorUrut : ''} · selesai ${waktuWIB(pk.waktuSelesai)}</p>
-    ${d.nilaiTeks !== undefined ? h`<div class="nilai-besar"><span class="nilai-label">Nilai</span><span class="nilai-angka angka" data-uji="nilai">${d.nilaiTeks}</span>${d.skor !== undefined ? h`<span class="teks-redam angka">Skor ${angkaSkor(d.skor)} dari ${angkaSkor(d.skorMaks)}</span>` : ''}</div>` : ''}
+    ${d.nilaiTeks === undefined ? '' : (!staf && isFinite(Number(d.nilai))
+      ? htmlNilaiMeriah(d)
+      : h`<div class="nilai-besar"><span class="nilai-label">Nilai</span><span class="nilai-angka angka" data-uji="nilai">${d.nilaiTeks}</span>${d.skor !== undefined ? h`<span class="teks-redam angka">Skor ${angkaSkor(d.skor)} dari ${angkaSkor(d.skorMaks)}</span>` : ''}</div>`)}
     ${d.pesan ? h`<div class="peringatan">${ikon('info')}<div><p>${d.pesan}</p></div></div>` : ''}
     ${d.dihapus ? h`<div class="peringatan" data-uji="catatan-dihapus">${ikon('info')}<div><p>${formatAngka(d.dihapus)} soal dihapus setelah dikerjakan, jadi tidak tampil di rincian. Nilai tetap sesuai hasil saat dikerjakan.</p></div></div>` : ''}
     ${d.hitung ? h`<ul class="hitung-hasil" aria-label="Rekap jawaban">
@@ -3649,6 +3691,7 @@ function renderHasil(p, c, token) {
       : h`<div class="baris-bungkus jarak-atas"><button type="button" class="tombol" data-aksi="ke-dasbor">${ikon('home')}<span>Kembali ke beranda</span></button><button type="button" class="tombol tombol-diam" data-aksi="nav" data-ke="riwayat">${ikon('clock')}<span>Riwayat</span></button></div>`;
     pasang(c.wadah, bungkus(h`${token ? '' : kepalaHalaman('Hasil ujian', null)}${htmlHasil(d, false)}${aksi}`));
     if (token) setJudul(d.paket.nama); else setJudul('Hasil ujian');
+    isiCincin();
     fokusJudul();
   }).catch(function (e) {
     if (!c.ok() || e.ditangani) return;
@@ -3666,6 +3709,30 @@ AKSI['token-selesai'] = function () {
 };
 
 const KELAS_STATUS = { Berjalan: 'lencana-info', Selesai: 'lencana-sukses', 'Waktu habis': 'lencana-peringatan', Dibatalkan: 'lencana-bahaya' };
+function mapelDariRiwayat(daftar) {
+  const urut = daftar.filter(function (r) { return r.status === 'Selesai' || r.status === 'Waktu habis'; })
+    .sort(function (a, b) { return String(a.waktuSelesai || a.waktuMulai).localeCompare(String(b.waktuSelesai || b.waktuMulai)); });
+  const nomor = {};
+  const per = {};
+  MAPEL_URUT.forEach(function (k) { per[k] = { kode: k, nama: MAPEL[k], selesai: 0, tersembunyi: 0, seri: [] }; });
+  urut.forEach(function (r) {
+    const e = per[r.mapel];
+    if (!e) return;
+    const kp = r.idPaket || r.namaPaket;
+    nomor[kp] = (nomor[kp] || 0) + 1;
+    e.selesai++;
+    if (r.nilai === null || r.nilai === undefined || r.nilaiTeks === null) { e.tersembunyi++; return; }
+    e.seri.push({ namaPaket: r.namaPaket, kategori: r.kategori, ke: nomor[kp], nilai: r.nilai, nilaiTeks: r.nilaiTeks, waktu: r.waktuSelesai || r.waktuMulai });
+  });
+  return MAPEL_URUT.map(function (k) {
+    const e = per[k];
+    let tertinggi = null;
+    e.seri.forEach(function (x) { if (!tertinggi || x.nilai > tertinggi.nilai) tertinggi = x; });
+    const batas = 30;
+    return { kode: k, nama: e.nama, selesai: e.selesai, tersembunyi: e.tersembunyi, nilaiTerbaru: e.seri.length ? e.seri[e.seri.length - 1] : null, nilaiTertinggi: tertinggi, seri: e.seri.slice(-batas), seriTerpotong: e.seri.length > batas };
+  });
+}
+
 function renderRiwayat(p, c) {
   panggil('ujian.riwayat', {}, { ulang: true }).then(function (daftar) {
     if (!c.ok()) return;
@@ -3674,7 +3741,11 @@ function renderRiwayat(p, c) {
       fokusJudul();
       return;
     }
+    const mapel = mapelDariRiwayat(daftar).filter(function (m) { return m.selesai > 0; });
+    grMapel = mapel;
     pasang(c.wadah, h`${kepalaHalaman('Riwayat pengerjaan', 'Semua percobaan Anda, terbaru di atas.')}
+      ${mapel.length ? h`<section aria-labelledby="ri-grafik-j" data-uji="ri-grafik"><h3 class="judul-bagian" id="ri-grafik-j">Perkembangan nilai</h3><div class="kisi-mapel">${mapel.map(function (m) { return kartuMapel(m, true); })}</div></section>` : ''}
+      <h3 class="judul-bagian">Semua percobaan</h3>
       <div class="bungkus-tabel"><table class="tabel"><caption class="sr-only">Riwayat pengerjaan</caption>
         <thead><tr><th scope="col">Paket</th><th scope="col">Percobaan</th><th scope="col">Status</th><th scope="col">Nilai</th><th scope="col">Mulai</th><th scope="col"><span class="sr-only">Aksi</span></th></tr></thead>
         <tbody>${daftar.map(function (r) {
@@ -3688,6 +3759,7 @@ function renderRiwayat(p, c) {
               ? h`<button type="button" class="tombol" data-aksi="ujian-lanjut" data-id="${r.id}">${ikon('play')}<span>Lanjutkan</span></button>`
               : h`<button type="button" class="tombol tombol-diam" data-aksi="riwayat-hasil" data-id="${r.id}">${ikon('file-text')}<span>Lihat hasil</span></button>`}</div></td></tr>`;
         })}</tbody></table></div>`);
+    gambarSemuaGrafik();
     fokusJudul();
   }).catch(function (e) { if (c.ok()) tampilkanGalatMuat(c.wadah, e, true); });
 }
@@ -3926,9 +3998,10 @@ function grContoh(gaya, ulang, tanpaGaris) {
 
 
 const bsSt = { d: null };
+let grMapel = [];
 const ktSt = { q: '', mapel: '', kategori: '', status: '', data: null };
 const KT_KATEGORI = ['Try Out Utama', 'Latihan Materi'];
-const KT_STATUS = [['', 'Semua status'], ['sedang', 'Sedang berjalan'], ['pernah', 'Pernah dikerjakan'], ['belum', 'Belum dikerjakan']];
+const KT_STATUS = [['', 'Semua status'], ['belum', 'Belum dikerjakan'], ['sedang', 'Sedang berjalan'], ['sudah', 'Sudah dikerjakan']];
 
 function kpiTeks(ikonNama, label, teks, sub) {
   return h`<article class="kartu kpi"><div class="kpi-label"><span class="ikon-bulat">${ikon(ikonNama)}</span>${label}</div><div class="kpi-nilai">${teks}</div>${sub ? h`<div class="kpi-sub">${sub}</div>` : ''}</article>`;
@@ -3938,15 +4011,18 @@ function tombolMulaiPaket(x, terkunci, sedang, sudah) {
   return h`<button type="button" class="tombol tombol-penuh jarak-atas-kecil" data-aksi="ujian-mulai" data-id="${x.id}" data-nama="${x.nama}" data-soal="${x.jumlahSoal || ''}" data-menit="${x.durasiMenit}" data-berjalan="${sedang ? '1' : '0'}"${terkunci ? mentah(' aria-disabled="true"') : ''}>${ikon(sedang ? 'play' : (sudah ? 'refresh' : 'play'))}<span>${sedang ? 'Lanjutkan ujian' : (sudah ? 'Kerjakan lagi' : 'Mulai mengerjakan')}</span></button>`;
 }
 
+function statusPaket(x) { return x.berjalan ? 'sedang' : (x.selesaiSaya > 0 ? 'sudah' : 'belum'); }
+
 function kartuPaketSiswa(x, sibuk) {
   const sedang = !!x.berjalan;
   const terkunci = !!sibuk && !sedang;
   const sudah = x.selesaiSaya > 0;
+  const status = statusPaket(x);
   const nilai = x.nilaiTerakhir ? h`<span>${ikon('award', 'ikon-sm')} Nilai terakhir <strong class="angka">${x.nilaiTerakhir.nilaiTeks}</strong></span>`
     : (sudah ? h`<span>${ikon('award', 'ikon-sm')} Nilai tidak ditampilkan</span>` : '');
-  return h`<article class="kartu paket-kartu" data-uji="kt-kartu"><h4>${x.nama}</h4>
-    <div class="meta"><span class="lencana lencana-primer">${x.kategori}</span>${sedang ? h`<span class="lencana lencana-info">${ikon('clock', 'ikon-sm')} Sedang berjalan</span>` : ''}${!sedang && sudah ? h`<span class="lencana lencana-sukses">${ikon('check', 'ikon-sm')} Pernah dikerjakan</span>` : ''}</div>
-    <div class="rincian"><span>${ikon('list', 'ikon-sm')} ${formatAngka(x.jumlahSoal)} soal</span><span>${ikon('clock', 'ikon-sm')} ${formatAngka(x.durasiMenit)} menit</span>${sudah ? h`<span>${ikon('refresh', 'ikon-sm')} ${formatAngka(x.selesaiSaya)}× selesai</span>` : ''}${nilai}</div>
+  return h`<article class="kartu paket-kartu mp-${x.mapel}" data-uji="kt-kartu" data-status="${status}"><div class="judul-kartu"><span class="ikon-bulat mapel" aria-hidden="true">${ikon(IKON_MAPEL[x.mapel] || 'book-open', 'ikon-sm')}</span><h4>${x.nama}</h4></div>
+    <div class="meta"><span class="lencana lencana-primer">${x.kategori}</span>${sedang ? h`<span class="lencana lencana-info" data-uji="kt-lencana">${ikon('clock', 'ikon-sm')} Sedang berjalan</span>` : ''}${!sedang && sudah ? h`<span class="lencana lencana-sukses" data-uji="kt-lencana">${ikon('check-circle', 'ikon-sm')} Sudah dikerjakan</span>` : ''}</div>
+    <div class="rincian"><span>${ikon('list', 'ikon-sm')} ${formatAngka(x.jumlahSoal)} soal</span><span>${ikon('clock', 'ikon-sm')} ${formatAngka(x.durasiMenit)} menit</span>${sudah ? h`<span data-uji="kt-kali">${ikon('refresh', 'ikon-sm')} Dikerjakan ${formatAngka(x.selesaiSaya)}×</span>` : ''}${nilai}</div>
     ${tombolMulaiPaket(x, terkunci, sedang, sudah)}
     ${terkunci ? h`<p class="bantu tanpa-margin">Selesaikan ujian yang sedang berjalan lebih dulu.</p>` : ''}</article>`;
 }
@@ -3980,7 +4056,7 @@ function tabelSeriMapel(m) {
       })}</tbody></table></div></details>`;
 }
 
-function kartuMapel(m) {
+function kartuMapel(m, diRiwayat) {
   const kode = m.kode;
   let isi;
   if (m.selesai === 0) {
@@ -3997,18 +4073,18 @@ function kartuMapel(m) {
       <div class="grafik-wadah" data-grafik="${kode}" data-uji="bs-grafik"></div>
       ${legendaMapel(m)}
       ${m.tersembunyi > 0 ? h`<p class="bantu tanpa-margin">${formatAngka(m.tersembunyi)} pengerjaan lain tidak menampilkan nilai (diatur guru), jadi tidak ada di grafik.</p>` : ''}
-      ${m.seriTerpotong ? h`<p class="bantu tanpa-margin">Grafik memuat pengerjaan terakhir saja; yang lebih lama ada di Riwayat.</p>` : ''}
+      ${m.seriTerpotong ? h`<p class="bantu tanpa-margin">Grafik memuat pengerjaan terakhir saja; ${diRiwayat === true ? 'semua pengerjaan ada di tabel di bawah' : 'yang lebih lama ada di Riwayat'}.</p>` : ''}
       ${tabelSeriMapel(m)}`;
   }
-  return h`<section class="kartu kartu-mapel" aria-labelledby="bs-${kode}" data-uji="bs-mapel-${kode}">
-    <div class="kartu-judul"><span class="ikon-bulat">${ikon(IKON_MAPEL[kode] || 'book-open')}</span><h3 id="bs-${kode}">${m.nama}</h3></div>${isi}</section>`;
+  return h`<section class="kartu kartu-mapel mp-${kode}" aria-labelledby="bs-${kode}" data-uji="bs-mapel-${kode}">
+    <div class="kartu-judul"><span class="ikon-bulat mapel">${ikon(IKON_MAPEL[kode] || 'book-open')}</span><h3 id="bs-${kode}">${m.nama}</h3></div>${isi}</section>`;
 }
 
 function kartuSaran(daftar, sibuk) {
   if (!daftar.length) return h`<div class="kosong kosong-kecil" data-uji="bs-saran-kosong"><p>Tidak ada Try Out Utama baru. Semua yang tersedia sudah pernah Anda kerjakan; ulangi dari Try Out &amp; Latihan.</p></div>`;
   return h`<div class="daftar-paket daftar-paket-sempit">${daftar.map(function (x) {
     const terkunci = !!sibuk;
-    return h`<article class="kartu paket-kartu" data-uji="bs-saran"><h4>${x.nama}</h4>
+    return h`<article class="kartu paket-kartu mp-${x.mapel}" data-uji="bs-saran"><h4>${x.nama}</h4>
       <div class="meta"><span class="lencana lencana-primer">${x.kategori}</span><span class="lencana">${MAPEL[x.mapel] || x.mapel}</span></div>
       <div class="rincian"><span>${ikon('clock', 'ikon-sm')} ${formatAngka(x.durasiMenit)} menit</span></div>
       ${tombolMulaiPaket({ id: x.id, nama: x.nama, jumlahSoal: 0, durasiMenit: x.durasiMenit }, terkunci, false, false)}
@@ -4027,16 +4103,29 @@ function pengerjaanTerakhir(d) {
   })}</ul>`;
 }
 
+function sapaBeranda(nama, d) {
+  const n = Number(d.paketSelesai) || 0, m = Number(d.jumlahPaket) || 0;
+  let kalimat;
+  if (m === 0) kalimat = 'Belum ada paket yang tersedia. Paket baru akan muncul di sini.';
+  else if (n === 0) kalimat = 'Yuk, mulai kerjakan paket pertamamu!';
+  else if (n >= m) kalimat = 'Hebat! Kamu sudah mengerjakan semua paket yang tersedia.';
+  else kalimat = 'Kamu sudah mengerjakan ' + formatAngka(n) + ' paket. Ayo lanjutkan!';
+  const persen = m > 0 ? Math.max(0, Math.min(100, Math.round(n / m * 100))) : 0;
+  return h`<section class="sapa" aria-labelledby="bs-sapa-j" data-uji="bs-sapa"><div class="sapa-kartu"><h2 id="bs-sapa-j">Halo, ${nama}!</h2><p data-uji="bs-sapa-teks">${kalimat}</p>
+    ${m > 0 ? h`<div class="progres-baris"><div class="progres-jalur" role="progressbar" aria-label="Paket yang sudah dikerjakan" aria-valuemin="0" aria-valuemax="${m}" aria-valuenow="${Math.min(n, m)}" aria-valuetext="${n} dari ${m} paket" data-uji="bs-progres"><span class="progres-isi" style="width:0" data-lebar="${persen}"></span></div><span class="progres-teks" data-uji="bs-progres-teks">${formatAngka(Math.min(n, m))} dari ${formatAngka(m)} paket</span></div>` : ''}</div></section>`;
+}
+
 function renderBerandaSiswa(p, c) {
   const u = S.pengguna;
   panggil('siswa.dasbor', {}, { ulang: true }).then(function (d) {
     if (!c.ok()) return;
     bsSt.d = d;
+    grMapel = d.mapel;
     let tertinggi = null, tertinggiMapel = '';
     d.mapel.forEach(function (m) { if (m.nilaiTertinggi && (!tertinggi || m.nilaiTertinggi.nilai > tertinggi.nilai)) { tertinggi = m.nilaiTertinggi; tertinggiMapel = m.nama; } });
     const dilatih = d.mapel.filter(function (m) { return m.selesai > 0; }).length;
     pasang(c.wadah, h`
-      ${kepalaHalaman('Halo, ' + u.nama + '!', 'Pantau perkembangan nilai Anda dan lanjutkan berlatih.')}
+      ${sapaBeranda(u.nama, d)}
       ${peringatanBerjalan(d.berjalan)}
       <div class="kisi-kpi kisi-kpi-2">
         ${kpi('check-circle', 'Ujian selesai', d.selesai, d.tersembunyi > 0 ? formatAngka(d.tersembunyi) + ' tanpa nilai tampil' : 'Semua percobaan yang diselesaikan', 'sukses')}
@@ -4055,14 +4144,20 @@ function renderBerandaSiswa(p, c) {
         <button type="button" class="tombol tombol-garis" data-aksi="nav" data-ke="materi">${ikon('book-open')}<span>Materi belajar</span></button>
       </div>`);
     gambarSemuaGrafik();
+    isiProgres();
     fokusJudul();
   }).catch(function (e) { if (c.ok()) tampilkanGalatMuat(c.wadah, e, true); });
 }
 
+function isiProgres() {
+  const naik = function () { semua('.progres-isi[data-lebar]').forEach(function (e) { e.style.width = e.getAttribute('data-lebar') + '%'; }); };
+  if (window.requestAnimationFrame) window.requestAnimationFrame(function () { window.requestAnimationFrame(naik); }); else naik();
+}
+
 function gambarGrafik(wadah) {
-  if (!wadah || !bsSt.d) return;
+  if (!wadah) return;
   const kode = wadah.getAttribute('data-grafik');
-  const m = bsSt.d.mapel.filter(function (x) { return x.kode === kode; })[0];
+  const m = grMapel.filter(function (x) { return x.kode === kode; })[0];
   if (!m || !m.seri.length) return;
   const lebar = wadah.clientWidth;
   if (!lebar) return;
@@ -4083,14 +4178,11 @@ window.addEventListener('resize', tundaKe(gambarSemuaGrafik, 150));
 
 AKSI['katalog-mapel'] = function (b) { navigateTo('katalog', { mapel: b.getAttribute('data-mapel') }); };
 
-function statusPaket(x) { return x.berjalan ? 'sedang' : (x.selesaiSaya > 0 ? 'pernah' : 'belum'); }
 function cocokPenyaring(x, f) {
   if (f.mapel && x.mapel !== f.mapel) return false;
   if (f.kategori && x.kategori !== f.kategori) return false;
   if (f.q && String(x.nama).toLowerCase().indexOf(f.q.toLowerCase()) === -1) return false;
-  if (f.status === 'sedang') return !!x.berjalan;
-  if (f.status === 'pernah') return x.selesaiSaya > 0;
-  if (f.status === 'belum') return !x.berjalan && !(x.selesaiSaya > 0);
+  if (f.status) return statusPaket(x) === f.status;
   return true;
 }
 
@@ -4102,7 +4194,7 @@ function renderKatalog(p, c) {
     if (!c.ok()) return;
     ktSt.data = d;
     pasang(c.wadah, h`
-      ${kepalaHalaman('Latihan soal ' + NAMA_MENU_MAPEL[kode], 'Try Out dan latihan ' + MAPEL[kode] + ' yang tersedia untuk Anda. Waktu dihitung oleh server setelah Anda menekan Mulai.')}
+      ${kepalaHalaman(h`<span class="judul-mapel mp-${kode}"><span class="ikon-bulat mapel" aria-hidden="true">${ikon(IKON_MAPEL[kode])}</span>Latihan soal ${NAMA_MENU_MAPEL[kode]}</span>`, 'Try Out dan latihan ' + MAPEL[kode] + ' yang tersedia untuk Anda. Waktu dihitung oleh server setelah Anda menekan Mulai.')}
       ${peringatanBerjalan(d.berjalan)}
       <div class="saring" role="search">
         <div class="cari"><label class="sr-only" for="kt-cari">Cari paket</label>${ikon('search')}<input class="kontrol" id="kt-cari" type="search" placeholder="Cari nama paket" value="" data-masuk="katalog-saring" autocomplete="off"></div>
