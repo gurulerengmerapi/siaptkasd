@@ -1336,7 +1336,7 @@ const CACHE_BACA = {
 
 const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
-  'percobaan.detail': 1, 'pantau.sekarang': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
+  'percobaan.detail': 1, 'pantau.sekarang': 1, 'perkembangan.cari': 1, 'perkembangan.siswa': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
   'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1,
   'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
@@ -1564,15 +1564,15 @@ function pulihkanSnapshot() {
 const NAMA_MENU_MAPEL = { BIN: 'B.Indonesia', MAT: 'Matematika', IPA: 'IPA' };
 
 const MENU = {
-  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
-  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['audit', 'Log Aktivitas', 'activity']],
+  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
+  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['audit', 'Log Aktivitas', 'activity']],
   SISWA: [['dasbor', 'Beranda', 'home']].concat(MAPEL_URUT.map(function (k) {
     return ['katalog', 'Latihan soal ' + NAMA_MENU_MAPEL[k], IKON_MAPEL[k], { mapel: k }];
   }), [['materi', 'Materi', 'file-text'], ['riwayat', 'Riwayat', 'clock']])
 };
 const JUDUL_HALAMAN = {
   beranda: 'Beranda', masuk: 'Masuk', token: 'Ujian dengan kode', wajib: 'Lengkapi akun Anda', dasbor: 'Dasbor', profil: 'Profil Saya', akun: 'Kelola Akun', 'impor-siswa': 'Impor Siswa',
-  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', pantau: 'Pantauan Ujian', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
+  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', pantau: 'Pantauan Ujian', perkembangan: 'Perkembangan Siswa', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
   pengaturan: 'Pengaturan', audit: 'Log Audit', backup: 'Backup & Pulihkan'
 };
 
@@ -1598,6 +1598,7 @@ const HALAMAN = {
   'hasil-nilai': { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderHasilNilai(p, c); } },
   analisis: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderAnalisisSoal(p, c); } },
   pantau: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPantau(p, c); } },
+  perkembangan: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPerkembangan(p, c); } },
   wajib: { tanpaRangka: true, render: function (p, c) { renderWajib(p, c); } },
   dasbor: { render: function (p, c) { renderDasbor(p, c); } },
   profil: { render: function (p, c) { renderProfil(p, c); } },
@@ -2532,14 +2533,31 @@ function kartuKapasitasDrive(d, b) {
   </section>`;
 }
 
+const dsSt = { sekolah: '' };
+
+function pilihSekolahDasbor(sk, catatan) {
+  if (sk.terkunci) {
+    return h`<div class="ds-pilih ds-terkunci" data-uji="ds-sekolah-terkunci">${ikon('graduation-cap')}<span>Data pengerjaan di bawah ini khusus siswa <strong>${sk.nama}</strong>.</span></div>`;
+  }
+  return h`<div class="ds-pilih" data-uji="ds-sekolah"><label for="ds-sekolah">${ikon('graduation-cap')} Data sekolah</label>
+    <select class="kontrol" id="ds-sekolah" data-masuk="ds-sekolah"><option value="">Semua sekolah</option>${sk.daftar.map(function (n) { return h`<option value="${n}"${n === sk.dipilih ? mentah(' selected') : ''}>${n}</option>`; })}</select>
+    <p class="bantu tanpa-margin">${catatan}</p></div>`;
+}
+MASUKAN['ds-sekolah'] = function (sel) {
+  dsSt.sekolah = sel.value;
+  navigateTo('dasbor', {}, { senyap: true });
+};
+
 function renderDasbor(p, c) {
   const u = S.pengguna;
   if (u.peran === PERAN.SISWA) { renderBerandaSiswa(p, c); return; }
-  panggil('dashboard.ringkas', {}, { ulang: true }).then(function (d) {
+  const kunciGuru = u.peran === PERAN.GURU && !u.guruTamu;
+  panggil('dashboard.ringkas', { sekolah: kunciGuru ? '' : dsSt.sekolah }, { ulang: true }).then(function (d) {
     if (!c.ok()) return;
     if (d.peran === 'ADMIN') {
       pasang(c.wadah, h`
         ${kepalaHalaman('Selamat datang, ' + u.nama, 'Ringkasan data yang tersimpan di aplikasi.')}
+        ${pilihSekolahDasbor(d.sekolah, 'Angka siswa, percobaan, dan rata-rata nilai mengikuti pilihan ini. Jumlah guru, paket, soal, kapasitas, dan backup tetap untuk seluruh aplikasi.')}
         ${d.siswaBelumLengkap > 0 ? h`<div class="peringatan peringatan-waspada jarak-bawah">${ikon('info')}<div><p><strong>${formatAngka(d.siswaBelumLengkap)} siswa aktif</strong> belum melengkapi identitas. Mereka akan diminta mengisinya saat masuk.</p></div></div>` : ''}
         <div class="kisi-kpi">
           ${kpi('users', 'Siswa aktif', d.siswaAktif, formatAngka(d.siswaNonaktif) + ' nonaktif')}
@@ -2561,15 +2579,25 @@ function renderDasbor(p, c) {
           </div>
         </div>`);
     } else if (d.peran === 'GURU') {
+      const pg = d.pengerjaan;
+      const tamu = !pg.sekolah.terkunci;
       pasang(c.wadah, h`
-        ${kepalaHalaman('Selamat datang, ' + u.nama, 'Ringkasan paket dan soal milik Anda.', h`<button type="button" class="tombol" data-aksi="paket-baru-dari-dasbor">${ikon('plus')}<span>Buat paket</span></button>`)}
+        ${kepalaHalaman('Selamat datang, ' + u.nama, pg.sekolah.terkunci ? 'Pengerjaan siswa ' + pg.sekolah.nama + ' dan paket milik Anda.' : 'Pengerjaan siswa dan paket milik Anda.', h`<button type="button" class="tombol" data-aksi="paket-baru-dari-dasbor">${ikon('plus')}<span>Buat paket</span></button>`)}
+        ${pilihSekolahDasbor(pg.sekolah, 'Pilih satu sekolah untuk melihat data pengerjaannya, atau biarkan Semua sekolah.')}
+        <h3 class="judul-bagian" data-uji="ds-judul-pengerjaan">${tamu && pg.sekolah.dipilih ? 'Pengerjaan siswa ' + pg.sekolah.dipilih : (tamu ? 'Pengerjaan siswa semua sekolah' : 'Pengerjaan siswa sekolah Anda')}</h3>
+        <div class="kisi-kpi kisi-kpi-3" data-uji="ds-pengerjaan">
+          ${kpi('users', 'Siswa aktif', pg.siswaAktif, '')}
+          ${kpi('check-circle', 'Percobaan tercatat', pg.jumlahPercobaan, 'Dari semua paket, termasuk paket guru lain', 'sukses')}
+          ${kpi('play', 'Sedang mengerjakan', pg.percobaanBerjalan, 'Lihat rinciannya di Pantauan Ujian')}
+        </div>
+        <div class="dasbor-sama">${kartuRerataMapel(pg.rerata)}${kartuRerataPaket(pg.rerata)}</div>
+        <h3 class="judul-bagian">Paket dan soal milik Anda</h3>
         <div class="kisi-kpi">
           ${kpi('file-text', 'Paket draf', d.paketDraf, 'Belum terlihat siswa')}
           ${kpi('check-circle', 'Paket terbit', d.paketTerbit, 'Terlihat oleh siswa', 'sukses')}
           ${kpi('layers', 'Diarsipkan', d.paketArsip, '')}
           ${kpi('list', 'Soal milik Anda', d.jumlahSoal, formatAngka(d.jumlahPercobaan) + ' percobaan pada paket Anda')}
         </div>
-        <div class="dasbor-sama">${kartuRerataMapel(d.rerata)}${kartuRerataPaket(d.rerata)}</div>
         <section class="kartu" aria-labelledby="h-aktv"><div class="kartu-judul"><span class="ikon-bulat">${ikon('activity')}</span><h3 id="h-aktv">Aktivitas Anda</h3></div>${daftarAktivitas(d.aktivitas)}</section>`);
     }
     fokusJudul();
@@ -4412,7 +4440,7 @@ function gambarAkun() {
     <thead><tr><th scope="col">Username</th><th scope="col">Nama</th><th scope="col">Peran dan status</th><th scope="col">Login terakhir</th><th scope="col"><span class="sr-only">Aksi</span></th></tr></thead>
     <tbody>${akunSt.data.map(function (a) {
       const diri = a.id === saya;
-      const sekolah = a.profil ? [a.profil.sekolah, a.profil.kelas].filter(Boolean).join(' · ') : '';
+      const sekolah = a.profil ? [a.profil.sekolah, a.profil.kelas].filter(Boolean).join(' · ') : (a.peran === PERAN.GURU ? (a.guruTamu ? 'Guru tamu (semua sekolah)' : a.sekolah) : '');
       return h`<tr class="${a.aktif ? '' : 'nonaktif'}">
         <td data-label="Username"><span class="sel-username"><code>${a.username}</code><button type="button" class="tombol tombol-polos tombol-ikon" data-aksi="salin-teks" data-salin="${a.username}" data-pesan="Username disalin." aria-label="Salin username ${a.username}">${ikon('copy')}</button></span></td>
         <td data-label="Nama" class="pecah"><div>${a.nama}${diri ? h` <span class="lencana lencana-netral">Anda</span>` : ''}</div>${sekolah ? h`<div class="sub-sel">${sekolah}</div>` : ''}</td>
@@ -4454,6 +4482,25 @@ function tampilkanKredensial(o) {
   });
 }
 
+function blokGuru(pre, tamu, sekolahTerpilih, daftarSekolah, tersembunyi) {
+  const nama = {};
+  (daftarSekolah || []).forEach(function (x) { nama[x.nama] = true; });
+  if (sekolahTerpilih) nama[sekolahTerpilih] = true;
+  return h`<div class="kelompok-isian" data-bagian-guru data-uji="${pre}-guru"${tersembunyi ? mentah(' hidden') : ''}>
+    <fieldset class="isian fieldset-polos"><legend class="label">Jenis guru</legend>
+      <div class="segmen" role="radiogroup" aria-label="Jenis guru">
+        <label>${ikon('check')}<input type="radio" name="lingkup" value="sekolah" data-masuk="akun-lingkup"${tamu ? '' : mentah(' checked')}> Guru sekolah</label>
+        <label>${ikon('check')}<input type="radio" name="lingkup" value="tamu" data-masuk="akun-lingkup"${tamu ? mentah(' checked') : ''}> Guru tamu</label></div>
+      <p class="bantu">Guru sekolah hanya melihat data pengerjaan siswa sekolahnya. Guru tamu melihat semua sekolah, dengan pilihan sekolah tertentu.</p></fieldset>
+    <div class="isian" data-bagian-sekolah-guru${tamu ? mentah(' hidden') : ''}><label for="${pre}-sekolah-guru">Sekolah guru</label>
+      <select class="kontrol" id="${pre}-sekolah-guru" name="sekolah_guru"><option value="">Pilih sekolah…</option>${Object.keys(nama).sort(function (a, b) { return a.localeCompare(b, 'id'); }).map(function (n) { return h`<option value="${n}"${n === sekolahTerpilih ? mentah(' selected') : ''}>${n}</option>`; })}</select>
+      <p class="bantu">Daftar dari Master Sekolah (menu Pengaturan). Nama harus sama dengan asal sekolah siswa.</p></div></div>`;
+}
+MASUKAN['akun-lingkup'] = function (r) {
+  const form = r.form; if (!form || !r.checked) return;
+  const b = el('[data-bagian-sekolah-guru]', form); if (b) b.hidden = r.value === 'tamu';
+};
+
 AKSI['akun-baru'] = function () {
   panggil('sekolah.daftar', {}).then(function (daftar) { return daftar || []; }, function () { return []; }).then(function (sekolah) {
     modal({
@@ -4472,6 +4519,7 @@ AKSI['akun-baru'] = function () {
           <div class="isian"><label for="ab-sekolah">Asal sekolah <span class="opsional">(opsional)</span></label><input class="kontrol" id="ab-sekolah" name="sekolah" type="text" list="dl-ab-sekolah" maxlength="100" autocomplete="off"><datalist id="dl-ab-sekolah">${sekolah.map(function (s) { return h`<option value="${s.nama}"></option>`; })}</datalist></div>
           <div class="isian"><label for="ab-kelas">Kelas <span class="opsional">(opsional)</span></label><input class="kontrol" id="ab-kelas" name="kelas" type="text" maxlength="20" autocomplete="off" placeholder="Contoh: 6A"></div>
         </div>
+        ${blokGuru('ab', false, '', sekolah, true)}
         <p class="bantu catatan-papan" data-bagian-siswa data-uji="ab-catatan-papan">Dengan membuat akun siswa (member), nama lengkap dan asal sekolahnya akan tampil di papan peringkat beranda setelah ia menyelesaikan Try Out Utama. Pastikan orang tua atau wali sudah mengetahuinya. Nama bisa disembunyikan kapan saja dengan tombol &quot;Sembunyikan nama&quot; pada rincian akun.</p>
         <p class="bantu">Sistem membuat password sementara yang tampil sekali setelah akun dibuat. Pemilik wajib menggantinya saat pertama masuk.</p>
       </form>`,
@@ -4483,6 +4531,7 @@ MASUKAN['akun-peran'] = function (r) {
   const form = r.form; if (!form || !r.checked) return;
   const siswa = r.value === 'SISWA';
   semua('[data-bagian-siswa]', form).forEach(function (b) { b.hidden = !siswa; });
+  semua('[data-bagian-guru]', form).forEach(function (b) { b.hidden = r.value !== 'GURU'; });
   const l = el('#ab-nama-l', form);
   if (l) pasang(l, siswa ? h`Nama <span class="opsional">(opsional; siswa mengisi sendiri)</span>` : h`Nama lengkap`);
 };
@@ -4492,9 +4541,13 @@ KIRIM['akun-baru'] = function (form) {
   const salahU = validasiUsernameKlien(v.username);
   if (salahU) { galatIsian(form, 'username', salahU); return; }
   if (v.peran !== 'SISWA' && v.nama.length < 3) { galatIsian(form, 'nama', 'Nama minimal 3 karakter.'); return; }
+  const guru = v.peran === 'GURU';
+  if (guru && v.lingkup !== 'tamu' && !v.sekolah_guru) { galatIsian(form, 'sekolah_guru', 'Pilih sekolah untuk Guru sekolah, atau pilih Guru tamu.'); return; }
+  const data = { peran: v.peran, username: v.username, nama: v.nama, sekolah: v.peran === 'SISWA' ? v.sekolah : '', kelas: v.peran === 'SISWA' ? v.kelas : '' };
+  if (guru) { data.lingkup = v.lingkup === 'tamu' ? 'tamu' : 'sekolah'; data.sekolah = data.lingkup === 'sekolah' ? v.sekolah_guru : ''; }
   form.setAttribute('data-sibuk', 'ya');
   kerjakan(tombolKirim(form), function () {
-    return panggil('akun.buat', { peran: v.peran, username: v.username, nama: v.nama, sekolah: v.peran === 'SISWA' ? v.sekolah : '', kelas: v.peran === 'SISWA' ? v.kelas : '' }).then(function (d) {
+    return panggil('akun.buat', data).then(function (d) {
       const api = modalTeratas(); if (api) api.tutup('dibuat');
       tampilkanKredensial({ judul: 'Akun dibuat', username: d.akun.username, password: d.passwordSementara, pesan: 'Akun ' + LABEL_PERAN[d.akun.peran] + ' berhasil dibuat.' })
         .selesai.then(function () { if (S.halaman === 'akun') muatAkun(); });
@@ -4577,7 +4630,8 @@ function badanDetailAkun(a, sekolah) {
         <div class="kelompok-isian">
           <div class="isian"><label for="ad-peran">Peran</label><select class="kontrol" id="ad-peran" name="peran" data-masuk="akun-peran-detail"${diri ? mentah(' disabled') : ''}>${['GURU', 'ADMIN'].map(function (r) { return h`<option value="${r}"${a.peran === r ? mentah(' selected') : ''}>${LABEL_PERAN[r]}</option>`; })}</select>${diri ? h`<p class="bantu">Peran akun Anda sendiri tidak bisa diubah di sini.</p>` : ''}</div>
           <div class="isian" data-bagian-koreksi${a.peran === PERAN.GURU ? '' : mentah(' hidden')}><span class="label">Izin Koreksi Massal</span><label class="saklar"><input type="checkbox" name="izin_koreksi"${a.izinKoreksi ? mentah(' checked') : ''}><span class="jalur"></span><span>Boleh mengoreksi nilai massal (Tahap 2)</span></label></div>
-        </div>`}
+        </div>
+        ${blokGuru('ad', a.guruTamu === true, a.sekolah || '', sekolah, a.peran !== PERAN.GURU)}`}
       <div class="aksi-form"><button type="button" class="tombol tombol-diam" data-modal="tutup">Tutup</button><button type="submit" class="tombol">${ikon('save')}<span>Simpan perubahan</span></button></div>
     </form>
     ${siswa ? h`<hr><section aria-labelledby="ad-papan" data-uji="ad-papan"><h4 id="ad-papan">Nama di papan peringkat</h4>
@@ -4594,6 +4648,7 @@ function badanDetailAkun(a, sekolah) {
 MASUKAN['akun-peran-detail'] = function (sel) {
   const form = sel.form; if (!form) return;
   const b = el('[data-bagian-koreksi]', form); if (b) b.hidden = sel.value !== PERAN.GURU;
+  const g = el('[data-bagian-guru]', form); if (g) g.hidden = sel.value !== PERAN.GURU;
 };
 
 KIRIM['akun-ubah'] = function (form) {
@@ -4617,6 +4672,12 @@ KIRIM['akun-ubah'] = function (form) {
     if (v.peran && v.peran !== a.peran) p.peran = v.peran;
     const peranAkhir = p.peran || a.peran;
     if (peranAkhir === PERAN.GURU && !!v.izin_koreksi !== !!a.izinKoreksi) p.izin_koreksi = !!v.izin_koreksi;
+    if (peranAkhir === PERAN.GURU) {
+      const tamu = v.lingkup === 'tamu';
+      if (!tamu && !v.sekolah_guru) { galatIsian(form, 'sekolah_guru', 'Pilih sekolah untuk Guru sekolah, atau pilih Guru tamu.'); return; }
+      const sekolahBaru = tamu ? '' : v.sekolah_guru;
+      if (sekolahBaru !== (a.sekolah || '') || p.peran) { p.lingkup = tamu ? 'tamu' : 'sekolah'; p.sekolah = sekolahBaru; }
+    }
   }
   if (Object.keys(p).length === 1) { toast('Tidak ada perubahan untuk disimpan.', 'info'); return; }
   form.setAttribute('data-sibuk', 'ya');
@@ -8725,6 +8786,202 @@ AKSI['pk-bangun'] = function (b) {
 };
 
 
+const PRK_BATAS_SERI_PDF = 60;
+const prkSt = { q: '', sekolah: '', kelas: '', halaman: 1, daftar: null, opsi: null, terpilih: '', detail: null, seq: 0, seqDetail: 0 };
+
+function renderPerkembangan(p, c) {
+  prkSt.q = ''; prkSt.sekolah = ''; prkSt.kelas = ''; prkSt.halaman = 1; prkSt.daftar = null; prkSt.opsi = null; prkSt.terpilih = ''; prkSt.detail = null;
+  const terkunci = S.pengguna.peran === PERAN.GURU && !S.pengguna.guruTamu;
+  pasang(c.wadah, h`
+    ${kepalaHalaman('Perkembangan Siswa', terkunci ? 'Riwayat dan grafik nilai siswa ' + S.pengguna.sekolah + ', bisa diunduh sebagai laporan PDF.' : 'Riwayat dan grafik nilai tiap siswa, bisa diunduh sebagai laporan PDF.')}
+    <div class="saring" role="search">
+      <div class="cari"><label class="sr-only" for="prk-cari">Cari nama siswa</label>${ikon('search')}<input class="kontrol" id="prk-cari" type="search" placeholder="Cari nama atau username siswa" data-masuk="prk-saring" autocomplete="off"></div>
+      <div class="isian"><label class="sr-only" for="prk-sekolah">Sekolah</label><select class="kontrol" id="prk-sekolah" data-masuk="prk-saring"><option value="">${terkunci ? 'Sekolah Anda' : 'Semua sekolah'}</option></select></div>
+      <div class="isian"><label class="sr-only" for="prk-kelas">Kelas</label><select class="kontrol" id="prk-kelas" data-masuk="prk-saring"><option value="">Semua kelas</option></select></div>
+    </div>
+    <div class="prk-kisi">
+      <section aria-labelledby="prk-daftar-j"><h3 class="judul-bagian" id="prk-daftar-j">Daftar siswa</h3><p class="bantu" id="prk-hitung" aria-live="polite"></p>
+        <div id="prk-daftar" data-uji="prk-daftar"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat siswa…</span></div></div></section>
+      <section aria-labelledby="prk-detail-j" id="prk-detail" data-uji="prk-detail"><h3 class="judul-bagian" id="prk-detail-j">Perkembangan</h3>
+        <div class="kosong kosong-kecil"><p>Pilih seorang siswa dari daftar untuk melihat riwayat dan grafik nilainya.</p></div></section>
+    </div>`);
+  fokusJudul();
+  muatDaftarPerkembangan(c);
+}
+
+function isiOpsiPerkembangan(opsi) {
+  const isi = function (id, daftar, nilai) {
+    const sel = el('#' + id); if (!sel) return;
+    const pertama = sel.options[0];
+    while (sel.options.length > 1) sel.remove(1);
+    daftar.forEach(function (n) { const o = document.createElement('option'); o.value = n; o.textContent = n; if (n === nilai) o.selected = true; sel.appendChild(o); });
+    sel.options[0] = pertama;
+  };
+  isi('prk-sekolah', opsi.sekolah, prkSt.sekolah);
+  isi('prk-kelas', opsi.kelas, prkSt.kelas);
+}
+
+function muatDaftarPerkembangan(c) {
+  const seq = ++prkSt.seq;
+  return panggil('perkembangan.cari', { q: prkSt.q, sekolah: prkSt.sekolah, kelas: prkSt.kelas, halaman: prkSt.halaman }, { ulang: true }).then(function (d) {
+    if (seq !== prkSt.seq || (c && !c.ok())) return;
+    prkSt.daftar = d;
+    if (!prkSt.opsi) { prkSt.opsi = d.opsi; isiOpsiPerkembangan(d.opsi); }
+    gambarDaftarPerkembangan();
+  }).catch(function (e) {
+    if (seq !== prkSt.seq || (c && !c.ok())) return;
+    tampilkanGalatMuat(el('#prk-daftar'), e, true);
+  });
+}
+
+function gambarDaftarPerkembangan() {
+  const wadah = el('#prk-daftar'); if (!wadah) return;
+  const d = prkSt.daftar;
+  const hit = el('#prk-hitung');
+  const awal = d.total ? (d.halaman - 1) * d.ukuran + 1 : 0;
+  if (hit) hit.textContent = d.total ? 'Menampilkan ' + formatAngka(awal) + '–' + formatAngka(awal + d.daftar.length - 1) + ' dari ' + formatAngka(d.total) + ' siswa.' : '';
+  if (!d.daftar.length) {
+    pasang(wadah, h`<div class="kosong kosong-kecil" data-uji="prk-kosong"><p>${prkSt.q || prkSt.sekolah || prkSt.kelas ? 'Tidak ada siswa yang cocok dengan penyaring.' : 'Belum ada akun siswa di lingkup Anda.'}</p></div>`);
+    return;
+  }
+  const maks = Math.ceil(d.total / d.ukuran);
+  pasang(wadah, h`<ul class="prk-daftar">${d.daftar.map(function (x) {
+    return h`<li><button type="button" class="prk-butir" data-aksi="prk-pilih" data-id="${x.id}"${x.id === prkSt.terpilih ? mentah(' aria-current="true"') : ''} data-uji="prk-siswa">
+      <span><span class="prk-nama">${x.nama}</span><span class="prk-sub">${[x.sekolah, x.kelas].filter(Boolean).join(' · ') || 'Sekolah belum diisi'}${x.aktif ? '' : ' · nonaktif'}</span></span>
+      <span class="prk-angka" aria-label="${x.selesai} pengerjaan selesai, rata-rata ${x.rerata === null ? 'belum ada' : formatAngka(x.rerata, 2)}">${x.rerata === null ? '—' : formatAngka(x.rerata, 2)}<span class="prk-sub">${formatAngka(x.selesai)}×</span></span></button></li>`;
+  })}</ul>
+  ${maks > 1 ? h`<div class="baris-bungkus jarak-atas">
+    <button type="button" class="tombol tombol-garis" data-aksi="prk-halaman" data-ke="${d.halaman - 1}"${d.halaman <= 1 ? mentah(' disabled') : ''}>${ikon('chevron-left')}<span>Sebelumnya</span></button>
+    <span class="teks-redam">Halaman ${formatAngka(d.halaman)} dari ${formatAngka(maks)}</span>
+    <button type="button" class="tombol tombol-garis" data-aksi="prk-halaman" data-ke="${d.halaman + 1}"${d.halaman >= maks ? mentah(' disabled') : ''}>${ikon('chevron-right')}<span>Berikutnya</span></button></div>` : ''}`);
+}
+
+MASUKAN['prk-saring'] = tundaKe(function () {
+  const q = el('#prk-cari'), sk = el('#prk-sekolah'), kl = el('#prk-kelas');
+  if (!q || !sk || !kl) return;
+  prkSt.q = q.value.trim(); prkSt.sekolah = sk.value; prkSt.kelas = kl.value; prkSt.halaman = 1;
+  muatDaftarPerkembangan();
+}, 300);
+AKSI['prk-halaman'] = function (b) { prkSt.halaman = Math.max(1, parseInt(b.getAttribute('data-ke'), 10) || 1); muatDaftarPerkembangan(); };
+
+AKSI['prk-pilih'] = function (b) {
+  const id = b.getAttribute('data-id');
+  prkSt.terpilih = id;
+  semua('.prk-butir').forEach(function (x) { if (x.getAttribute('data-id') === id) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
+  const wadah = el('#prk-detail'); if (!wadah) return;
+  const seq = ++prkSt.seqDetail;
+  pasang(wadah, h`<h3 class="judul-bagian">Perkembangan</h3><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat riwayat…</span></div>`);
+  panggil('perkembangan.siswa', { id: id }, { ulang: true }).then(function (d) {
+    if (seq !== prkSt.seqDetail || !el('#prk-detail')) return;
+    prkSt.detail = d;
+    gambarDetailPerkembangan(d);
+    try { const j = el('#prk-detail-j'); if (j) { j.setAttribute('tabindex', '-1'); if (window.matchMedia && window.matchMedia('(max-width: 899px)').matches && j.scrollIntoView) j.scrollIntoView(); j.focus({ preventScroll: true }); } } catch (e) {   }
+  }).catch(function (e) { if (seq === prkSt.seqDetail && el('#prk-detail')) tampilkanGalatMuat(el('#prk-detail'), e, false); });
+};
+
+function gambarDetailPerkembangan(d) {
+  const wadah = el('#prk-detail'); if (!wadah) return;
+  const s = d.siswa, r = d.ringkas;
+  const mapel = mapelDariRiwayat(d.riwayat).filter(function (m) { return m.selesai > 0; });
+  grMapel = mapel;
+  pasang(wadah, h`<h3 class="judul-bagian" id="prk-detail-j" tabindex="-1">Perkembangan</h3>
+    <div class="prk-profil" data-uji="prk-profil"><h3>${s.nama}</h3>
+      <p class="teks-redam tanpa-margin">${[s.sekolah, s.kelas ? 'Kelas ' + s.kelas : ''].filter(Boolean).join(' · ') || 'Sekolah belum diisi'}${s.username ? ' · ' + s.username : ''}${s.aktif ? '' : ' · akun nonaktif'}</p></div>
+    <div class="kisi-kpi kisi-kpi-3" data-uji="prk-ringkas">
+      ${kpi('check-circle', 'Pengerjaan selesai', r.selesai, d.terpotong ? 'Memuat ' + formatAngka(d.batas) + ' terakhir' : '')}
+      ${kpi('bar-chart', 'Rata-rata nilai', r.rerata === null ? 0 : r.rerata, r.rerata === null ? 'Belum ada nilai' : 'Skala 0–100')}
+      ${kpi('trophy', 'Nilai tertinggi', r.tertinggi === null ? 0 : r.tertinggi, r.tertinggi === null ? 'Belum ada nilai' : '')}
+    </div>
+    <div class="baris-bungkus jarak-bawah"><button type="button" class="tombol" data-aksi="prk-unduh-pdf" data-uji="prk-unduh"${r.selesai ? '' : mentah(' disabled')}>${ikon('download')}<span>Unduh laporan PDF</span></button></div>
+    <div id="prk-unduh-pesan" aria-live="polite"></div>
+    ${mapel.length ? h`<section aria-labelledby="prk-grafik-j" data-uji="prk-grafik"><h3 class="judul-bagian" id="prk-grafik-j">Perkembangan nilai</h3><div class="kisi-mapel">${mapel.map(function (m) { return kartuMapel(m, true); })}</div></section>`
+      : h`<div class="kosong kosong-kecil" data-uji="prk-belum"><p>Siswa ini belum menyelesaikan satu pun paket.</p></div>`}
+    ${d.riwayat.length ? h`<h3 class="judul-bagian">Semua pengerjaan</h3>
+      <div class="bungkus-tabel"><table class="tabel" data-uji="prk-tabel"><caption class="sr-only">Pengerjaan ${s.nama}</caption>
+        <thead><tr><th scope="col">Paket</th><th scope="col">Percobaan</th><th scope="col">Nilai</th><th scope="col">Selesai</th></tr></thead>
+        <tbody>${d.riwayat.map(function (x) {
+          return h`<tr><td data-label="Paket" class="pecah"><div class="tebal">${x.namaPaket}</div><div class="sub-sel">${MAPEL[x.mapel] || x.mapel} · ${x.kategori}</div></td>
+            <td data-label="Percobaan" class="angka">ke-${x.nomorUrut}</td><td data-label="Nilai" class="angka">${x.nilaiTeks !== null ? x.nilaiTeks : '—'}</td><td data-label="Selesai">${waktuWIB(x.waktuSelesai || x.waktuMulai)}</td></tr>`;
+        })}</tbody></table></div>` : ''}`);
+  gambarSemuaGrafik();
+}
+
+
+function prkRerata(nilai) {
+  if (!nilai.length) return null;
+  let total = 0;
+  nilai.forEach(function (v) { total += Math.round(v * 100); });
+  return Math.floor((2 * total + nilai.length) / (2 * nilai.length)) / 100;
+}
+
+function prkSusunMapel(riwayat) {
+  const urut = riwayat.filter(function (r) { return r.status === 'Selesai' || r.status === 'Waktu habis'; })
+    .sort(function (a, b) { return String(a.waktuSelesai || a.waktuMulai).localeCompare(String(b.waktuSelesai || b.waktuMulai)); });
+  const ke = {};
+  const per = {};
+  MAPEL_URUT.forEach(function (k) { per[k] = { kode: k, nama: MAPEL[k], selesai: 0, nilai: [], seri: [] }; });
+  urut.forEach(function (r) {
+    const e = per[r.mapel]; if (!e) return;
+    const kp = r.idPaket || r.namaPaket;
+    ke[kp] = (ke[kp] || 0) + 1;
+    e.selesai++;
+    if (typeof r.nilai !== 'number') return;
+    e.nilai.push(r.nilai);
+    e.seri.push({ nilai: r.nilai, kategori: r.kategori, ulang: ke[kp] > 1 });
+  });
+  return MAPEL_URUT.map(function (k) {
+    const e = per[k];
+    return {
+      kode: k, nama: e.nama, selesai: e.selesai, bernilai: e.nilai.length, rerata: prkRerata(e.nilai),
+      tertinggi: e.nilai.length ? Math.max.apply(null, e.nilai) : null,
+      terakhir: e.nilai.length ? e.nilai[e.nilai.length - 1] : null,
+      seri: e.seri.slice(-PRK_BATAS_SERI_PDF), terpotong: e.seri.length > PRK_BATAS_SERI_PDF
+    };
+  }).filter(function (m) { return m.selesai > 0; });
+}
+
+function prkPdf(d) {
+  const s = d.siswa, r = d.ringkas;
+  const mapel = prkSusunMapel(d.riwayat);
+  const angka = function (v) { return v === null || v === undefined ? '-' : formatAngka(v, 2); };
+  const dok = pdfBuat({ judul: 'Laporan perkembangan: ' + s.nama, penulis: ekPenulis(), arah: 'tegak', kaki: namaApp() + ' · Laporan perkembangan siswa · dibuat ' + ekWaktuCetak() });
+  dok.judul('Laporan Perkembangan Siswa');
+  dok.teks(namaApp() + ' · dibuat ' + ekWaktuCetak(), { ukuran: 9, warna: PDF_WARNA.redam, jarakBawah: 6 });
+  dok.pasangan([['Nama siswa', s.nama], ['Sekolah', s.sekolah || '-'], ['Kelas', s.kelas || '-']], { kolom: 3 });
+  dok.kotakAngka([['Pengerjaan selesai', formatAngka(r.selesai)], ['Rata-rata nilai', angka(r.rerata)], ['Nilai tertinggi', angka(r.tertinggi)], ['Mata pelajaran', formatAngka(mapel.length)]]);
+  dok.teks('Ringkasan nilai per mata pelajaran', { ukuran: 11, tebal: true, jarakBawah: 3 });
+  if (mapel.length) {
+    dok.tabel({
+      ukuran: 9, maksBaris: 2,
+      kolom: [{ judul: 'Mata pelajaran', lebar: 3.2 }, { judul: 'Selesai', lebar: 1.2, rata: 'kanan' }, { judul: 'Rata-rata', lebar: 1.4, rata: 'kanan' }, { judul: 'Tertinggi', lebar: 1.4, rata: 'kanan' }, { judul: 'Terakhir', lebar: 1.4, rata: 'kanan' }],
+      baris: mapel.map(function (m) { return [m.nama, formatAngka(m.selesai), angka(m.rerata), angka(m.tertinggi), angka(m.terakhir)]; })
+    });
+  } else {
+    dok.teks('Siswa ini belum menyelesaikan satu pun paket.', { ukuran: 9.5, warna: PDF_WARNA.redam });
+  }
+  mapel.forEach(function (m) {
+    dok.teks('Grafik perkembangan nilai ' + m.nama, { ukuran: 11, tebal: true, jarakBawah: 3 });
+    if (m.seri.length) dok.grafik({ seri: m.seri });
+    else dok.teks('Pengerjaan ' + m.nama + ' sudah selesai tetapi tidak ada nilai angka untuk digambar.', { ukuran: 9, warna: PDF_WARNA.redam });
+    if (m.terpotong) dok.teks('Grafik memuat ' + PRK_BATAS_SERI_PDF + ' pengerjaan terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
+  });
+  if (d.terpotong) dok.teks('Laporan memuat ' + formatAngka(d.batas) + ' pengerjaan terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
+  dok.teks('Nilai adalah nilai resmi pada skala 0-100. Rata-rata dihitung dari semua pengerjaan yang selesai dan bernilai.', { ukuran: 8, warna: PDF_WARNA.redam });
+  return dok.selesai();
+}
+
+AKSI['prk-unduh-pdf'] = function (tombol) {
+  const d = prkSt.detail; if (!d) return;
+  const wadah = el('#prk-unduh-pesan');
+  pasang(wadah, '');
+  kerjakan(tombol, function () {
+    return new Promise(function (selesai) { setTimeout(selesai, 0); }).then(function () {
+      ekLapor(wadah, ekNamaBerkas(['perkembangan', d.siswa.nama], 'pdf'), prkPdf(d), 'application/pdf');
+    });
+  }).catch(function (e) { ekLaporGalat(wadah, e); });
+};
+
+
 const LABEL_TINDAKAN = { ubah_kunci: 'Ubah kunci jawaban', batalkan_soal: 'Batalkan soal', pulihkan_soal: 'Pulihkan soal' };
 
 function bolehKoreksi() { return S.pengguna && (S.pengguna.peran === PERAN.ADMIN || !!S.pengguna.izinKoreksi); }
@@ -9892,6 +10149,55 @@ function pdfBuat(opsi) {
         gambarBaris(sel, t, n % 2 ? PDF_WARNA.belang : null);
       });
       y -= 6;
+      return api;
+    },
+    grafik: function (def) {
+      const tinggi = def.tinggi || 128;
+      const seri = (def.seri || []).filter(function (x) { return typeof x.nilai === 'number' && isFinite(x.nilai); });
+      pastikan(tinggi + (def.judul ? 16 : 0) + 24);
+      if (def.judul) api.teks(def.judul, { ukuran: 9.5, tebal: true, jarakBawah: 2 });
+      const kiri = 26, kanan = 8, atas = 8, bawah = 14;
+      const x0 = M + kiri, x1 = W - M - kanan;
+      const yAtas = y - atas, yBawah = y - tinggi + bawah;
+      const py = function (v) { return yBawah + (yAtas - yBawah) * Math.max(0, Math.min(100, v)) / 100; };
+      [0, 25, 50, 75, 100].forEach(function (v) {
+        garisH(x0, x1, py(v), PDF_WARNA.garis, v === 0 ? 0.8 : 0.4);
+        const lab = pdfKodeTeks(String(v));
+        gambarTeks(lab, x0 - 4 - pdfLebarTeks(lab, false, 7), py(v) - 2.5, 7, false, PDF_WARNA.redam);
+      });
+      const n = seri.length;
+      const dalam = 8;
+      const langkah = n > 1 ? (x1 - x0 - 2 * dalam) / (n - 1) : 0;
+      const px = function (i) { return n > 1 ? x0 + dalam + i * langkah : (x0 + x1) / 2; };
+      const lompat = langkah > 0 ? Math.max(1, Math.ceil(22 / langkah)) : 1;
+      for (let i = 0; i < n; i += lompat) {
+        const lab = pdfKodeTeks(String(i + 1));
+        gambarTeks(lab, px(i) - pdfLebarTeks(lab, false, 7) / 2, yBawah - 10, 7, false, PDF_WARNA.redam);
+      }
+      const gaya = { 'Try Out Utama': { warna: PDF_WARNA.bar, putus: false, bulat: true }, 'Latihan Materi': { warna: PDF_WARNA.redam, putus: true, bulat: false } };
+      Object.keys(gaya).forEach(function (kat) {
+        const g = gaya[kat];
+        const idx = [];
+        seri.forEach(function (x, i) { if (x.kategori === kat) idx.push(i); });
+        if (idx.length >= 2) {
+          aktif.push(pdfAngka(1.4) + ' w ' + pdfWarna(g.warna) + ' RG ' + (g.putus ? '[3 2] 0 d ' : '[] 0 d ') +
+            idx.map(function (i, k) { return pdfAngka(px(i)) + ' ' + pdfAngka(py(seri[i].nilai)) + (k ? ' l' : ' m'); }).join(' ') + ' S [] 0 d');
+        }
+        idx.forEach(function (i) {
+          const cx = px(i), cy = py(seri[i].nilai), r = g.bulat ? 3.2 : 4;
+          const jalan = g.bulat
+            ? pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' m ' +
+              pdfAngka(cx + r) + ' ' + pdfAngka(cy + 0.5523 * r) + ' ' + pdfAngka(cx + 0.5523 * r) + ' ' + pdfAngka(cy + r) + ' ' + pdfAngka(cx) + ' ' + pdfAngka(cy + r) + ' c ' +
+              pdfAngka(cx - 0.5523 * r) + ' ' + pdfAngka(cy + r) + ' ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy + 0.5523 * r) + ' ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy) + ' c ' +
+              pdfAngka(cx - r) + ' ' + pdfAngka(cy - 0.5523 * r) + ' ' + pdfAngka(cx - 0.5523 * r) + ' ' + pdfAngka(cy - r) + ' ' + pdfAngka(cx) + ' ' + pdfAngka(cy - r) + ' c ' +
+              pdfAngka(cx + 0.5523 * r) + ' ' + pdfAngka(cy - r) + ' ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy - 0.5523 * r) + ' ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' c h'
+            : pdfAngka(cx) + ' ' + pdfAngka(cy + r) + ' m ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' l ' + pdfAngka(cx) + ' ' + pdfAngka(cy - r) + ' l ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy) + ' l h';
+          aktif.push(pdfAngka(1.1) + ' w ' + pdfWarna(g.warna) + ' RG ' + pdfWarna(seri[i].ulang ? PDF_WARNA.putih : g.warna) + ' rg ' + jalan + ' B');
+        });
+      });
+      if (!n) gambarTeks(pdfKodeTeks('Belum ada nilai'), x0 + 10, (yAtas + yBawah) / 2, 9, false, PDF_WARNA.redam);
+      y -= tinggi;
+      api.teks('Sumbu bawah: urutan pengerjaan (terlama ke terbaru). Garis utuh dan bulat = Try Out Utama; garis putus-putus dan belah ketupat = Latihan Materi; penanda berongga = pengerjaan ulang paket yang sama.', { ukuran: 7.5, warna: PDF_WARNA.redam, jarakBawah: 8 });
       return api;
     },
     selesai: function () {
