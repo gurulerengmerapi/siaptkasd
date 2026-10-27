@@ -3948,10 +3948,10 @@ const GR_LEBAR_MIN = 240;
 const GR_JARAK_LABEL_X = 28;
 const GR_GARIS_Y = [0, 25, 50, 75, 100];
 
-function grUkuran(lebarWadah) {
+function grUkuran(lebarWadah, halus) {
   const w = Number(lebarWadah);
   const lebar = Math.max(GR_LEBAR_MIN, Math.floor(isFinite(w) ? w : GR_LEBAR_MIN));
-  const tinggi = Math.max(180, Math.min(280, Math.round(lebar * 0.55)));
+  const tinggi = halus ? Math.max(200, Math.min(340, Math.round(lebar * 0.42))) : Math.max(180, Math.min(280, Math.round(lebar * 0.55)));
   return { lebar: lebar, tinggi: tinggi };
 }
 
@@ -3959,8 +3959,8 @@ function grGaya(kategori) { return kategori === 'Try Out Utama' ? 'to' : 'lm'; }
 function grBulat(n) { return Math.round(n * 100) / 100; }
 function grBatas(n) { return n < 0 ? 0 : (n > 100 ? 100 : n); }
 
-function hitungGrafik(seri, lebar, tinggi) {
-  const m = GR_MARGIN;
+function hitungGrafik(seri, lebar, tinggi, opsi) {
+  const m = (opsi && opsi.atas) ? { kiri: GR_MARGIN.kiri, kanan: GR_MARGIN.kanan, atas: opsi.atas, bawah: GR_MARGIN.bawah } : GR_MARGIN;
   const x0 = m.kiri, x1 = lebar - m.kanan, y0 = m.atas, y1 = tinggi - m.bawah;
   const bersih = (seri || []).filter(function (s) {
     return s && s.nilai !== null && s.nilai !== undefined && s.nilai !== '' && isFinite(Number(s.nilai));
@@ -3996,6 +3996,25 @@ function grPenanda(p) {
   return '<g class="' + kelas + '">' + judul + '<polygon points="' + pts + '"></polygon></g>';
 }
 
+function grKurva(titik, y0, y1) {
+  const jepit = function (v) { return grBulat(v < y0 ? y0 : (v > y1 ? y1 : v)); };
+  let d = 'M' + titik[0].x + ',' + titik[0].y;
+  for (let i = 0; i < titik.length - 1; i++) {
+    const a = titik[i - 1] || titik[i], b = titik[i], c = titik[i + 1], e = titik[i + 2] || c, k = 0.18;
+    d += ' C' + grBulat(b.x + (c.x - a.x) * k) + ',' + jepit(b.y + (c.y - a.y) * k) + ' ' + grBulat(c.x - (e.x - b.x) * k) + ',' + jepit(c.y - (e.y - b.y) * k) + ' ' + c.x + ',' + c.y;
+  }
+  return d;
+}
+
+function grGelembung(p, teks, g) {
+  const t = String(teks), lebar = Math.max(34, t.length * 7.5 + 16), tinggi = 20;
+  let x = p.x - lebar / 2;
+  x = x < 2 ? 2 : (x + lebar > g.lebar - 2 ? g.lebar - 2 - lebar : x);
+  const atas = p.y - 12 - tinggi >= 2;
+  const y = atas ? p.y - 12 - tinggi : p.y + 12;
+  return '<g class="gr-gelembung"><rect x="' + grBulat(x) + '" y="' + grBulat(y) + '" width="' + grBulat(lebar) + '" height="' + tinggi + '" rx="10"></rect><text x="' + grBulat(x + lebar / 2) + '" y="' + grBulat(y + 14) + '" text-anchor="middle">' + esc(t) + '</text></g>';
+}
+
 function svgGrafik(g, opsi) {
   const o = opsi || {};
   const id = String(o.id || 'gr').replace(/[^A-Za-z0-9_-]/g, '');
@@ -4003,6 +4022,7 @@ function svgGrafik(g, opsi) {
   bagian.push('<svg class="grafik" width="' + g.lebar + '" height="' + g.tinggi + '" viewBox="0 0 ' + g.lebar + ' ' + g.tinggi + '" role="img" aria-labelledby="' + id + '-j ' + id + '-d" focusable="false">');
   bagian.push('<title id="' + id + '-j">' + esc(o.judul || 'Grafik nilai') + '</title>');
   bagian.push('<desc id="' + id + '-d">' + esc(o.deskripsi || '') + '</desc>');
+  if (o.halus) bagian.push('<defs><linearGradient id="' + id + '-g" x1="0" y1="0" x2="0" y2="1"><stop class="gr-isi-atas" offset="0"></stop><stop class="gr-isi-bawah" offset="1"></stop></linearGradient></defs>');
   g.sumbuY.forEach(function (s) {
     bagian.push('<line class="gr-grid' + (s.nilai === 0 ? ' gr-dasar' : '') + '" x1="' + g.area.x0 + '" x2="' + g.area.x1 + '" y1="' + s.y + '" y2="' + s.y + '"></line>');
     bagian.push('<text class="gr-sumbu" x="' + (g.area.x0 - 6) + '" y="' + grBulat(s.y + 4) + '" text-anchor="end">' + s.nilai + '</text>');
@@ -4010,10 +4030,24 @@ function svgGrafik(g, opsi) {
   g.sumbuX.forEach(function (s) {
     bagian.push('<text class="gr-sumbu" x="' + s.x + '" y="' + (g.area.y1 + 18) + '" text-anchor="middle">' + esc(s.teks) + '</text>');
   });
-  g.garis.forEach(function (l) {
-    bagian.push('<polyline class="gr-garis gr-' + l.gaya + '" points="' + l.titik.map(function (p) { return p.x + ',' + p.y; }).join(' ') + '"></polyline>');
-  });
-  g.titik.forEach(function (p) { bagian.push(grPenanda(p)); });
+  if (o.halus) {
+    g.garis.forEach(function (l) {
+      const d = grKurva(l.titik, g.area.y0, g.area.y1), awal = l.titik[0], akhir = l.titik[l.titik.length - 1];
+      bagian.push('<path class="gr-isi gr-' + l.gaya + '" d="' + d + ' L' + akhir.x + ',' + g.area.y1 + ' L' + awal.x + ',' + g.area.y1 + ' Z" fill="url(#' + id + '-g)"></path>');
+      bagian.push('<path class="gr-garis gr-' + l.gaya + '" d="' + d + '"></path>');
+    });
+    const akhirTitik = g.titik.length ? g.titik[g.titik.length - 1] : null;
+    g.titik.forEach(function (p) {
+      if (p === akhirTitik) bagian.push('<circle class="gr-cahaya" cx="' + p.x + '" cy="' + p.y + '" r="13"></circle><circle class="gr-cahaya gr-cahaya-dalam" cx="' + p.x + '" cy="' + p.y + '" r="9"></circle>');
+      bagian.push(grPenanda(p));
+    });
+    if (akhirTitik && o.teksTerbaru) bagian.push(grGelembung(akhirTitik, o.teksTerbaru, g));
+  } else {
+    g.garis.forEach(function (l) {
+      bagian.push('<polyline class="gr-garis gr-' + l.gaya + '" points="' + l.titik.map(function (p) { return p.x + ',' + p.y; }).join(' ') + '"></polyline>');
+    });
+    g.titik.forEach(function (p) { bagian.push(grPenanda(p)); });
+  }
   bagian.push('</svg>');
   return bagian.join('');
 }
@@ -4066,21 +4100,32 @@ function labelTitikGrafik(x) {
   return x.kategori + ' · ' + x.namaPaket + ' · pengerjaan ke-' + x.ke + ' · nilai ' + x.nilaiTeks + ' · ' + tanggalWIB(x.waktu);
 }
 
+function seriTryOut(m) { return m.seri.filter(function (x) { return x.kategori === 'Try Out Utama'; }); }
+
+function trenTryOut(to) {
+  if (to.length < 2) return null;
+  const sel = Math.round((to[to.length - 1].nilai - to[to.length - 2].nilai) * 100) / 100;
+  return { arah: sel > 0 ? 'naik' : (sel < 0 ? 'turun' : 'sama'), selisih: Math.abs(sel) };
+}
+function chipTren(t) {
+  if (!t) return '';
+  if (t.arah === 'sama') return h`<span class="lencana lencana-info" data-uji="bs-tren" data-arah="sama">Sama dengan Try Out sebelumnya</span>`;
+  const naik = t.arah === 'naik';
+  return h`<span class="lencana ${naik ? 'lencana-sukses' : 'lencana-peringatan'}" data-uji="bs-tren" data-arah="${t.arah}">${ikon(naik ? 'arrow-up' : 'arrow-down', 'ikon-sm')} ${naik ? 'Naik' : 'Turun'} ${formatAngka(t.selisih)} poin dari Try Out sebelumnya</span>`;
+}
+
 function legendaMapel(m) {
-  const ada = { to: false, lm: false, ulang: false };
-  m.seri.forEach(function (x) { ada[grGaya(x.kategori)] = true; if (x.ke > 1) ada.ulang = true; });
-  const butir = [];
-  if (ada.to) butir.push(h`<li>${mentah(grContoh('to', false, false))}<span>Try Out Utama</span></li>`);
-  if (ada.lm) butir.push(h`<li>${mentah(grContoh('lm', false, false))}<span>Latihan Materi</span></li>`);
-  if (ada.ulang) butir.push(h`<li>${mentah(grContoh(ada.to ? 'to' : 'lm', true, true))}<span>Berongga: pengerjaan ulang paket yang sama</span></li>`);
+  const to = seriTryOut(m);
+  const butir = [h`<li>${mentah(grContoh('to', false, false))}<span>Try Out Utama</span></li>`];
+  if (to.some(function (x) { return x.ke > 1; })) butir.push(h`<li>${mentah(grContoh('to', true, true))}<span>Berongga: pengerjaan ulang paket yang sama</span></li>`);
   return h`<ul class="gr-legenda" aria-label="Keterangan grafik">${butir}</ul>`;
 }
 
 function tabelSeriMapel(m) {
   return h`<details class="gr-tabel" data-uji="bs-tabel"><summary>Lihat data sebagai tabel</summary>
-    <div class="bungkus-tabel"><table class="tabel"><caption class="sr-only">Nilai ${m.nama}, dari yang terlama</caption>
+    <div class="bungkus-tabel"><table class="tabel"><caption class="sr-only">Nilai Try Out Utama ${m.nama}, dari yang terlama</caption>
       <thead><tr><th scope="col">No</th><th scope="col">Paket</th><th scope="col">Kategori</th><th scope="col">Pengerjaan</th><th scope="col">Nilai</th><th scope="col">Selesai</th></tr></thead>
-      <tbody>${m.seri.map(function (x, i) {
+      <tbody>${seriTryOut(m).map(function (x, i) {
         return h`<tr><td data-label="No" class="angka">${i + 1}</td><td data-label="Paket" class="pecah">${x.namaPaket}</td><td data-label="Kategori">${x.kategori}</td><td data-label="Pengerjaan" class="angka">ke-${x.ke}</td><td data-label="Nilai" class="angka"><strong>${x.nilaiTeks}</strong></td><td data-label="Selesai">${waktuWIB(x.waktu)}</td></tr>`;
       })}</tbody></table></div></details>`;
 }
@@ -4093,14 +4138,22 @@ function kartuMapel(m, diRiwayat) {
       <button type="button" class="tombol tombol-garis" data-aksi="katalog-mapel" data-mapel="${kode}">${ikon('package')}<span>Cari paket ${m.nama}</span></button></div>`;
   } else if (!m.seri.length) {
     isi = h`<div class="peringatan peringatan-info" data-uji="bs-tersembunyi">${ikon('info')}<div><p>${formatAngka(m.selesai)} pengerjaan ${m.nama} sudah selesai, tetapi nilainya tidak ditampilkan karena diatur oleh guru.</p></div></div>`;
+  } else if (!seriTryOut(m).length) {
+    isi = h`<div class="peringatan peringatan-info" data-uji="bs-tanpa-to">${ikon('info')}<div><p>Belum ada Try Out Utama ${m.nama} yang dikerjakan. Grafik perkembangan hanya menampilkan Try Out Utama.</p>
+      <button type="button" class="tombol tombol-garis jarak-atas-kecil" data-aksi="katalog-mapel" data-mapel="${kode}">${ikon('package')}<span>Cari Try Out ${m.nama}</span></button></div></div>`;
   } else {
-    const t = m.nilaiTerbaru, k = m.nilaiTertinggi;
-    isi = h`<dl class="gr-ringkas">
+    const to = seriTryOut(m), t = to[to.length - 1];
+    const k = to.reduce(function (a, x) { return x.nilai >= a.nilai ? x : a; }, to[0]);
+    const latihan = m.seri.length - to.length;
+    isi = h`<div class="gr-kepala"><dl class="gr-ringkas">
         <div><dt>Nilai terbaru</dt><dd class="angka" data-uji="bs-terbaru">${t.nilaiTeks}</dd></div>
         <div><dt>Nilai tertinggi</dt><dd class="angka" data-uji="bs-tertinggi">${k.nilaiTeks}</dd></div>
-        <div><dt>Selesai</dt><dd class="angka">${formatAngka(m.selesai)}</dd></div></dl>
+        <div><dt>Try Out selesai</dt><dd class="angka" data-uji="bs-jumlah">${formatAngka(to.length)}</dd></div></dl>
+        ${chipTren(trenTryOut(to))}</div>
       <div class="grafik-wadah" data-grafik="${kode}" data-uji="bs-grafik"></div>
+      <p class="gr-sumbu-ket">Urutan pengerjaan Try Out Utama</p>
       ${legendaMapel(m)}
+      ${latihan > 0 ? h`<p class="bantu tanpa-margin" data-uji="bs-latihan">${formatAngka(latihan)} pengerjaan Latihan Materi tidak ditampilkan di grafik.</p>` : ''}
       ${m.tersembunyi > 0 ? h`<p class="bantu tanpa-margin">${formatAngka(m.tersembunyi)} pengerjaan lain tidak menampilkan nilai (diatur guru), jadi tidak ada di grafik.</p>` : ''}
       ${m.seriTerpotong ? h`<p class="bantu tanpa-margin">Grafik memuat pengerjaan terakhir saja; ${diRiwayat === true ? 'semua pengerjaan ada di tabel di bawah' : 'yang lebih lama ada di Riwayat'}.</p>` : ''}
       ${tabelSeriMapel(m)}`;
@@ -4187,18 +4240,23 @@ function gambarGrafik(wadah) {
   if (!wadah) return;
   const kode = wadah.getAttribute('data-grafik');
   const m = grMapel.filter(function (x) { return x.kode === kode; })[0];
-  if (!m || !m.seri.length) return;
+  if (!m) return;
+  const to = seriTryOut(m);
+  if (!to.length) return;
   const lebar = wadah.clientWidth;
   if (!lebar) return;
-  const uk = grUkuran(lebar);
+  const uk = grUkuran(lebar, true);
   if (wadah.getAttribute('data-lebar') === String(uk.lebar)) return;
-  const seri = m.seri.map(function (x) { return { nilai: x.nilai, kategori: x.kategori, ke: x.ke, label: labelTitikGrafik(x) }; });
-  const g = hitungGrafik(seri, uk.lebar, uk.tinggi);
-  const t = m.nilaiTerbaru, k = m.nilaiTertinggi;
+  const seri = to.map(function (x) { return { nilai: x.nilai, kategori: x.kategori, ke: x.ke, label: labelTitikGrafik(x) }; });
+  const g = hitungGrafik(seri, uk.lebar, to.length < 2 ? Math.min(uk.tinggi, 210) : uk.tinggi, { atas: 38 });
+  const t = to[to.length - 1];
+  const k = to.reduce(function (a, x) { return x.nilai >= a.nilai ? x : a; }, to[0]);
   wadah.innerHTML = svgGrafik(g, {
     id: 'gr-' + kode,
-    judul: 'Grafik nilai ' + m.nama,
-    deskripsi: formatAngka(m.seri.length) + ' pengerjaan dengan nilai. Nilai terbaru ' + t.nilaiTeks + ', tertinggi ' + k.nilaiTeks + '. Data lengkap ada pada tabel di bawah grafik.'
+    halus: true,
+    teksTerbaru: t.nilaiTeks,
+    judul: 'Grafik nilai Try Out Utama ' + m.nama,
+    deskripsi: formatAngka(to.length) + ' pengerjaan Try Out Utama dengan nilai. Nilai terbaru ' + t.nilaiTeks + ', tertinggi ' + k.nilaiTeks + '. Data lengkap ada pada tabel di bawah grafik.'
   });
   wadah.setAttribute('data-lebar', String(uk.lebar));
 }
