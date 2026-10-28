@@ -1337,7 +1337,7 @@ const CACHE_BACA = {
 const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
   'percobaan.detail': 1, 'pantau.sekarang': 1, 'perkembangan.cari': 1, 'perkembangan.siswa': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
-  'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1, 'pesertaKode.pratinjau': 1, 'pesertaKode.arsip': 1,
+  'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1, 'pesertaKode.pratinjau': 1, 'pesertaKode.arsip': 1, 'paket.ekstrak': 1, 'paket.ekstrakGambar': 1,
   'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
 
@@ -6927,7 +6927,8 @@ function gambarPaket() {
           <div class="paket-staf-meta"><span class="lencana lencana-primer">${x.kategori}</span><span>${formatAngka(x.jumlahSoal)} soal</span><span aria-hidden="true">·</span><span>${formatAngka(x.durasiMenit)} menit</span><span aria-hidden="true">·</span><span>${formatAngka(x.jumlahPercobaan)} percobaan</span>${admin || x.bisaUbah === false ? h`<span aria-hidden="true">·</span><span>oleh ${x.namaPemilik}</span>` : ''}</div>
           <div class="paket-staf-aksi">
             ${x.bisaUbah === false ? h`<button type="button" class="tombol tombol-garis" data-aksi="paket-buka" data-id="${x.id}" data-uji="pk-lihat">${ikon('eye')}<span>Lihat soal</span></button>` : h`<button type="button" class="tombol" data-aksi="paket-buka" data-id="${x.id}">${ikon('edit')}<span>Kelola soal</span></button>
-            <button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${x.id}" aria-label="Duplikat paket ${x.nama}">${ikon('copy')}<span>Duplikat</span></button>`}
+            <button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${x.id}" aria-label="Duplikat paket ${x.nama}">${ikon('copy')}<span>Duplikat</span></button>
+            <button type="button" class="tombol tombol-diam" data-aksi="paket-ekstrak" data-id="${x.id}" data-uji="pk-ekstrak" aria-label="Ekstrak soal paket ${x.nama} ke Word">${ikon('download')}<span>Ekstrak ke Word</span></button>`}
             ${bisaUrut ? h`<button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="paket-geser" data-id="${x.id}" data-arah="naik" aria-label="Naikkan urutan ${x.nama}"${i === 0 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-up')}</button>
             <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="paket-geser" data-id="${x.id}" data-arah="turun" aria-label="Turunkan urutan ${x.nama}"${i === sebaris.length - 1 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-down')}</button>` : ''}
           </div></article>`;
@@ -7060,7 +7061,7 @@ function gambarEditor() {
   else aksiStatus.push(['Draf', 'Kembalikan ke Draf', 'rotate-ccw', 'tombol']);
   pasang(wadah, h`
     <div class="remah"><button type="button" class="tombol tombol-polos" data-aksi="kembali" data-ke="paket">${ikon('chevron-left')}<span>Semua paket</span></button></div>
-    ${kepalaHalaman(pk.nama, null, h`<button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${pk.id}">${ikon('copy')}<span>Duplikat</span></button><button type="button" class="tombol tombol-diam" data-aksi="paket-ubah">${ikon('settings')}<span>Pengaturan</span></button>`)}
+    ${kepalaHalaman(pk.nama, null, h`<button type="button" class="tombol tombol-diam" data-aksi="paket-duplikat" data-id="${pk.id}">${ikon('copy')}<span>Duplikat</span></button><button type="button" class="tombol tombol-diam" data-aksi="paket-ekstrak" data-id="${pk.id}" data-uji="pk-ekstrak">${ikon('download')}<span>Ekstrak ke Word</span></button><button type="button" class="tombol tombol-diam" data-aksi="paket-ubah">${ikon('settings')}<span>Pengaturan</span></button>`)}
     <div class="baris-bungkus jarak-bawah">${lencanaStatus(pk.status)}<span class="lencana lencana-primer">${MAPEL[pk.mapel] || pk.mapel}</span><span class="lencana">${pk.kategori}</span>
       <span class="teks-redam">${formatAngka(pk.durasiMenit)} menit · ${formatAngka(soal.length)} soal · ${formatAngka(pk.jumlahPercobaan)} percobaan · oleh ${pk.namaPemilik}</span></div>
     ${sedangDikerjakan ? h`<div class="peringatan peringatan-waspada jarak-bawah" data-uji="banner-sedang">${ikon('clock')}<div>
@@ -11123,6 +11124,416 @@ function hnXlsxDaftar(d, f) {
     { nama: 'Ringkasan', arah: 'tegak', kolom: [{ judul: 'Keterangan', lebar: 24 }, { judul: 'Isi', lebar: 56 }], baris: ringkas }
   ], { judul: 'Hasil & Nilai', penulis: ekPenulis() });
 }
+
+'use strict';
+
+const WD_TIPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const WD_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
+  'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ' +
+  'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"';
+const WD_KIRI = 567;
+const WD_LEBAR_HALAMAN = 9638;
+const WD_EMU_PX = 9525;
+
+const wdSt = { urut: 0 };
+
+function wdX(t) {
+  return String(t === null || t === undefined ? '' : t).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function wdProp(f) {
+  return (f.b ? '<w:b/>' : '') + (f.i ? '<w:i/>' : '') + (f.s ? '<w:strike/>' : '') + (f.abu ? '<w:color w:val="6B7280"/>' : '') + (f.kecil ? '<w:sz w:val="20"/>' : '') +
+    (f.u ? '<w:u w:val="single"/>' : '') + (f.sup ? '<w:vertAlign w:val="superscript"/>' : (f.sub ? '<w:vertAlign w:val="subscript"/>' : ''));
+}
+function wdRun(teks, f) {
+  const p = wdProp(f || {});
+  const bagian = String(teks).split('\n');
+  return bagian.map(function (b, i) {
+    return (i ? '<w:r><w:br/></w:r>' : '') + (b === '' ? '' : '<w:r>' + (p ? '<w:rPr>' + p + '</w:rPr>' : '') + '<w:t xml:space="preserve">' + wdX(b) + '</w:t></w:r>');
+  }).join('');
+}
+
+function wdMatRun(t) {
+  return '<m:r><m:rPr><m:sty m:val="p"/></m:rPr><w:rPr><w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math"/></w:rPr><m:t xml:space="preserve">' + wdX(t) + '</m:t></m:r>';
+}
+function wdMat(arr) {
+  const el = [];
+  function dorong(x, teks) { el.push({ x: x, teks: teks }); }
+  (Array.isArray(arr) ? arr : []).forEach(function (n) {
+    if (typeof n === 'string') { if (n) dorong(wdMatRun(n), n); return; }
+    if (!n || typeof n !== 'object') return;
+    if (n.t === 'frac') { dorong('<m:f><m:num>' + wdMat(n.n) + '</m:num><m:den>' + wdMat(n.d) + '</m:den></m:f>', null); return; }
+    if (n.t === 'sqrt') { dorong('<m:rad><m:radPr><m:degHide m:val="1"/></m:radPr><m:deg/><m:e>' + wdMat(n.c) + '</m:e></m:rad>', null); return; }
+    if (n.t === 'sup' || n.t === 'sub') {
+      const isi = wdMat(n.c), dasar = el.pop();
+      let dx;
+      if (dasar && dasar.teks) {
+        const huruf = Array.from(dasar.teks), akhir = huruf.pop();
+        if (huruf.length) dorong(wdMatRun(huruf.join('')), huruf.join(''));
+        dx = wdMatRun(akhir);
+      } else dx = dasar ? dasar.x : wdMatRun('');
+      const tag = n.t === 'sup' ? 'sSup' : 'sSub', anak = n.t === 'sup' ? 'sup' : 'sub';
+      dorong('<m:' + tag + '><m:e>' + dx + '</m:e><m:' + anak + '>' + isi + '</m:' + anak + '></m:' + tag + '>', null);
+      return;
+    }
+    if (n.t === 'br' || n.t === 'img') return;
+    if (Array.isArray(n.c)) dorong(wdMat(n.c), null);
+  });
+  return el.length ? el.map(function (e) { return e.x; }).join('') : wdMatRun('');
+}
+
+function wdGambar(id, alt, ctx) {
+  const g = ctx.gambar[id];
+  if (!g) return wdRun('[gambar tidak tersedia]', { i: true, abu: true });
+  let w = g.w, hh = g.h;
+  const maks = ctx.lebarMaks || 480;
+  if (w > maks) { hh = hh * maks / w; w = maks; }
+  if (hh > 520) { w = w * 520 / hh; hh = 520; }
+  const cx = Math.max(1, Math.round(w * WD_EMU_PX)), cy = Math.max(1, Math.round(hh * WD_EMU_PX));
+  const n = ++ctx.docPr;
+  return '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cx + '" cy="' + cy + '"/><wp:docPr id="' + n + '" name="Gambar ' + n + '" descr="' + wdX(alt || '') + '"/>' +
+    '<wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>' +
+    '<pic:nvPicPr><pic:cNvPr id="' + n + '" name="' + wdX(g.nama) + '"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + g.rId + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>' +
+    '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>';
+}
+
+function wdSebaris(arr, f, ctx) {
+  let s = '';
+  (Array.isArray(arr) ? arr : []).forEach(function (n) {
+    if (typeof n === 'string') { s += n ? wdRun(n, f) : ''; return; }
+    if (!n || typeof n !== 'object') return;
+    if (n.t === 'br') { s += '<w:r><w:br/></w:r>'; return; }
+    if (n.t === 'frac' || n.t === 'sqrt') { s += '<m:oMath>' + wdMat([n]) + '</m:oMath>'; return; }
+    if (n.t === 'img') { s += wdGambar(n.m, n.alt, ctx); return; }
+    const g = Object.assign({}, f);
+    if (n.t === 'b' || n.t === 'i' || n.t === 'u' || n.t === 's' || n.t === 'sup' || n.t === 'sub') g[n.t] = true;
+    s += wdSebaris(n.c, g, ctx);
+  });
+  return s;
+}
+
+function wdPPr(o) {
+  const x = [];
+  if (o.gaya) x.push('<w:pStyle w:val="' + o.gaya + '"/>');
+  if (o.keepNext) x.push('<w:keepNext/>');
+  if (o.keepLines) x.push('<w:keepLines/>');
+  if (o.pecahHalaman) x.push('<w:pageBreakBefore/>');
+  if (o.num) x.push('<w:numPr><w:ilvl w:val="0"/><w:numId w:val="' + o.num + '"/></w:numPr>');
+  if (o.tab) x.push('<w:tabs><w:tab w:val="left" w:pos="' + o.tab + '"/></w:tabs>');
+  if (o.jarak !== undefined) x.push('<w:spacing w:before="' + (o.sebelum || 0) + '" w:after="' + o.jarak + '"/>');
+  if (o.kiri || o.gantung) x.push('<w:ind w:left="' + (o.kiri || 0) + '"' + (o.gantung ? ' w:hanging="' + o.gantung + '"' : '') + '/>');
+  if (o.rata) x.push('<w:jc w:val="' + o.rata + '"/>');
+  return x.length ? '<w:pPr>' + x.join('') + '</w:pPr>' : '';
+}
+function wdPara(isi, o) { return '<w:p>' + wdPPr(o || {}) + isi + '</w:p>'; }
+const WD_RATA = { c: 'center', r: 'right', j: 'both' };
+
+function wdBlok(blok, o, ctx) {
+  const kiri = o.kiri || 0, gantung = o.gantung || 0;
+  const f = o.f || {};
+  const lab = o.label ? wdRun(o.label, o.fLabel || f) + '<w:r><w:tab/></w:r>' : '';
+  const daftar = (Array.isArray(blok) ? blok : []).filter(function (b) { return b && typeof b === 'object'; });
+  if (!daftar.length) {
+    return o.label || o.kosong ? wdPara(lab + (o.kosong ? wdRun(o.kosong, { i: true, abu: true }) : ''), { gaya: o.gaya, kiri: kiri, gantung: gantung, tab: kiri, keepNext: o.keepNext }) : '';
+  }
+  let hasil = '';
+  let pakaiLabel = !!o.label;
+  daftar.forEach(function (b, idx) {
+    const terakhir = idx === daftar.length - 1;
+    const kn = o.keepNext || !terakhir;
+    if (b.t === 'ul' || b.t === 'ol') {
+      if (pakaiLabel) { hasil += wdPara(lab, { gaya: o.gaya, kiri: kiri, gantung: gantung, tab: kiri, keepNext: true }); pakaiLabel = false; }
+      const num = b.t === 'ol' ? ctx.numBaru() : 1;
+      b.i.forEach(function (butir, k) {
+        hasil += wdPara(wdSebaris(butir, f, ctx), { gaya: o.gaya, num: num, keepNext: kn || k < b.i.length - 1, kiri: kiri + 567, gantung: 283 });
+      });
+      return;
+    }
+    const isi = wdSebaris(b.c, f, ctx);
+    if (pakaiLabel) {
+      hasil += wdPara(lab + isi, { gaya: o.gaya, kiri: kiri, gantung: gantung, tab: kiri, keepNext: kn, rata: WD_RATA[b.a] });
+      pakaiLabel = false;
+    } else {
+      hasil += wdPara(isi, { gaya: o.gaya, kiri: kiri, keepNext: kn, rata: WD_RATA[b.a] });
+    }
+  });
+  return hasil;
+}
+
+const WD_GARIS = '<w:top w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/><w:left w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/><w:right w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/><w:insideH w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="9CA3AF"/>';
+function wdSel(lebar, isi, o) {
+  return '<w:tc><w:tcPr><w:tcW w:w="' + lebar + '" w:type="dxa"/>' + (o && o.warna ? '<w:shd w:val="clear" w:color="auto" w:fill="' + o.warna + '"/>' : '') + '<w:vAlign w:val="center"/></w:tcPr>' + (isi || '<w:p/>') + '</w:tc>';
+}
+function wdTabel(lebarKolom, baris, kiri) {
+  return '<w:tbl><w:tblPr><w:tblW w:w="' + lebarKolom.reduce(function (a, b) { return a + b; }, 0) + '" w:type="dxa"/><w:tblInd w:w="' + (kiri || 0) + '" w:type="dxa"/><w:tblBorders>' + WD_GARIS + '</w:tblBorders><w:tblLayout w:type="fixed"/>' +
+    '<w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>' +
+    lebarKolom.map(function (w) { return '<w:gridCol w:w="' + w + '"/>'; }).join('') + '</w:tblGrid>' + baris.join('') + '</w:tbl>' + wdPara('', { jarak: 60 });
+}
+const wdBaris = function (sel, o) { return '<w:tr><w:trPr><w:cantSplit/>' + (o && o.kepala ? '<w:tblHeader/>' : '') + '</w:trPr>' + sel.join('') + '</w:tr>'; };
+
+function wdKunciTeks(s) {
+  if (!s.kunci) return '—';
+  if (s.jenis === 'PG') return s.kunci;
+  return String(s.kunci).split(',').map(function (x) { return x.trim(); }).join(' – ');
+}
+
+function wdSoal(s, d, ctx, kelompok) {
+  let x = '';
+  if (kelompok) {
+    x += wdPara(wdRun(kelompok.akhir > kelompok.awal ? 'Bacaan untuk soal ' + kelompok.awal + '–' + kelompok.akhir : 'Bacaan untuk soal ' + kelompok.awal, { b: true, kecil: true }), { gaya: 'BacaanJudul', keepNext: true });
+    x += wdBlok(Kaya.pohon(s.stimulus), { gaya: 'Bacaan', keepNext: true }, ctx);
+  }
+  x += wdBlok(Kaya.pohon(s.pertanyaan), { label: s.nomor + '.', kiri: WD_KIRI, gantung: WD_KIRI, keepNext: true, fLabel: {}, kosong: '[Pertanyaan belum diisi]' }, ctx);
+  const opsi = Array.isArray(s.opsi) ? s.opsi : [];
+  if (s.jenis === 'PG') {
+    for (let i = 0; i < 4; i++) {
+      x += wdBlok(Kaya.pohon(opsi[i]), { label: 'ABCD'.charAt(i) + '.', kiri: WD_KIRI + 454, gantung: 454, keepNext: i < 3, kosong: '[belum diisi]' }, Object.assign(ctx, { lebarMaks: 300 }));
+    }
+    ctx.lebarMaks = 480;
+  } else if (s.jenis === 'MCMA') {
+    x += wdPara(wdRun('Berilah tanda centang pada setiap jawaban yang benar. Jawaban benar lebih dari satu.', { i: true, kecil: true, abu: true }), { kiri: WD_KIRI, keepNext: true });
+    for (let i = 0; i < 3; i++) {
+      x += wdBlok(Kaya.pohon(opsi[i]), { label: '☐', kiri: WD_KIRI + 454, gantung: 454, keepNext: i < 2, kosong: '[belum diisi]' }, ctx);
+    }
+  } else if (s.jenis === 'BS') {
+    x += wdPara(wdRun('Pilih Benar atau Salah untuk setiap pernyataan.', { i: true, kecil: true, abu: true }), { kiri: WD_KIRI, keepNext: true });
+    const kol = [WD_LEBAR_HALAMAN - WD_KIRI - 2 * 1100, 1100, 1100];
+    const baris = [wdBaris([
+      wdSel(kol[0], wdPara(wdRun('Pernyataan', { b: true }), { jarak: 0, keepNext: true }), { warna: 'F3F4F6' }),
+      wdSel(kol[1], wdPara(wdRun('Benar', { b: true }), { jarak: 0, rata: 'center', keepNext: true }), { warna: 'F3F4F6' }),
+      wdSel(kol[2], wdPara(wdRun('Salah', { b: true }), { jarak: 0, rata: 'center', keepNext: true }), { warna: 'F3F4F6' })], { kepala: true })];
+    for (let i = 0; i < 3; i++) {
+      baris.push(wdBaris([
+        wdSel(kol[0], wdBlok(Kaya.pohon(opsi[i]), { label: (i + 1) + '.', kiri: 340, gantung: 340, kosong: '[belum diisi]', keepNext: i < 2 }, ctx) || wdPara('', {})),
+        wdSel(kol[1], wdPara(wdRun('☐'), { jarak: 0, rata: 'center', keepNext: i < 2 })),
+        wdSel(kol[2], wdPara(wdRun('☐'), { jarak: 0, rata: 'center', keepNext: i < 2 }))]));
+    }
+    x += wdTabel(kol, baris, WD_KIRI);
+  }
+  if (s.kurang && s.kurang.length) {
+    x += wdPara(wdRun('[Soal belum lengkap: ' + s.kurang.join('; ') + ']', { i: true, kecil: true, abu: true }), { kiri: WD_KIRI, jarak: 120 });
+  } else {
+    x += wdPara('', { jarak: 60 });
+  }
+  return x;
+}
+
+function wdKelompokBacaan(soal) {
+  const peta = {};
+  let i = 0;
+  while (i < soal.length) {
+    if (Kaya.kosong(soal[i].stimulus)) { i++; continue; }
+    let j = i;
+    while (j + 1 < soal.length && soal[j + 1].stimulus === soal[i].stimulus) j++;
+    peta[i] = { awal: soal[i].nomor, akhir: soal[j].nomor };
+    i = j + 1;
+  }
+  return peta;
+}
+
+function wdBagianKunci(soal, ctx) {
+  let x = wdPara(wdRun('KUNCI JAWABAN'), { gaya: 'Bagian', pecahHalaman: true });
+  const adaTebakan = soal.some(function (s) { return s.kunciStatus === 'claude'; });
+  const adaCampur = soal.some(function (s) { return s.jenis !== 'PG'; });
+  const per = 4, kol = [];
+  for (let i = 0; i < per; i++) kol.push(620, WD_LEBAR_HALAMAN / per - 620);
+  kol[kol.length - 1] = WD_LEBAR_HALAMAN - kol.slice(0, -1).reduce(function (a, b) { return a + b; }, 0);
+  const baris = [];
+  for (let i = 0; i < soal.length; i += per) {
+    const sel = [];
+    for (let k = 0; k < per; k++) {
+      const s = soal[i + k];
+      sel.push(wdSel(kol[2 * k], s ? wdPara(wdRun(String(s.nomor), { b: true }), { jarak: 0, rata: 'center' }) : '', { warna: s ? 'F3F4F6' : '' }));
+      sel.push(wdSel(kol[2 * k + 1], s ? wdPara(wdRun(wdKunciTeks(s) + (s.kunciStatus === 'claude' ? '*' : '')), { jarak: 0, rata: 'center' }) : ''));
+    }
+    baris.push(wdBaris(sel));
+  }
+  x += wdTabel(kol, baris, 0);
+  if (adaCampur) x += wdPara(wdRun('Soal MCMA dan Benar–Salah: B = Benar, S = Salah, berurutan menurut pernyataan 1, 2, 3.', { kecil: true, abu: true, i: true }), { jarak: 60 });
+  if (adaTebakan) x += wdPara(wdRun('* Kunci ini masih tebakan dan belum diperiksa.', { kecil: true, abu: true, i: true }), { jarak: 60 });
+  x += wdPara(wdRun('PEMBAHASAN'), { gaya: 'Bagian', keepNext: true });
+  const ada = soal.filter(function (s) { return !Kaya.kosong(s.pembahasan); });
+  if (!ada.length) x += wdPara(wdRun('Belum ada pembahasan pada paket ini.', { i: true, abu: true }), {});
+  ada.forEach(function (s) {
+    x += wdBlok(Kaya.pohon(s.pembahasan), { label: s.nomor + '.', kiri: WD_KIRI, gantung: WD_KIRI }, ctx);
+  });
+  return x;
+}
+
+const WD_FONT = 'Times New Roman';
+function wdStyles() {
+  const f = '<w:rFonts w:ascii="' + WD_FONT + '" w:hAnsi="' + WD_FONT + '" w:cs="' + WD_FONT + '" w:eastAsia="' + WD_FONT + '"/>';
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + WD_NS + '><w:docDefaults><w:rPrDefault><w:rPr>' + f + '<w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="id-ID"/></w:rPr></w:rPrDefault>' +
+    '<w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+    '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Judul"><w:name w:val="Judul"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:spacing w:after="60"/><w:jc w:val="center"/></w:pPr><w:rPr><w:b/><w:sz w:val="34"/><w:szCs w:val="34"/></w:rPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Info"><w:name w:val="Info"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="40"/><w:jc w:val="center"/></w:pPr><w:rPr><w:color w:val="4B5563"/><w:sz w:val="21"/></w:rPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Bagian"><w:name w:val="Bagian"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="2" w:color="374151"/></w:pBdr><w:spacing w:before="240" w:after="160"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="BacaanJudul"><w:name w:val="Judul bacaan"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="160" w:after="40"/></w:pPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Bacaan"><w:name w:val="Bacaan"/><w:basedOn w:val="Normal"/><w:pPr><w:pBdr><w:left w:val="single" w:sz="18" w:space="6" w:color="9CA3AF"/></w:pBdr><w:shd w:val="clear" w:color="auto" w:fill="F3F4F6"/><w:spacing w:after="80"/><w:ind w:left="170" w:right="113"/></w:pPr></w:style>' +
+    '<w:style w:type="paragraph" w:styleId="Kaki"><w:name w:val="Kaki"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="0"/><w:jc w:val="center"/></w:pPr><w:rPr><w:color w:val="6B7280"/><w:sz w:val="18"/></w:rPr></w:style></w:styles>';
+}
+function wdNumbering(jumlahDaftar, mulai) {
+  const lvl = function (fmt, teks) { return '<w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="' + fmt + '"/><w:lvlText w:val="' + teks + '"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="567" w:hanging="283"/></w:pPr></w:lvl>'; };
+  let x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering ' + WD_NS + '><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="singleLevel"/>' + lvl('bullet', '•') + '</w:abstractNum>' +
+    '<w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="singleLevel"/>' + lvl('decimal', '%1.') + '</w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num>';
+  for (let i = 0; i < jumlahDaftar; i++) x += '<w:num w:numId="' + (mulai + i) + '"><w:abstractNumId w:val="1"/><w:lvlOverride w:ilvl="0"><w:startOverride w:val="1"/></w:lvlOverride></w:num>';
+  return x + '</w:numbering>';
+}
+function wdKaki(nama) {
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ' + WD_NS + '><w:p><w:pPr><w:pStyle w:val="Kaki"/></w:pPr>' + wdRun(nama + ' · halaman ') +
+    '<w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>';
+}
+
+function docxBuat(data, gambar, opsi) {
+  const o = Object.assign({ nama: 'Siap TKA SD', waktu: new Date(), dibuatOleh: '', cetak: '' }, opsi || {});
+  const enc = new TextEncoder();
+  const rels = [], media = [];
+  let nomorGambar = 0;
+  const peta = {};
+  Object.keys(gambar || {}).forEach(function (id) {
+    const g = gambar[id];
+    if (!g || !g.bytes || !(g.w > 0) || !(g.h > 0)) return;
+    nomorGambar++;
+    const nama = 'g' + nomorGambar + '.' + (g.ext === 'jpeg' ? 'jpeg' : 'png');
+    peta[id] = { rId: 'rIdG' + nomorGambar, w: g.w, h: g.h, nama: nama };
+    media.push({ nama: 'word/media/' + nama, data: g.bytes });
+    rels.push('<Relationship Id="rIdG' + nomorGambar + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/' + nama + '"/>');
+  });
+  let daftarOl = 0;
+  const ctx = { gambar: peta, docPr: 0, lebarMaks: 480, numBaru: function () { daftarOl++; return 1 + daftarOl; } };
+  const p = data.paket, soal = data.soal;
+  const kelompok = wdKelompokBacaan(soal);
+  let isi = wdPara(wdRun(p.nama), { gaya: 'Judul' });
+  isi += wdPara(wdRun([MAPEL[p.mapel] || p.mapel, p.kategori, p.durasiMenit ? p.durasiMenit + ' menit' : '', soal.length + ' soal'].filter(Boolean).join(' · ')), { gaya: 'Info' });
+  isi += wdPara(wdRun(o.nama + (o.cetak ? ' · diekstrak ' + o.cetak : '') + (o.dibuatOleh ? ' oleh ' + o.dibuatOleh : '')), { gaya: 'Info', jarak: 200 });
+  if (data.dilewati > 0) isi += wdPara(wdRun(data.dilewati + ' soal dilewati karena bukan milik Anda.', { i: true, kecil: true, abu: true }), { rata: 'center' });
+  if (!soal.length) isi += wdPara(wdRun('Paket ini belum memuat soal.', { i: true }), {});
+  soal.forEach(function (s, i) { isi += wdSoal(s, data, ctx, kelompok[i]); });
+  if (soal.length) isi += wdBagianKunci(soal, ctx);
+  const sect = '<w:sectPr><w:footerReference w:type="default" r:id="rIdKaki"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>';
+  const dokumen = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + WD_NS + '><w:body>' + isi + sect + '</w:body></w:document>';
+  const tipeGambar = (media.some(function (m) { return /\.png$/.test(m.nama); }) ? '<Default Extension="png" ContentType="image/png"/>' : '') + (media.some(function (m) { return /\.jpeg$/.test(m.nama); }) ? '<Default Extension="jpeg" ContentType="image/jpeg"/>' : '');
+  const tipe = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' + tipeGambar +
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
+    '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' +
+    '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>';
+  const relRoot = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+    '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>';
+  const relDok = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdN" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>' +
+    '<Relationship Id="rIdKaki" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>' + rels.join('') + '</Relationships>';
+  const w = o.waktu instanceof Date && !isNaN(o.waktu) ? o.waktu : new Date();
+  const core = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+    '<dc:title>' + wdX(p.nama) + '</dc:title><dc:creator>' + wdX(o.dibuatOleh || o.nama) + '</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">' + w.toISOString().replace(/\.\d+Z$/, 'Z') + '</dcterms:created></cp:coreProperties>';
+  const entri = [
+    { nama: '[Content_Types].xml', data: enc.encode(tipe) }, { nama: '_rels/.rels', data: enc.encode(relRoot) }, { nama: 'docProps/core.xml', data: enc.encode(core) },
+    { nama: 'word/document.xml', data: enc.encode(dokumen) }, { nama: 'word/_rels/document.xml.rels', data: enc.encode(relDok) }, { nama: 'word/styles.xml', data: enc.encode(wdStyles()) },
+    { nama: 'word/numbering.xml', data: enc.encode(wdNumbering(daftarOl, 2)) }, { nama: 'word/footer1.xml', data: enc.encode(wdKaki(p.nama)) }
+  ].concat(media);
+  return zipBuat(entri, w);
+}
+
+function wdBytesDariBase64(b64) {
+  const bin = atob(b64), out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function wdMuatBitmap(blob) {
+  if (typeof window.createImageBitmap === 'function') {
+    return window.createImageBitmap(blob).then(function (bm) { return { sumber: bm, w: bm.width, h: bm.height, tutup: function () { try { bm.close(); } catch (e) {   } } }; });
+  }
+  return new Promise(function (ok, no) {
+    const url = URL.createObjectURL(blob), im = new Image();
+    im.onload = function () { ok({ sumber: im, w: im.naturalWidth, h: im.naturalHeight, tutup: function () { URL.revokeObjectURL(url); } }); };
+    im.onerror = function () { URL.revokeObjectURL(url); no(new Error('gambar tidak terbaca')); };
+    im.src = url;
+  });
+}
+function wdSiapkanGambar(mime, b64) {
+  const bytes = wdBytesDariBase64(b64);
+  const asli = mime === 'image/png' ? 'png' : (mime === 'image/jpeg' ? 'jpeg' : '');
+  return wdMuatBitmap(new Blob([bytes], { type: mime || 'application/octet-stream' })).then(function (g) {
+    if (!(g.w > 0 && g.h > 0)) { g.tutup(); return null; }
+    if (asli) { g.tutup(); return { bytes: bytes, ext: asli, w: g.w, h: g.h }; }
+    const kanvas = document.createElement('canvas');
+    kanvas.width = g.w; kanvas.height = g.h;
+    kanvas.getContext('2d').drawImage(g.sumber, 0, 0);
+    g.tutup();
+    return new Promise(function (ok) {
+      kanvas.toBlob(function (b) {
+        if (!b) { ok(null); return; }
+        const fr = new FileReader();
+        fr.onload = function () { ok({ bytes: new Uint8Array(fr.result), ext: 'png', w: kanvas.width, h: kanvas.height }); };
+        fr.onerror = function () { ok(null); };
+        fr.readAsArrayBuffer(b);
+      }, 'image/png');
+    });
+  }).catch(function () { return null; });
+}
+
+function wdEkstrak(idPaket, lapor, batal) {
+  lapor('Mengambil soal…');
+  return panggil('paket.ekstrak', { id_paket: idPaket }).then(function (data) {
+    if (batal()) return null;
+    const ids = Object.keys(data.media);
+    const gambar = {};
+    let gagal = (data.gambarHilang || []).length;
+    const per = Math.max(1, data.perPanggilan || 8);
+    let selesai = 0;
+    function kelompok(antrean) {
+      if (!antrean.length || batal()) return Promise.resolve();
+      const bagian = antrean.slice(0, per), sisa = antrean.slice(per);
+      lapor('Mengambil gambar ' + formatAngka(Math.min(ids.length, selesai + bagian.length)) + ' dari ' + formatAngka(ids.length) + '…');
+      return panggil('paket.ekstrakGambar', { id_paket: idPaket, ids: bagian }).then(function (r) {
+        const jalan = Object.keys(r.gambar).map(function (id) {
+          return wdSiapkanGambar(r.gambar[id].mime, r.gambar[id].data).then(function (g) { if (g) gambar[id] = g; else gagal++; });
+        });
+        gagal += (r.hilang || []).length;
+        selesai += bagian.length - (r.tertunda || []).length;
+        return Promise.all(jalan).then(function () { return kelompok((r.tertunda || []).concat(sisa)); });
+      });
+    }
+    return kelompok(ids).then(function () {
+      if (batal()) return null;
+      lapor('Menyusun dokumen Word…');
+      const bytes = docxBuat(data, gambar, { nama: namaApp(), cetak: ekWaktuCetak(), dibuatOleh: ekPenulis() });
+      return { bytes: bytes, jumlahSoal: data.soal.length, gambarGagal: gagal, nama: data.paket.nama, dilewati: data.dilewati };
+    });
+  });
+}
+
+AKSI['paket-ekstrak'] = function (b) {
+  const id = b.getAttribute('data-id') || (edSt && edSt.paket && edSt.paket.id);
+  if (!id) return;
+  const urut = ++wdSt.urut;
+  let ditutup = false;
+  const api = modal({
+    judul: 'Ekstrak soal ke Word',
+    badan: h`<div id="wd-status" class="teks-redam" aria-live="polite" data-uji="wd-status">Menyiapkan…</div><div id="wd-hasil" class="jarak-atas-kecil"></div>
+      <p class="bantu jarak-atas-kecil">Berkas dibuat di peramban Anda dan langsung diunduh. Tidak ada yang disimpan di Drive.</p>`,
+    aksi: [{ id: 'tutup', label: 'Tutup', gaya: 'diam' }]
+  });
+  api.selesai.then(function () { ditutup = true; });
+  const batal = function () { return ditutup || urut !== wdSt.urut; };
+  const status = function (t) { const e = el('#wd-status'); if (e) pasang(e, h`<span class="spinner" aria-hidden="true"></span> <span>${t}</span>`); };
+  wdEkstrak(id, status, batal).then(function (r) {
+    if (!r || batal()) return;
+    const e = el('#wd-status'); if (e) pasang(e, h`<span></span>`);
+    const wadah = el('#wd-hasil');
+    ekLapor(wadah, ekNamaBerkas(['soal', r.nama], 'docx'), r.bytes, WD_TIPE);
+    const catatan = [];
+    if (!r.jumlahSoal) catatan.push('Paket ini belum memuat soal.');
+    if (r.gambarGagal) catatan.push(formatAngka(r.gambarGagal) + ' gambar tidak dapat diambil dan ditulis sebagai “[gambar tidak tersedia]”.');
+    if (r.dilewati) catatan.push(formatAngka(r.dilewati) + ' soal dilewati karena bukan milik Anda.');
+    if (catatan.length && wadah) wadah.insertAdjacentHTML('beforeend', '<div class="peringatan peringatan-waspada jarak-atas-kecil" data-uji="wd-catatan"><div>' + catatan.map(function (c) { return '<p>' + esc(c) + '</p>'; }).join('') + '</div></div>');
+  }).catch(function (e) {
+    if (batal()) return;
+    const s = el('#wd-status'); if (s) pasang(s, h`<span></span>`);
+    ekLaporGalat(el('#wd-hasil'), e);
+  });
+};
 
 
 let pgAsli = null;
