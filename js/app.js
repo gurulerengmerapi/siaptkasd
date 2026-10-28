@@ -1336,7 +1336,7 @@ const CACHE_BACA = {
 
 const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
-  'percobaan.detail': 1, 'pantau.sekarang': 1, 'perkembangan.cari': 1, 'perkembangan.siswa': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
+  'percobaan.detail': 1, 'pantau.sekarang': 1, 'perkembangan.cari': 1, 'perkembangan.siswa': 1, 'peringkat.siswa': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
   'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1, 'pesertaKode.pratinjau': 1, 'pesertaKode.arsip': 1, 'paket.ekstrak': 1, 'paket.ekstrakGambar': 1,
   'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
@@ -1564,15 +1564,15 @@ function pulihkanSnapshot() {
 const NAMA_MENU_MAPEL = { BIN: 'B.Indonesia', MAT: 'Matematika', IPA: 'IPA' };
 
 const MENU = {
-  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
-  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['audit', 'Log Aktivitas', 'activity']],
+  ADMIN: [['dasbor', 'Dasbor', 'home'], ['akun', 'Kelola Akun', 'users'], ['impor-siswa', 'Impor Siswa', 'upload'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['banner', 'Banner', 'megaphone'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['peringkat-siswa', 'Peringkat Siswa', 'award'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['percobaan', 'Percobaan', 'list'], ['pengaturan', 'Pengaturan', 'settings'], ['audit', 'Log Audit', 'shield'], ['backup', 'Backup & Pulihkan', 'database']],
+  GURU: [['dasbor', 'Dasbor', 'home'], ['paket', 'Paket Soal', 'package'], ['materi', 'Materi', 'book-open'], ['hasil-nilai', 'Hasil & Nilai', 'trophy'], ['perkembangan', 'Perkembangan Siswa', 'trending-up'], ['peringkat-siswa', 'Peringkat Siswa', 'award'], ['analisis', 'Analisis Soal', 'bar-chart'], ['pantau', 'Pantauan Ujian', 'eye'], ['audit', 'Log Aktivitas', 'activity']],
   SISWA: [['dasbor', 'Beranda', 'home']].concat(MAPEL_URUT.map(function (k) {
     return ['katalog', 'Latihan soal ' + NAMA_MENU_MAPEL[k], IKON_MAPEL[k], { mapel: k }];
   }), [['materi', 'Materi', 'file-text'], ['riwayat', 'Riwayat', 'clock']])
 };
 const JUDUL_HALAMAN = {
   beranda: 'Beranda', masuk: 'Masuk', token: 'Ujian dengan kode', wajib: 'Lengkapi akun Anda', dasbor: 'Dasbor', profil: 'Profil Saya', akun: 'Kelola Akun', 'impor-siswa': 'Impor Siswa',
-  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', pantau: 'Pantauan Ujian', perkembangan: 'Perkembangan Siswa', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
+  paket: 'Paket Soal', 'paket-edit': 'Susun Paket', katalog: 'Latihan soal', materi: 'Materi', banner: 'Banner beranda', percobaan: 'Percobaan', pantau: 'Pantauan Ujian', perkembangan: 'Perkembangan Siswa', 'peringkat-siswa': 'Peringkat Siswa', 'hasil-nilai': 'Hasil & Nilai', analisis: 'Analisis Soal', riwayat: 'Riwayat', hasil: 'Hasil ujian', 'hasil-token': 'Hasil ujian', ujian: 'Ujian',
   pengaturan: 'Pengaturan', audit: 'Log Audit', backup: 'Backup & Pulihkan'
 };
 
@@ -1599,6 +1599,7 @@ const HALAMAN = {
   analisis: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderAnalisisSoal(p, c); } },
   pantau: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPantau(p, c); } },
   perkembangan: { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPerkembangan(p, c); } },
+  'peringkat-siswa': { peran: [PERAN.ADMIN, PERAN.GURU], render: function (p, c) { renderPeringkatSiswa(p, c); } },
   wajib: { tanpaRangka: true, render: function (p, c) { renderWajib(p, c); } },
   dasbor: { render: function (p, c) { renderDasbor(p, c); } },
   profil: { render: function (p, c) { renderProfil(p, c); } },
@@ -3751,7 +3752,7 @@ function mapelDariRiwayat(daftar) {
     nomor[kp] = (nomor[kp] || 0) + 1;
     e.selesai++;
     if (r.nilai === null || r.nilai === undefined || r.nilaiTeks === null) { e.tersembunyi++; return; }
-    e.seri.push({ namaPaket: r.namaPaket, kategori: r.kategori, ke: nomor[kp], nilai: r.nilai, nilaiTeks: r.nilaiTeks, waktu: r.waktuSelesai || r.waktuMulai });
+    e.seri.push({ namaPaket: r.namaPaket, kategori: r.kategori, ke: nomor[kp], nilai: r.nilai, nilaiTeks: r.nilaiTeks, waktu: r.waktuSelesai || r.waktuMulai, lamaMenit: r.lamaMenit === undefined ? null : r.lamaMenit, rinci: r.rinci || null });
   });
   return MAPEL_URUT.map(function (k) {
     const e = per[k];
@@ -3943,15 +3944,17 @@ KIRIM['token-mulai'] = function (form) {
 
 
 const GR_MARGIN = { kiri: 34, kanan: 10, atas: 12, bawah: 26 };
+const GR_MARGIN_BAWAH_LABEL = 44;
 const GR_DALAM = 10;
 const GR_LEBAR_MIN = 240;
 const GR_JARAK_LABEL_X = 28;
 const GR_GARIS_Y = [0, 25, 50, 75, 100];
+const GR_BULAN_PENDEK = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
 function grUkuran(lebarWadah, halus) {
   const w = Number(lebarWadah);
   const lebar = Math.max(GR_LEBAR_MIN, Math.floor(isFinite(w) ? w : GR_LEBAR_MIN));
-  const tinggi = halus ? Math.max(200, Math.min(340, Math.round(lebar * 0.42))) : Math.max(180, Math.min(280, Math.round(lebar * 0.55)));
+  const tinggi = halus ? Math.max(220, Math.min(360, Math.round(lebar * 0.44))) : Math.max(180, Math.min(280, Math.round(lebar * 0.55)));
   return { lebar: lebar, tinggi: tinggi };
 }
 
@@ -3959,32 +3962,144 @@ function grGaya(kategori) { return kategori === 'Try Out Utama' ? 'to' : 'lm'; }
 function grBulat(n) { return Math.round(n * 100) / 100; }
 function grBatas(n) { return n < 0 ? 0 : (n > 100 ? 100 : n); }
 
+function grRentangY(nilai) {
+  const a = (nilai || []).map(Number).filter(function (v) { return isFinite(v); }).map(grBatas);
+  if (a.length < 2) return { bawah: 0, atas: 100, langkah: 25, ticks: GR_GARIS_Y.slice(), terpotong: false };
+  const lo = Math.min.apply(null, a), hi = Math.max.apply(null, a);
+  let bawah = Math.floor((lo - 5) / 10) * 10, atas = Math.ceil((hi + 5) / 10) * 10;
+  if (bawah <= 10) bawah = 0;
+  if (atas > 100) atas = 100;
+  if (atas - bawah < 20) { if (bawah + 20 <= 100) atas = bawah + 20; else bawah = atas - 20; }
+  if (atas - bawah > 50) { bawah = Math.floor(bawah / 20) * 20; atas = Math.min(100, Math.ceil(atas / 20) * 20); }
+  const langkah = (bawah === 0 && atas === 100) ? 25 : ((atas - bawah) > 50 ? 20 : 10);
+  const ticks = [];
+  for (let v = bawah; v <= atas + 0.001; v += langkah) ticks.push(v);
+  return { bawah: bawah, atas: atas, langkah: langkah, ticks: ticks, terpotong: bawah > 0 };
+}
+
+function grTanggalPendek(iso) {
+  const t = Date.parse(iso);
+  if (!iso || isNaN(t)) return '';
+  const d = new Date(t + 7 * 3600000);
+  return d.getUTCDate() + ' ' + GR_BULAN_PENDEK[d.getUTCMonth()];
+}
+
+function grNamaPendek(nama) {
+  const asli = String(nama === null || nama === undefined ? '' : nama).trim();
+  let s = asli.replace(/^(try\s*out(\s+utama)?|paket|latihan(\s+materi)?)\s*[:\-]?\s*/i, '').trim();
+  if (!s) s = asli;
+  return s.length > 10 ? s.slice(0, 9) + '…' : s;
+}
+
+function grAngkaPendek(teks) { return String(teks).replace(/,00$/, '').replace(/(,\d)0$/, '$1'); }
+function grSelTeks(sel) { return String(Math.round(Math.abs(sel) * 10) / 10).replace('.', ','); }
+
+function grSegmen(titik, k, y0, y1) {
+  const jepit = function (v) { return grBulat(v < y0 ? y0 : (v > y1 ? y1 : v)); };
+  const a = titik[k - 1] || titik[k], b = titik[k], c = titik[k + 1], e = titik[k + 2] || c, kk = 0.18;
+  return 'M' + b.x + ',' + b.y + ' C' + grBulat(b.x + (c.x - a.x) * kk) + ',' + jepit(b.y + (c.y - a.y) * kk) + ' ' + grBulat(c.x - (e.x - b.x) * kk) + ',' + jepit(c.y - (e.y - b.y) * kk) + ' ' + c.x + ',' + c.y;
+}
+
+function grKotak(p, teks, lebarG, bawah) {
+  const t = String(teks), w = Math.max(34, t.length * 7.5 + 16), tinggi = 20;
+  let x = p.x - w / 2;
+  x = x < 2 ? 2 : (x + w > lebarG - 2 ? lebarG - 2 - w : x);
+  const y = bawah ? p.y + 12 : p.y - 12 - tinggi;
+  return { x: grBulat(x), y: grBulat(y), w: grBulat(w), h: tinggi, teks: t, tx: grBulat(x + w / 2), ty: grBulat(y + 14), bawah: !!bawah };
+}
+function grBersinggungan(a, b, jarak) {
+  return !(a.x + a.w + jarak < b.x || b.x + b.w + jarak < a.x || a.y + a.h + jarak < b.y || b.y + b.h + jarak < a.y);
+}
+
 function hitungGrafik(seri, lebar, tinggi, opsi) {
-  const m = (opsi && opsi.atas) ? { kiri: GR_MARGIN.kiri, kanan: GR_MARGIN.kanan, atas: opsi.atas, bawah: GR_MARGIN.bawah } : GR_MARGIN;
-  const x0 = m.kiri, x1 = lebar - m.kanan, y0 = m.atas, y1 = tinggi - m.bawah;
+  const o = opsi || {};
   const bersih = (seri || []).filter(function (s) {
     return s && s.nilai !== null && s.nilai !== undefined && s.nilai !== '' && isFinite(Number(s.nilai));
   });
   const n = bersih.length;
+  const berlabel = bersih.some(function (s) { return s.namaPaket || s.waktu; });
+  const m = { kiri: GR_MARGIN.kiri, kanan: GR_MARGIN.kanan, atas: o.atas || GR_MARGIN.atas, bawah: berlabel ? GR_MARGIN_BAWAH_LABEL : GR_MARGIN.bawah };
+  const x0 = m.kiri, x1 = lebar - m.kanan, y0 = m.atas, y1 = tinggi - m.bawah;
+  const rentang = o.adaptif ? grRentangY(bersih.map(function (s) { return Number(s.nilai); })) : { bawah: 0, atas: 100, langkah: 25, ticks: GR_GARIS_Y.slice(), terpotong: false };
   const px0 = x0 + GR_DALAM, px1 = x1 - GR_DALAM;
   const langkah = n > 1 ? (px1 - px0) / (n - 1) : 0;
-  const yDari = function (nilai) { return y1 - (grBatas(Number(nilai)) / 100) * (y1 - y0); };
+  const yDari = function (nilai) { return y1 - ((grBatas(Number(nilai)) - rentang.bawah) / (rentang.atas - rentang.bawah)) * (y1 - y0); };
   const titik = bersih.map(function (s, i) {
     const nilai = grBatas(Number(s.nilai));
     return {
       i: i, x: grBulat(n > 1 ? px0 + i * langkah : (px0 + px1) / 2), y: grBulat(yDari(nilai)), nilai: nilai,
-      kategori: s.kategori, gaya: grGaya(s.kategori), ulang: Number(s.ke) > 1, ke: Number(s.ke) || 1, label: s.label || ''
+      kategori: s.kategori, gaya: grGaya(s.kategori), ulang: Number(s.ke) > 1, ke: Number(s.ke) || 1, label: s.label || '',
+      namaPaket: s.namaPaket || '', waktu: s.waktu || '',
+      nilaiTeks: (s.nilaiTeks !== undefined && s.nilaiTeks !== null) ? String(s.nilaiTeks) : String(nilai),
+      lamaMenit: (s.lamaMenit === undefined || s.lamaMenit === null) ? null : s.lamaMenit, rinci: s.rinci || null,
+      selisih: null, arah: '', angka: false, angkaBawah: false, ketUlang: false
     };
   });
-  const garis = [];
+  const garis = [], segmen = [];
   ['to', 'lm'].forEach(function (g) {
     const t = titik.filter(function (p) { return p.gaya === g; });
     if (t.length >= 2) garis.push({ gaya: g, titik: t });
+    for (let k = 1; k < t.length; k++) {
+      const sel = grBulat(t[k].nilai - t[k - 1].nilai);
+      t[k].selisih = sel;
+      t[k].arah = sel > 0 ? 'naik' : (sel < 0 ? 'turun' : 'sama');
+      segmen.push({ gaya: g, dari: t[k - 1].i, ke: t[k].i, arah: t[k].arah, d: grSegmen(t, k - 1, y0, y1) });
+    }
   });
-  const sumbuY = GR_GARIS_Y.map(function (v) { return { nilai: v, y: grBulat(yDari(v)) }; });
-  const lompat = langkah > 0 ? Math.max(1, Math.ceil(GR_JARAK_LABEL_X / langkah)) : 1;
-  const sumbuX = titik.filter(function (p) { return p.i % lompat === 0; }).map(function (p) { return { i: p.i, x: p.x, teks: String(p.i + 1) }; });
-  return { lebar: lebar, tinggi: tinggi, area: { x0: x0, x1: x1, y0: y0, y1: y1 }, titik: titik, garis: garis, sumbuY: sumbuY, sumbuX: sumbuX, n: n };
+  let ib = -1;
+  if (n >= 2) titik.forEach(function (p) { if (ib < 0 || p.nilai >= titik[ib].nilai) ib = p.i; });
+  const sumbuY = rentang.ticks.map(function (v) { return { nilai: v, y: grBulat(yDari(v)) }; });
+
+  const baris = function (p) {
+    const b = [grTanggalPendek(p.waktu), p.namaPaket ? grNamaPendek(p.namaPaket) : ''].filter(function (x) { return x; });
+    return b.length ? b : [String(p.i + 1)];
+  };
+  let sumbuX;
+  if (berlabel) {
+    const lebarLabel = titik.reduce(function (a, p) { return Math.max(a, baris(p).reduce(function (c, s) { return Math.max(c, s.length); }, 0) * 6.4 + 10); }, 0);
+    const lompat = langkah > 0 ? Math.max(1, Math.ceil(lebarLabel / langkah)) : 1;
+    sumbuX = titik.filter(function (p) { return (n - 1 - p.i) % lompat === 0; }).map(function (p) {
+      const b = baris(p), w = b.reduce(function (c, s) { return Math.max(c, s.length); }, 0) * 6.4 + 6;
+      const ax = Math.min(Math.max(p.x, w / 2 + 2), lebar - w / 2 - 2);
+      return { i: p.i, x: p.x, ax: grBulat(ax), teks: b[0], baris: b };
+    });
+  } else {
+    const lompat = langkah > 0 ? Math.max(1, Math.ceil(GR_JARAK_LABEL_X / langkah)) : 1;
+    sumbuX = titik.filter(function (p) { return p.i % lompat === 0; }).map(function (p) { return { i: p.i, x: p.x, ax: p.x, teks: String(p.i + 1), baris: [String(p.i + 1)] }; });
+  }
+
+  let kotak = null;
+  if (n >= 1) {
+    const baru = titik[n - 1], gabung = ib === n - 1;
+    const teksBaru = gabung ? 'Terbaikmu ' + baru.nilaiTeks : baru.nilaiTeks;
+    let kBaru = grKotak(baru, teksBaru, lebar, !(baru.y - 32 >= 2)), kBaik = null;
+    if (ib >= 0 && !gabung) {
+      const pb = titik[ib];
+      kBaik = grKotak(pb, 'Terbaikmu ' + pb.nilaiTeks, lebar, !(pb.y - 32 >= 2));
+      if (grBersinggungan(kBaru, kBaik, 4)) kBaru = grKotak(baru, teksBaru, lebar, !kBaru.bawah);
+    }
+    kotak = { terbaru: kBaru, terbaik: kBaik, gabung: gabung };
+  }
+
+  const lompatAngka = langkah > 0 ? Math.max(1, Math.ceil(38 / langkah)) : 1;
+  const bidang = [];
+  if (kotak) { bidang.push(kotak.terbaru); if (kotak.terbaik) bidang.push(kotak.terbaik); }
+  titik.forEach(function (p) {
+    const polos = (p.i === n - 1) || (kotak && kotak.terbaik && p.i === ib);
+    if (!polos && (n - 1 - p.i) % lompatAngka === 0) {
+      const bawah = p.y - 22 < 0;
+      const r = { x: p.x - 18, y: bawah ? p.y + 6 : p.y - 21, w: 36, h: 15 };
+      if (!bidang.some(function (k) { return grBersinggungan(r, k, 2); })) { p.angka = true; p.angkaBawah = bawah; }
+    }
+    if (p.ulang && langkah >= 34) {
+      const dipakaiKotak = (p.i === n - 1 && kotak.terbaru.bawah) || (kotak && kotak.terbaik && p.i === ib && kotak.terbaik.bawah);
+      p.ketUlang = !dipakaiKotak;
+    }
+  });
+  return {
+    lebar: lebar, tinggi: tinggi, area: { x0: x0, x1: x1, y0: y0, y1: y1 }, titik: titik, garis: garis, segmen: segmen, sumbuY: sumbuY, sumbuX: sumbuX, n: n,
+    bawah: rentang.bawah, atas: rentang.atas, terpotong: rentang.terpotong, langkah: langkah, terbaik: ib, kotak: kotak
+  };
 }
 
 function grPenanda(p) {
@@ -4006,42 +4121,57 @@ function grKurva(titik, y0, y1) {
   return d;
 }
 
-function grGelembung(p, teks, g) {
-  const t = String(teks), lebar = Math.max(34, t.length * 7.5 + 16), tinggi = 20;
-  let x = p.x - lebar / 2;
-  x = x < 2 ? 2 : (x + lebar > g.lebar - 2 ? g.lebar - 2 - lebar : x);
-  const atas = p.y - 12 - tinggi >= 2;
-  const y = atas ? p.y - 12 - tinggi : p.y + 12;
-  return '<g class="gr-gelembung"><rect x="' + grBulat(x) + '" y="' + grBulat(y) + '" width="' + grBulat(lebar) + '" height="' + tinggi + '" rx="10"></rect><text x="' + grBulat(x + lebar / 2) + '" y="' + grBulat(y + 14) + '" text-anchor="middle">' + esc(t) + '</text></g>';
+function grLencana(k, kelas) {
+  return '<g class="gr-gelembung' + (kelas ? ' ' + kelas : '') + '"><rect x="' + k.x + '" y="' + k.y + '" width="' + k.w + '" height="' + k.h + '" rx="10"></rect><text x="' + k.tx + '" y="' + k.ty + '" text-anchor="middle">' + esc(k.teks) + '</text></g>';
 }
 
 function svgGrafik(g, opsi) {
   const o = opsi || {};
   const id = String(o.id || 'gr').replace(/[^A-Za-z0-9_-]/g, '');
   const bagian = [];
-  bagian.push('<svg class="grafik" width="' + g.lebar + '" height="' + g.tinggi + '" viewBox="0 0 ' + g.lebar + ' ' + g.tinggi + '" role="img" aria-labelledby="' + id + '-j ' + id + '-d" focusable="false">');
+  bagian.push('<svg class="grafik" width="' + g.lebar + '" height="' + g.tinggi + '" viewBox="0 0 ' + g.lebar + ' ' + g.tinggi + '" role="img" aria-labelledby="' + id + '-j ' + id + '-d" focusable="false"' + (o.halus ? ' tabindex="0"' : '') + '>');
   bagian.push('<title id="' + id + '-j">' + esc(o.judul || 'Grafik nilai') + '</title>');
   bagian.push('<desc id="' + id + '-d">' + esc(o.deskripsi || '') + '</desc>');
   if (o.halus) bagian.push('<defs><linearGradient id="' + id + '-g" x1="0" y1="0" x2="0" y2="1"><stop class="gr-isi-atas" offset="0"></stop><stop class="gr-isi-bawah" offset="1"></stop></linearGradient></defs>');
   g.sumbuY.forEach(function (s) {
-    bagian.push('<line class="gr-grid' + (s.nilai === 0 ? ' gr-dasar' : '') + '" x1="' + g.area.x0 + '" x2="' + g.area.x1 + '" y1="' + s.y + '" y2="' + s.y + '"></line>');
+    bagian.push('<line class="gr-grid' + (s.y >= g.area.y1 - 0.5 ? ' gr-dasar' : '') + '" x1="' + g.area.x0 + '" x2="' + g.area.x1 + '" y1="' + s.y + '" y2="' + s.y + '"></line>');
     bagian.push('<text class="gr-sumbu" x="' + (g.area.x0 - 6) + '" y="' + grBulat(s.y + 4) + '" text-anchor="end">' + s.nilai + '</text>');
   });
+  if (o.halus && g.terpotong) {
+    const px = g.area.x0 + 6, py = g.area.y1;
+    const d = 'M' + px + ',' + py + ' l4,-5 l5,10 l5,-10 l4,5';
+    bagian.push('<path class="gr-patah-alas" d="' + d + '"></path><path class="gr-patah" d="' + d + '"></path>');
+  }
   g.sumbuX.forEach(function (s) {
-    bagian.push('<text class="gr-sumbu" x="' + s.x + '" y="' + (g.area.y1 + 18) + '" text-anchor="middle">' + esc(s.teks) + '</text>');
+    s.baris.forEach(function (teks, k) {
+      bagian.push('<text class="gr-sumbu' + (k ? ' gr-sumbu-nama' : '') + '" x="' + s.ax + '" y="' + (g.area.y1 + 18 + k * 14) + '" text-anchor="middle">' + esc(teks) + '</text>');
+    });
   });
   if (o.halus) {
     g.garis.forEach(function (l) {
       const d = grKurva(l.titik, g.area.y0, g.area.y1), awal = l.titik[0], akhir = l.titik[l.titik.length - 1];
       bagian.push('<path class="gr-isi gr-' + l.gaya + '" d="' + d + ' L' + akhir.x + ',' + g.area.y1 + ' L' + awal.x + ',' + g.area.y1 + ' Z" fill="url(#' + id + '-g)"></path>');
-      bagian.push('<path class="gr-garis gr-' + l.gaya + '" d="' + d + '"></path>');
+    });
+    g.segmen.forEach(function (s) {
+      bagian.push('<path class="gr-garis gr-' + s.gaya + ' gr-seg gr-' + s.arah + '" d="' + s.d + '"></path>');
     });
     const akhirTitik = g.titik.length ? g.titik[g.titik.length - 1] : null;
     g.titik.forEach(function (p) {
       if (p === akhirTitik) bagian.push('<circle class="gr-cahaya" cx="' + p.x + '" cy="' + p.y + '" r="13"></circle><circle class="gr-cahaya gr-cahaya-dalam" cx="' + p.x + '" cy="' + p.y + '" r="9"></circle>');
       bagian.push(grPenanda(p));
     });
-    if (akhirTitik && o.teksTerbaru) bagian.push(grGelembung(akhirTitik, o.teksTerbaru, g));
+    g.titik.forEach(function (p) {
+      if (p.angka) bagian.push('<text class="gr-angka" x="' + p.x + '" y="' + (p.angkaBawah ? p.y + 19 : p.y - 10) + '" text-anchor="middle">' + esc(grAngkaPendek(p.nilaiTeks)) + '</text>');
+      if (p.ketUlang) bagian.push('<text class="gr-ulang-ket" x="' + p.x + '" y="' + (p.y + 21) + '" text-anchor="middle">ulang</text>');
+    });
+    if (g.kotak) {
+      bagian.push(grLencana(g.kotak.terbaru, g.kotak.gabung ? 'gr-terbaik' : ''));
+      if (g.kotak.terbaik) bagian.push(grLencana(g.kotak.terbaik, 'gr-terbaik'));
+    }
+    const rs = Math.max(8, Math.min(16, g.langkah > 0 ? g.langkah / 2 : 16));
+    g.titik.forEach(function (p) {
+      bagian.push('<circle class="gr-sasaran" data-i="' + p.i + '" cx="' + p.x + '" cy="' + p.y + '" r="' + grBulat(rs) + '"></circle>');
+    });
   } else {
     g.garis.forEach(function (l) {
       bagian.push('<polyline class="gr-garis gr-' + l.gaya + '" points="' + l.titik.map(function (p) { return p.x + ',' + p.y; }).join(' ') + '"></polyline>');
@@ -4052,11 +4182,42 @@ function svgGrafik(g, opsi) {
   return bagian.join('');
 }
 
+function grWawasan(namaMapel, titik) {
+  const t = (titik || []).filter(function (x) { return x && x.nilai !== null && x.nilai !== undefined && x.nilai !== '' && isFinite(Number(x.nilai)); });
+  const n = t.length;
+  if (!n) return '';
+  const nm = String(namaMapel || '');
+  const nil = function (x) { return Number(x.nilai); };
+  const kt = function (x) { return grAngkaPendek(x.nilaiTeks !== undefined && x.nilaiTeks !== null ? x.nilaiTeks : String(nil(x)).replace('.', ',')); };
+  const a = t[n - 1];
+  if (n === 1) return 'Baru satu Try Out ' + nm + ': nilainya ' + kt(a) + '. Kerjakan satu lagi untuk melihat arah perkembanganmu.';
+  const b = t[n - 2];
+  let tinggi = t[0], rendah = t[0];
+  t.forEach(function (x) { if (nil(x) >= nil(tinggi)) tinggi = x; if (nil(x) < nil(rendah)) rendah = x; });
+  let beruntun = 0;
+  for (let i = n - 1; i > 0 && nil(t[i]) > nil(t[i - 1]); i--) beruntun++;
+  const sel = Math.round((nil(a) - nil(b)) * 100) / 100;
+  const kisaran = Math.round(nil(rendah)) + '–' + Math.round(nil(tinggi));
+  if (beruntun >= 2) return nm + ' kamu naik ' + beruntun + ' kali berturut-turut, dari ' + kt(t[n - 1 - beruntun]) + ' menjadi ' + kt(a) + '.';
+  if (sel > 0 && nil(a) >= nil(tinggi)) return 'Nilai ' + nm + ' terbarumu ' + kt(a) + ' adalah yang tertinggi sejauh ini. Pertahankan!';
+  if (n >= 3 && nil(tinggi) - nil(rendah) <= 5) return nm + ' kamu stabil di kisaran ' + kisaran + '.';
+  if (sel < 0) {
+    if (Math.abs(sel) <= 3) return 'Turun tipis ' + grSelTeks(sel) + ' poin dari Try Out sebelumnya; ' + nm + ' kamu masih di kisaran ' + kisaran + '.';
+    return 'Nilai ' + nm + ' turun ' + grSelTeks(sel) + ' poin dari Try Out sebelumnya. Nilai terbaikmu ' + kt(tinggi) + '; yuk pelajari lagi soal yang salah.';
+  }
+  if (sel > 0) return 'Nilai ' + nm + ' naik ' + grSelTeks(sel) + ' poin dari Try Out sebelumnya; nilai terbaikmu ' + kt(tinggi) + '.';
+  return 'Nilai ' + nm + ' sama dengan Try Out sebelumnya (' + kt(a) + ').';
+}
+
 function grContoh(gaya, ulang, tanpaGaris) {
   const kelas = 'gr-titik gr-' + gaya + (ulang ? ' gr-ulang' : '');
   const garis = tanpaGaris ? '' : '<line class="gr-garis gr-' + gaya + '" x1="1" x2="35" y1="7" y2="7"></line>';
   const bentuk = gaya === 'to' ? '<circle cx="18" cy="7" r="5"></circle>' : '<polygon points="18,0.5 24.5,7 18,13.5 11.5,7"></polygon>';
   return '<svg class="gr-contoh" width="36" height="14" viewBox="0 0 36 14" aria-hidden="true" focusable="false">' + garis + '<g class="' + kelas + '">' + bentuk + '</g></svg>';
+}
+
+function grContohRuas(arah) {
+  return '<svg class="gr-contoh" width="36" height="14" viewBox="0 0 36 14" aria-hidden="true" focusable="false"><path class="gr-garis gr-to gr-seg gr-' + arah + '" d="M1,7 L35,7"></path></svg>';
 }
 
 
@@ -4115,10 +4276,14 @@ function chipTren(t) {
 }
 
 function legendaMapel(m) {
-  const to = seriTryOut(m);
-  const butir = [h`<li>${mentah(grContoh('to', false, false))}<span>Try Out Utama</span></li>`];
-  if (to.some(function (x) { return x.ke > 1; })) butir.push(h`<li>${mentah(grContoh('to', true, true))}<span>Berongga: pengerjaan ulang paket yang sama</span></li>`);
-  return h`<ul class="gr-legenda" aria-label="Keterangan grafik">${butir}</ul>`;
+  const to = seriTryOut(m), ada = {};
+  for (let i = 1; i < to.length; i++) { const sel = to[i].nilai - to[i - 1].nilai; ada[sel > 0 ? 'naik' : (sel < 0 ? 'turun' : 'sama')] = true; }
+  const butir = [];
+  if (ada.naik) butir.push(h`<li>${mentah(grContohRuas('naik'))}<span>Naik dari sebelumnya</span></li>`);
+  if (ada.turun) butir.push(h`<li>${mentah(grContohRuas('turun'))}<span>Turun dari sebelumnya</span></li>`);
+  if (ada.sama) butir.push(h`<li>${mentah(grContohRuas('sama'))}<span>Sama dengan sebelumnya</span></li>`);
+  if (!butir.length) butir.push(h`<li>${mentah(grContoh('to', false, false))}<span>Try Out Utama</span></li>`);
+  return h`<ul class="gr-legenda" aria-label="Keterangan grafik" data-uji="bs-legenda">${butir}</ul>`;
 }
 
 function tabelSeriMapel(m) {
@@ -4150,8 +4315,9 @@ function kartuMapel(m, diRiwayat) {
         <div><dt>Nilai tertinggi</dt><dd class="angka" data-uji="bs-tertinggi">${k.nilaiTeks}</dd></div>
         <div><dt>Try Out selesai</dt><dd class="angka" data-uji="bs-jumlah">${formatAngka(to.length)}</dd></div></dl>
         ${chipTren(trenTryOut(to))}</div>
+      <p class="gr-wawasan" data-uji="bs-wawasan">${ikon('trending-up')}<span>${grWawasan(m.nama, to)}</span></p>
       <div class="grafik-wadah" data-grafik="${kode}" data-uji="bs-grafik"></div>
-      <p class="gr-sumbu-ket">Urutan pengerjaan Try Out Utama</p>
+      <p class="gr-sumbu-ket" data-uji="bs-sumbu-ket">Urutan pengerjaan Try Out Utama. Arahkan atau sentuh sebuah titik untuk melihat rinciannya.</p>
       ${legendaMapel(m)}
       ${latihan > 0 ? h`<p class="bantu tanpa-margin" data-uji="bs-latihan">${formatAngka(latihan)} pengerjaan Latihan Materi tidak ditampilkan di grafik.</p>` : ''}
       ${m.tersembunyi > 0 ? h`<p class="bantu tanpa-margin">${formatAngka(m.tersembunyi)} pengerjaan lain tidak menampilkan nilai (diatur guru), jadi tidak ada di grafik.</p>` : ''}
@@ -4236,6 +4402,82 @@ function isiProgres() {
   if (window.requestAnimationFrame) window.requestAnimationFrame(function () { window.requestAnimationFrame(naik); }); else naik();
 }
 
+function kartuTitikIsi(p) {
+  const sel = p.selisih === null ? '' : (p.arah === 'sama' ? 'Sama dengan sebelumnya' : (p.arah === 'naik' ? 'Naik ' : 'Turun ') + grSelTeks(p.selisih) + ' poin dari sebelumnya');
+  const r = p.rinci;
+  return h`<strong class="gr-kartu-judul">${p.namaPaket}</strong>
+    <span class="gr-kartu-waktu">${waktuWIB(p.waktu)}${p.ulang ? ' · pengerjaan ke-' + p.ke : ''}</span>
+    <span class="gr-kartu-nilai"><strong class="angka">Nilai ${p.nilaiTeks}</strong>${sel ? h`<span class="gr-kartu-sel gr-${p.arah}">${ikon(p.arah === 'turun' ? 'arrow-down' : (p.arah === 'naik' ? 'arrow-up' : 'check'), 'ikon-sm')} ${sel}</span>` : ''}</span>
+    ${r ? h`<span class="gr-kartu-rinci">Benar ${formatAngka(r.benar)} · Sebagian ${formatAngka(r.sebagian)} · Salah ${formatAngka(r.salah)} · Kosong ${formatAngka(r.kosong)}</span>` : ''}
+    ${p.lamaMenit !== null && p.lamaMenit !== undefined ? h`<span class="gr-kartu-rinci">Lama mengerjakan ${formatAngka(p.lamaMenit)} menit</span>` : ''}`;
+}
+
+function grKartuTampil(wadah, i) {
+  const p = wadah._grTitik && wadah._grTitik[i], kartu = wadah.querySelector('.gr-kartu');
+  if (!p || !kartu) return;
+  pasang(kartu, kartuTitikIsi(p));
+  kartu.hidden = false;
+  const lw = wadah.clientWidth, kw = kartu.offsetWidth, kh = kartu.offsetHeight;
+  let kiri = p.x - kw / 2;
+  kiri = Math.max(2, Math.min(kiri, lw - kw - 2));
+  let atas = p.y - kh - 14;
+  if (atas < 0) atas = p.y + 14;
+  kartu.style.left = Math.round(kiri) + 'px';
+  kartu.style.top = Math.round(atas) + 'px';
+  semua('.gr-titik', wadah).forEach(function (g, k) { g.classList.toggle('gr-aktif', k === i); });
+  wadah._grAktif = i;
+}
+function grKartuSembunyi(wadah) {
+  const kartu = wadah.querySelector('.gr-kartu');
+  if (kartu) kartu.hidden = true;
+  semua('.gr-titik.gr-aktif', wadah).forEach(function (g) { g.classList.remove('gr-aktif'); });
+  wadah._grAktif = -1;
+  wadah._grTetap = -1;
+}
+
+function grPasangInteraksi(wadah) {
+  if (wadah._grPasang) return;
+  wadah._grPasang = true;
+  wadah._grAktif = -1; wadah._grTetap = -1;
+  const indeks = function (e) {
+    const t = e.target && e.target.closest ? e.target.closest('.gr-sasaran') : null;
+    return t ? Number(t.getAttribute('data-i')) : -1;
+  };
+  wadah.addEventListener('pointerover', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    const i = indeks(e);
+    if (i >= 0) grKartuTampil(wadah, i);
+  });
+  wadah.addEventListener('pointerout', function (e) {
+    if (e.pointerType !== 'mouse' || indeks(e) < 0) return;
+    if (wadah._grTetap >= 0) grKartuTampil(wadah, wadah._grTetap); else { const k = wadah.querySelector('.gr-kartu'); if (k) k.hidden = true; semua('.gr-titik.gr-aktif', wadah).forEach(function (g) { g.classList.remove('gr-aktif'); }); wadah._grAktif = -1; }
+  });
+  wadah.addEventListener('click', function (e) {
+    const i = indeks(e);
+    if (i < 0) { grKartuSembunyi(wadah); return; }
+    if (wadah._grTetap === i) { grKartuSembunyi(wadah); return; }
+    wadah._grTetap = i;
+    grKartuTampil(wadah, i);
+  });
+  wadah.addEventListener('keydown', function (e) {
+    const n = wadah._grTitik ? wadah._grTitik.length : 0;
+    if (!n) return;
+    if (e.key === 'Escape') { grKartuSembunyi(wadah); return; }
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return;
+    e.preventDefault();
+    let i = wadah._grAktif;
+    if (e.key === 'Home') i = 0;
+    else if (e.key === 'End') i = n - 1;
+    else if (i < 0) i = n - 1;
+    else i = Math.max(0, Math.min(n - 1, i + (e.key === 'ArrowRight' ? 1 : -1)));
+    wadah._grTetap = i;
+    grKartuTampil(wadah, i);
+  });
+}
+document.addEventListener('click', function (e) {
+  semua('[data-grafik]').forEach(function (w) { if (w._grAktif >= 0 && !w.contains(e.target)) grKartuSembunyi(w); });
+});
+
 function gambarGrafik(wadah) {
   if (!wadah) return;
   const kode = wadah.getAttribute('data-grafik');
@@ -4247,18 +4489,24 @@ function gambarGrafik(wadah) {
   if (!lebar) return;
   const uk = grUkuran(lebar, true);
   if (wadah.getAttribute('data-lebar') === String(uk.lebar)) return;
-  const seri = to.map(function (x) { return { nilai: x.nilai, kategori: x.kategori, ke: x.ke, label: labelTitikGrafik(x) }; });
-  const g = hitungGrafik(seri, uk.lebar, to.length < 2 ? Math.min(uk.tinggi, 210) : uk.tinggi, { atas: 38 });
+  const seri = to.map(function (x) {
+    return { nilai: x.nilai, kategori: x.kategori, ke: x.ke, label: labelTitikGrafik(x), namaPaket: x.namaPaket, waktu: x.waktu, nilaiTeks: x.nilaiTeks, lamaMenit: x.lamaMenit, rinci: x.rinci };
+  });
+  const g = hitungGrafik(seri, uk.lebar, to.length < 2 ? Math.min(uk.tinggi, 230) : uk.tinggi, { atas: 38, adaptif: true });
   const t = to[to.length - 1];
   const k = to.reduce(function (a, x) { return x.nilai >= a.nilai ? x : a; }, to[0]);
   wadah.innerHTML = svgGrafik(g, {
     id: 'gr-' + kode,
     halus: true,
-    teksTerbaru: t.nilaiTeks,
     judul: 'Grafik nilai Try Out Utama ' + m.nama,
-    deskripsi: formatAngka(to.length) + ' pengerjaan Try Out Utama dengan nilai. Nilai terbaru ' + t.nilaiTeks + ', tertinggi ' + k.nilaiTeks + '. Data lengkap ada pada tabel di bawah grafik.'
-  });
+    deskripsi: formatAngka(to.length) + ' pengerjaan Try Out Utama dengan nilai. Nilai terbaru ' + t.nilaiTeks + ', tertinggi ' + k.nilaiTeks + '. Sumbu nilai ' + (g.terpotong ? 'dimulai dari ' + g.bawah : 'dimulai dari 0') + '. Data lengkap ada pada tabel di bawah grafik.'
+  }) + '<div class="gr-kartu" role="status" aria-live="polite" hidden></div>';
   wadah.setAttribute('data-lebar', String(uk.lebar));
+  wadah._grTitik = g.titik;
+  wadah._grAktif = -1; wadah._grTetap = -1;
+  grPasangInteraksi(wadah);
+  const ket = wadah.parentNode ? wadah.parentNode.querySelector('.gr-sumbu-ket') : null;
+  if (ket) ket.textContent = 'Urutan pengerjaan Try Out Utama.' + (g.terpotong ? ' Sumbu nilai dimulai dari ' + g.bawah + ', bukan 0.' : '') + ' Arahkan atau sentuh sebuah titik untuk melihat rinciannya.';
 }
 function gambarSemuaGrafik() { semua('[data-grafik]').forEach(gambarGrafik); }
 window.addEventListener('resize', tundaKe(gambarSemuaGrafik, 150));
@@ -8992,6 +9240,210 @@ AKSI['pk-bangun'] = function (b) {
 };
 
 
+const psSt = { mapel: 'RERATA', lingkup: 'global', sekolah: '', q: '', halaman: 1, data: null, opsi: null, seq: 0 };
+const PS_PILIHAN = [['RERATA', 'Rerata 3 mapel'], ['BIN', 'Bahasa Indonesia'], ['MAT', 'Matematika'], ['IPA', 'IPA']];
+
+function psTerkunci() { return S.pengguna && S.pengguna.peran === PERAN.GURU && !S.pengguna.guruTamu; }
+function psNamaPilihan(k) { return k === 'RERATA' ? 'rerata tiga mapel' : (MAPEL[k] || k); }
+
+function renderPeringkatSiswa(p, c) {
+  psSt.mapel = 'RERATA'; psSt.lingkup = 'global'; psSt.sekolah = ''; psSt.q = ''; psSt.halaman = 1; psSt.data = null; psSt.opsi = null;
+  pasang(c.wadah, h`
+    ${kepalaHalaman('Peringkat Siswa', 'Peringkat semua siswa berakun menurut Try Out Utama, secara global atau per sekolah. Dasar hitungnya sama dengan papan peringkat di beranda.')}
+    <div class="ps-kontrol" data-uji="ps-kontrol">
+      <fieldset class="isian fieldset-polos"><legend class="label">Peringkat berdasarkan</legend>
+        <div class="segmen" role="radiogroup" aria-label="Peringkat berdasarkan" data-uji="ps-mapel">
+          ${PS_PILIHAN.map(function (t) {
+            return h`<label>${ikon('check')}<input type="radio" name="ps-mapel" value="${t[0]}" data-masuk="ps-mapel"${psSt.mapel === t[0] ? mentah(' checked') : ''}> ${t[1]}</label>`;
+          })}
+        </div></fieldset>
+      <fieldset class="isian fieldset-polos"><legend class="label">Lingkup peringkat</legend>
+        <div class="segmen" role="radiogroup" aria-label="Lingkup peringkat" data-uji="ps-lingkup">
+          <label>${ikon('check')}<input type="radio" name="ps-lingkup" value="global" data-masuk="ps-lingkup" checked> Global (semua siswa)</label>
+          <label>${ikon('check')}<input type="radio" name="ps-lingkup" value="sekolah" data-masuk="ps-lingkup"> Per sekolah</label>
+        </div></fieldset>
+      <div class="ps-saring" role="search">
+        <div class="isian"><label class="label" for="ps-sekolah" id="ps-sekolah-label">Tampilkan sekolah</label>
+          <select class="kontrol" id="ps-sekolah" data-masuk="ps-sekolah" data-uji="ps-sekolah"><option value="">Semua sekolah</option></select></div>
+        <div class="isian ps-cari"><label class="label" for="ps-cari">Cari nama siswa</label>
+          <div class="cari">${ikon('search')}<input class="kontrol" id="ps-cari" type="search" placeholder="Ketik nama siswa" data-masuk="ps-cari" data-uji="ps-cari" autocomplete="off"></div></div>
+      </div>
+      <p class="bantu" id="ps-bantu" data-uji="ps-bantu"></p>
+    </div>
+    <div class="baris-bungkus jarak-bawah" id="ps-aksi">
+      <button type="button" class="tombol tombol-garis" data-aksi="ps-unduh-xlsx" data-uji="ps-unduh-xlsx" disabled>${ikon('download')}<span>Unduh Excel</span></button>
+      <span class="bantu" id="ps-hitung" aria-live="polite" data-uji="ps-hitung"></span>
+    </div>
+    <div id="ps-unduh" aria-live="polite"></div>
+    <div id="ps-isi" data-uji="ps-isi"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat peringkat…</span></div></div>`);
+  fokusJudul();
+  psIsiSekolah();
+  psMuat(c);
+}
+
+function psIsiSekolah() {
+  const sel = el('#ps-sekolah'); if (!sel) return;
+  const lab = el('#ps-sekolah-label'), bantu = el('#ps-bantu');
+  const daftar = psSt.opsi && psSt.opsi.sekolah ? psSt.opsi.sekolah.slice() : [];
+  const perSekolah = psSt.lingkup === 'sekolah';
+  let pilihan = daftar;
+  if (perSekolah && psTerkunci()) pilihan = [S.pengguna.sekolah];
+  if (perSekolah && pilihan.indexOf(psSt.sekolah) === -1) psSt.sekolah = pilihan[0] || '';
+  if (!perSekolah && psSt.sekolah && daftar.indexOf(psSt.sekolah) === -1) psSt.sekolah = '';
+  while (sel.options.length) sel.remove(0);
+  if (!perSekolah) { const o = document.createElement('option'); o.value = ''; o.textContent = 'Semua sekolah'; sel.appendChild(o); }
+  pilihan.forEach(function (n) { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+  sel.value = psSt.sekolah;
+  sel.disabled = perSekolah && psTerkunci();
+  if (lab) lab.textContent = perSekolah ? 'Sekolah' : 'Tampilkan sekolah';
+  if (bantu) {
+    bantu.textContent = perSekolah
+      ? (psTerkunci() ? 'Peringkat per sekolah hanya untuk sekolah Anda. Pilih "Global" untuk melihat semua siswa.' : 'Peringkat diurut ulang di dalam sekolah yang dipilih (siswa sekolah lain tidak ikut dihitung).')
+      : 'Peringkat global dihitung dari semua siswa. Memilih sekolah hanya menyaring tampilan; nomor peringkatnya tetap peringkat global.';
+  }
+}
+
+function psParam(tambah) {
+  const d = { mapel: psSt.mapel, lingkup: psSt.lingkup, sekolah: psSt.sekolah, q: psSt.q, halaman: psSt.halaman };
+  return Object.assign(d, tambah || {});
+}
+
+function psMuat(c) {
+  const seq = ++psSt.seq;
+  const isi = el('#ps-isi');
+  if (psSt.lingkup === 'sekolah' && !psSt.sekolah) {
+    psSt.data = null;
+    pasang(isi, h`<div class="kosong kosong-kecil" data-uji="ps-kosong"><p>Belum ada sekolah yang bisa dipilih.</p></div>`);
+    psPerbaruiAksi();
+    return Promise.resolve();
+  }
+  return panggil('peringkat.siswa', psParam(), { ulang: true }).then(function (d) {
+    if (seq !== psSt.seq || (c && !c.ok()) || !el('#ps-isi')) return;
+    psSt.data = d;
+    if (!psSt.opsi) { psSt.opsi = d.opsi; psIsiSekolah(); }
+    psGambar();
+  }).catch(function (e) {
+    if (seq !== psSt.seq || (c && !c.ok()) || !el('#ps-isi')) return;
+    psSt.data = null;
+    tampilkanGalatMuat(el('#ps-isi'), e, true);
+    psPerbaruiAksi();
+  });
+}
+
+function psPerbaruiAksi() {
+  const d = psSt.data;
+  const tombol = el('[data-aksi="ps-unduh-xlsx"]');
+  if (tombol) tombol.disabled = !(d && d.total > 0);
+  const hit = el('#ps-hitung');
+  if (!hit) return;
+  if (!d) { hit.textContent = ''; return; }
+  const awal = d.total ? (d.halaman - 1) * d.ukuran + 1 : 0;
+  const bagian = [];
+  if (d.total) bagian.push('Menampilkan ' + formatAngka(awal) + '–' + formatAngka(awal + d.daftar.length - 1) + ' dari ' + formatAngka(d.total) + ' siswa.');
+  bagian.push('Peringkat dihitung dari ' + formatAngka(d.dari) + ' siswa' + (d.lingkup === 'sekolah' ? ' di ' + d.sekolah : '') + '.');
+  if (d.belumLengkap) bagian.push(formatAngka(d.belumLengkap) + ' siswa belum punya nilai ketiga mapel sehingga belum berperingkat.');
+  hit.textContent = bagian.join(' ');
+}
+
+function psSel(x, gabung, d) {
+  const atas = x.peringkat !== null && x.peringkat <= 3;
+  const nomor = x.peringkat === null
+    ? h`<span class="ps-belum" title="Baru ${x.mapelAda || 0} dari 3 mapel">—</span>`
+    : h`<span class="papan-lencana${atas ? ' papan-lencana-atas' : ''}">${atas ? ikon('award', 'ikon-sm') : ''}<span class="angka">${formatAngka(x.peringkat)}</span></span><span class="ps-dari" data-uji="ps-dari"> dari ${formatAngka(d.dari)}</span>`;
+  const rerata = x.rerata === null
+    ? h`<span class="lencana lencana-peringatan" data-uji="ps-belum-lengkap">Belum lengkap · ${x.mapelAda || 0}/3 mapel</span>`
+    : formatAngka(x.rerata, 2);
+  return h`<tr class="${atas ? 'papan-atas' : ''}${x.rerata === null ? ' ps-baris-belum' : ''}" data-uji="ps-baris">
+    <td class="ps-no" data-label="Peringkat">${nomor}</td>
+    <td class="pecah ps-nama" data-label="Nama">${x.nama}${x.disembunyi ? h` <span class="ps-sembunyi" data-uji="ps-sembunyi" title="Nama disembunyikan di papan peringkat beranda">${ikon('eye-off', 'ikon-sm')}<span class="sr-only">Nama disembunyikan di beranda</span></span>` : ''}</td>
+    <td class="pecah ps-sekolah" data-label="Sekolah">${x.sekolah || '—'}</td>
+    <td class="angka ps-rerata" data-label="Rerata">${rerata}</td>
+    ${gabung ? d.kodeMapel.map(function (k, i) { return h`<td class="angka ps-mapel" data-label="${NAMA_MENU_MAPEL[k] || k}">${x.perMapel && x.perMapel[i] !== null && x.perMapel[i] !== undefined ? formatAngka(x.perMapel[i], 2) : '—'}</td>`; }) : ''}
+    <td class="angka ps-jumlah" data-label="Try Out">${formatAngka(x.jumlah)}</td></tr>`;
+}
+
+function psGambar() {
+  const isi = el('#ps-isi'); if (!isi) return;
+  const d = psSt.data;
+  psPerbaruiAksi();
+  if (!d.daftar.length) {
+    const disaring = !!(psSt.q || (psSt.lingkup === 'global' && psSt.sekolah));
+    pasang(isi, h`<div class="kosong kosong-kecil" data-uji="ps-kosong"><p>${disaring ? 'Tidak ada siswa yang cocok dengan penyaring.' : (d.lingkup === 'sekolah' ? 'Belum ada siswa berperingkat di sekolah ini.' : 'Belum ada siswa yang menyelesaikan Try Out Utama.')}</p></div>`);
+    return;
+  }
+  const gabung = d.mapel === 'RERATA';
+  const maks = Math.ceil(d.total / d.ukuran);
+  pasang(isi, h`
+    <div class="bungkus-tabel ps-bungkus"><table class="tabel ps-tabel${gabung ? ' ps-gabung' : ''}" data-uji="ps-tabel">
+      <caption class="sr-only">Peringkat ${psNamaPilihan(d.mapel)}${d.lingkup === 'sekolah' ? ' di ' + d.sekolah : ' global'}, ${formatAngka(d.total)} siswa</caption>
+      <thead><tr><th scope="col">Peringkat</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col" class="angka">${gabung ? 'Rerata 3 mapel' : 'Rerata'}</th>
+        ${gabung ? d.kodeMapel.map(function (k) { return h`<th scope="col" class="angka">${NAMA_MENU_MAPEL[k] || k}</th>`; }) : ''}<th scope="col" class="angka">Try Out</th></tr></thead>
+      <tbody>${d.daftar.map(function (x) { return psSel(x, gabung, d); })}</tbody></table></div>
+    ${maks > 1 ? h`<div class="baris-bungkus jarak-atas" data-uji="ps-halaman">
+      <button type="button" class="tombol tombol-garis" data-aksi="ps-halaman" data-ke="${d.halaman - 1}"${d.halaman <= 1 ? mentah(' disabled') : ''}>${ikon('chevron-left')}<span>Sebelumnya</span></button>
+      <span class="teks-redam">Halaman ${formatAngka(d.halaman)} dari ${formatAngka(maks)}</span>
+      <button type="button" class="tombol tombol-garis" data-aksi="ps-halaman" data-ke="${d.halaman + 1}"${d.halaman >= maks ? mentah(' disabled') : ''}>${ikon('chevron-right')}<span>Berikutnya</span></button></div>` : ''}`);
+}
+
+MASUKAN['ps-mapel'] = function (r) {
+  if (!r.checked) return;
+  psSt.mapel = r.value; psSt.halaman = 1;
+  psMuat();
+};
+MASUKAN['ps-lingkup'] = function (r) {
+  if (!r.checked) return;
+  psSt.lingkup = r.value; psSt.halaman = 1;
+  psIsiSekolah();
+  psMuat();
+};
+MASUKAN['ps-sekolah'] = function (s) { psSt.sekolah = s.value; psSt.halaman = 1; psMuat(); };
+MASUKAN['ps-cari'] = tundaKe(function () {
+  const q = el('#ps-cari'); if (!q) return;
+  psSt.q = q.value.trim(); psSt.halaman = 1;
+  psMuat();
+}, 300);
+AKSI['ps-halaman'] = function (b) { psSt.halaman = Math.max(1, parseInt(b.getAttribute('data-ke'), 10) || 1); psMuat(); };
+
+AKSI['ps-unduh-xlsx'] = function (tombol) {
+  const wadah = el('#ps-unduh');
+  pasang(wadah, '');
+  kerjakan(tombol, function () {
+    return panggil('peringkat.siswa', psParam({ ekspor: true }), { ulang: true }).then(function (d) {
+      const bytes = psXlsx(d);
+      const nama = ['peringkat', d.mapel === 'RERATA' ? 'rerata' : d.mapel, d.lingkup === 'sekolah' ? d.sekolah : 'global'];
+      ekLapor(wadah, ekNamaBerkas(nama, 'xlsx'), bytes, XLSX_TIPE);
+    });
+  }).catch(function (e) { ekLaporGalat(wadah, e); });
+};
+
+function psXlsx(d) {
+  const gabung = d.mapel === 'RERATA';
+  const kolom = [{ judul: 'Peringkat', lebar: 11, tipe: 'bulat' }, { judul: 'Nama', lebar: 34 }, { judul: 'Sekolah', lebar: 30 }, { judul: gabung ? 'Rerata 3 mapel' : 'Rerata', lebar: 16, tipe: 'desimal2' }];
+  if (gabung) d.kodeMapel.forEach(function (k) { kolom.push({ judul: NAMA_MENU_MAPEL[k] || k, lebar: 14, tipe: 'desimal2' }); });
+  kolom.push({ judul: 'Jumlah Try Out', lebar: 15, tipe: 'bulat' }, { judul: 'Keterangan', lebar: 34 });
+  const baris = d.daftar.map(function (x) {
+    const r = [x.peringkat === null ? '' : x.peringkat, x.nama, x.sekolah || '', x.rerata === null ? '' : x.rerata];
+    if (gabung) d.kodeMapel.forEach(function (k, i) { r.push(x.perMapel && x.perMapel[i] !== null && x.perMapel[i] !== undefined ? x.perMapel[i] : ''); });
+    r.push(x.jumlah);
+    const ket = [];
+    if (x.rerata === null) ket.push('Belum lengkap (' + (x.mapelAda || 0) + ' dari 3 mapel), belum berperingkat');
+    if (x.disembunyi) ket.push('Nama disembunyikan di beranda');
+    r.push(ket.join('; '));
+    return r;
+  });
+  const lingkupTeks = d.lingkup === 'sekolah' ? 'Per sekolah: ' + d.sekolah : 'Global (semua siswa)' + (d.sekolah ? ', ditampilkan hanya ' + d.sekolah : '');
+  const catatan = ['Dasar hitung sama dengan papan peringkat beranda: Try Out Utama, siswa berakun aktif, urutan rerata, lalu jumlah Try Out, lalu nama; rerata yang sama berbagi peringkat.'];
+  if (gabung) catatan.push('Rerata 3 mapel = rata-rata tiga rerata mapel (bobot sama); hanya siswa yang punya nilai ketiga mapel yang berperingkat.');
+  if (d.terpotong) catatan.push('Daftar dipotong pada ' + formatAngka(d.daftar.length) + ' baris pertama dari ' + formatAngka(d.total) + '.');
+  const lembar = [{
+    nama: 'Peringkat', arah: 'datar',
+    judul: ['Peringkat Siswa — ' + psNamaPilihan(d.mapel), 'Lingkup: ' + lingkupTeks, 'Dibuat: ' + ekWaktuCetak() + ' · Peringkat dihitung dari ' + formatAngka(d.dari) + ' siswa' + (d.belumLengkap ? ', ' + formatAngka(d.belumLengkap) + ' belum lengkap' : '')],
+    kolom: kolom, baris: baris, catatan: catatan
+  }];
+  return xlsxBuat(lembar, { judul: 'Peringkat Siswa · ' + psNamaPilihan(d.mapel), penulis: ekPenulis() });
+}
+
+
 const PRK_BATAS_SERI_PDF = 60;
 const prkSt = { q: '', sekolah: '', kelas: '', halaman: 1, daftar: null, opsi: null, terpilih: '', detail: null, seq: 0, seqDetail: 0 };
 
@@ -9120,12 +9572,18 @@ function prkRerata(nilai) {
   return Math.floor((2 * total + nilai.length) / (2 * nilai.length)) / 100;
 }
 
+const PRK_WARNA_MAPEL = {
+  BIN: { aksen: '#DB2777', teks: '#9D174D', lembut: '#FCE7F3' },
+  MAT: { aksen: '#4F46E5', teks: '#3730A3', lembut: '#E0E7FF' },
+  IPA: { aksen: '#0891B2', teks: '#155E75', lembut: '#CFFAFE' }
+};
+
 function prkSusunMapel(riwayat) {
   const urut = riwayat.filter(function (r) { return r.status === 'Selesai' || r.status === 'Waktu habis'; })
     .sort(function (a, b) { return String(a.waktuSelesai || a.waktuMulai).localeCompare(String(b.waktuSelesai || b.waktuMulai)); });
   const ke = {};
   const per = {};
-  MAPEL_URUT.forEach(function (k) { per[k] = { kode: k, nama: MAPEL[k], selesai: 0, nilai: [], seri: [] }; });
+  MAPEL_URUT.forEach(function (k) { per[k] = { kode: k, nama: MAPEL[k], selesai: 0, nilai: [], seri: [], latihan: 0 }; });
   urut.forEach(function (r) {
     const e = per[r.mapel]; if (!e) return;
     const kp = r.idPaket || r.namaPaket;
@@ -9133,7 +9591,8 @@ function prkSusunMapel(riwayat) {
     e.selesai++;
     if (typeof r.nilai !== 'number') return;
     e.nilai.push(r.nilai);
-    e.seri.push({ nilai: r.nilai, kategori: r.kategori, ulang: ke[kp] > 1 });
+    if (r.kategori === 'Try Out Utama') e.seri.push({ nilai: r.nilai, nilaiTeks: r.nilaiTeks, kategori: r.kategori, ke: ke[kp], ulang: ke[kp] > 1, namaPaket: r.namaPaket, waktu: r.waktuSelesai || r.waktuMulai });
+    else e.latihan++;
   });
   return MAPEL_URUT.map(function (k) {
     const e = per[k];
@@ -9141,7 +9600,7 @@ function prkSusunMapel(riwayat) {
       kode: k, nama: e.nama, selesai: e.selesai, bernilai: e.nilai.length, rerata: prkRerata(e.nilai),
       tertinggi: e.nilai.length ? Math.max.apply(null, e.nilai) : null,
       terakhir: e.nilai.length ? e.nilai[e.nilai.length - 1] : null,
-      seri: e.seri.slice(-PRK_BATAS_SERI_PDF), terpotong: e.seri.length > PRK_BATAS_SERI_PDF
+      seri: e.seri.slice(-PRK_BATAS_SERI_PDF), terpotong: e.seri.length > PRK_BATAS_SERI_PDF, latihan: e.latihan
     };
   }).filter(function (m) { return m.selesai > 0; });
 }
@@ -9166,10 +9625,14 @@ function prkPdf(d) {
     dok.teks('Siswa ini belum menyelesaikan satu pun paket.', { ukuran: 9.5, warna: PDF_WARNA.redam });
   }
   mapel.forEach(function (m) {
-    dok.teks('Grafik perkembangan nilai ' + m.nama, { ukuran: 11, tebal: true, jarakBawah: 3 });
-    if (m.seri.length) dok.grafik({ seri: m.seri });
-    else dok.teks('Pengerjaan ' + m.nama + ' sudah selesai tetapi tidak ada nilai angka untuk digambar.', { ukuran: 9, warna: PDF_WARNA.redam });
-    if (m.terpotong) dok.teks('Grafik memuat ' + PRK_BATAS_SERI_PDF + ' pengerjaan terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
+    const w = PRK_WARNA_MAPEL[m.kode] || {};
+    if (m.seri.length) dok.grafik({ judul: 'Grafik perkembangan nilai ' + m.nama + ' (Try Out Utama)', nama: m.nama, seri: m.seri, aksen: w.aksen, aksenTeks: w.teks, aksenLembut: w.lembut });
+    else {
+      dok.teks('Grafik perkembangan nilai ' + m.nama + ' (Try Out Utama)', { ukuran: 11, tebal: true, jarakBawah: 3 });
+      dok.teks(m.bernilai ? 'Belum ada Try Out Utama ' + m.nama + ' dengan nilai angka untuk digambar.' : 'Pengerjaan ' + m.nama + ' sudah selesai tetapi tidak ada nilai angka untuk digambar.', { ukuran: 9, warna: PDF_WARNA.redam });
+    }
+    if (m.latihan > 0) dok.teks(formatAngka(m.latihan) + ' pengerjaan Latihan Materi tidak digambar di grafik (tetap dihitung di ringkasan).', { ukuran: 8, warna: PDF_WARNA.redam });
+    if (m.terpotong) dok.teks('Grafik memuat ' + PRK_BATAS_SERI_PDF + ' Try Out Utama terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
   });
   if (d.terpotong) dok.teks('Laporan memuat ' + formatAngka(d.batas) + ' pengerjaan terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
   dok.teks('Nilai adalah nilai resmi pada skala 0-100. Rata-rata dihitung dari semua pengerjaan yang selesai dan bernilai.', { ukuran: 8, warna: PDF_WARNA.redam });
@@ -10210,8 +10673,26 @@ function pdfWarna(w) {
 }
 const PDF_WARNA = {
   teks: [0.09, 0.11, 0.15], redam: [0.34, 0.38, 0.45], garis: [0.78, 0.81, 0.86], kepala: [0.88, 0.92, 0.97], belang: [0.972, 0.978, 0.988],
-  benar: [0.04, 0.4, 0.17], sebagian: [0.6, 0.27, 0.0], salah: [0.7, 0.09, 0.09], bar: [0.15, 0.39, 0.92], lintasan: [0.9, 0.92, 0.95], putih: [1, 1, 1]
+  benar: [0.04, 0.4, 0.17], sebagian: [0.6, 0.27, 0.0], salah: [0.7, 0.09, 0.09], bar: [0.15, 0.39, 0.92], lintasan: [0.9, 0.92, 0.95], putih: [1, 1, 1],
+  naik: [0.086, 0.639, 0.29], turun: [0.918, 0.345, 0.047], terbaik: [0.706, 0.325, 0.035]
 };
+function pdfWarnaHex(hex, cadangan) {
+  const m = /^#([0-9a-f]{6})$/i.exec(String(hex || ''));
+  if (!m) return cadangan;
+  return [parseInt(m[1].slice(0, 2), 16) / 255, parseInt(m[1].slice(2, 4), 16) / 255, parseInt(m[1].slice(4, 6), 16) / 255];
+}
+function pdfCampur(w, bagian) { return w.map(function (x) { return 1 - (1 - x) * bagian; }); }
+function pdfJalurDariSvg(d, X, Y) {
+  const t = String(d).match(/[MLC]|-?\d+(?:\.\d+)?/g) || [];
+  const hasil = [];
+  let i = 0;
+  while (i < t.length) {
+    const c = t[i++], n = c === 'C' ? 3 : 1, titik = [];
+    for (let j = 0; j < n; j++) { titik.push(pdfAngka(X(parseFloat(t[i]))) + ' ' + pdfAngka(Y(parseFloat(t[i + 1])))); i += 2; }
+    hasil.push(titik.join(' ') + ' ' + (c === 'M' ? 'm' : (c === 'L' ? 'l' : 'c')));
+  }
+  return hasil.join(' ');
+}
 const PDF_UKURAN_KERTAS = { A4: [595.28, 841.89] };
 
 function pdfStringKode(kodeArr) {
@@ -10358,52 +10839,102 @@ function pdfBuat(opsi) {
       return api;
     },
     grafik: function (def) {
-      const tinggi = def.tinggi || 128;
       const seri = (def.seri || []).filter(function (x) { return typeof x.nilai === 'number' && isFinite(x.nilai); });
-      pastikan(tinggi + (def.judul ? 16 : 0) + 24);
-      if (def.judul) api.teks(def.judul, { ukuran: 9.5, tebal: true, jarakBawah: 2 });
-      const kiri = 26, kanan = 8, atas = 8, bawah = 14;
-      const x0 = M + kiri, x1 = W - M - kanan;
-      const yAtas = y - atas, yBawah = y - tinggi + bawah;
-      const py = function (v) { return yBawah + (yAtas - yBawah) * Math.max(0, Math.min(100, v)) / 100; };
-      [0, 25, 50, 75, 100].forEach(function (v) {
-        garisH(x0, x1, py(v), PDF_WARNA.garis, v === 0 ? 0.8 : 0.4);
-        const lab = pdfKodeTeks(String(v));
-        gambarTeks(lab, x0 - 4 - pdfLebarTeks(lab, false, 7), py(v) - 2.5, 7, false, PDF_WARNA.redam);
-      });
-      const n = seri.length;
-      const dalam = 8;
-      const langkah = n > 1 ? (x1 - x0 - 2 * dalam) / (n - 1) : 0;
-      const px = function (i) { return n > 1 ? x0 + dalam + i * langkah : (x0 + x1) / 2; };
-      const lompat = langkah > 0 ? Math.max(1, Math.ceil(22 / langkah)) : 1;
-      for (let i = 0; i < n; i += lompat) {
-        const lab = pdfKodeTeks(String(i + 1));
-        gambarTeks(lab, px(i) - pdfLebarTeks(lab, false, 7) / 2, yBawah - 10, 7, false, PDF_WARNA.redam);
+      const tinggi = seri.length < 2 ? Math.min(def.tinggi || 190, 130) : (def.tinggi || 190);
+      const warna = { aksen: pdfWarnaHex(def.aksen, PDF_WARNA.bar), teks: pdfWarnaHex(def.aksenTeks, PDF_WARNA.teks), lembut: pdfWarnaHex(def.aksenLembut, PDF_WARNA.kepala) };
+      const wawasan = seri.length ? grWawasan(def.nama || '', seri) : '';
+      const barisWawasan = wawasan ? pdfBungkus(wawasan, false, 9, lebarIsi - 20, 3) : [];
+      const tinggiWawasan = barisWawasan.length ? barisWawasan.length * 9 * 1.28 + 10 + 6 : 0;
+      pastikan((def.judul ? 18 : 0) + tinggiWawasan + tinggi + 34);
+      if (def.judul) api.teks(def.judul, { ukuran: 11, tebal: true, jarakBawah: 3 });
+      function persegiBulat(x, yb, w, h, r, w2) {
+        const rr = Math.min(r, w / 2, h / 2), c = 0.5523 * rr, x2 = x + w, y2 = yb + h, A = pdfAngka;
+        aktif.push(pdfWarna(w2) + ' rg ' + A(x + rr) + ' ' + A(yb) + ' m ' + A(x2 - rr) + ' ' + A(yb) + ' l ' +
+          A(x2 - rr + c) + ' ' + A(yb) + ' ' + A(x2) + ' ' + A(yb + rr - c) + ' ' + A(x2) + ' ' + A(yb + rr) + ' c ' + A(x2) + ' ' + A(y2 - rr) + ' l ' +
+          A(x2) + ' ' + A(y2 - rr + c) + ' ' + A(x2 - rr + c) + ' ' + A(y2) + ' ' + A(x2 - rr) + ' ' + A(y2) + ' c ' + A(x + rr) + ' ' + A(y2) + ' l ' +
+          A(x + rr - c) + ' ' + A(y2) + ' ' + A(x) + ' ' + A(y2 - rr + c) + ' ' + A(x) + ' ' + A(y2 - rr) + ' c ' + A(x) + ' ' + A(yb + rr) + ' l ' +
+          A(x) + ' ' + A(yb + rr - c) + ' ' + A(x + rr - c) + ' ' + A(yb) + ' ' + A(x + rr) + ' ' + A(yb) + ' c h f');
       }
-      const gaya = { 'Try Out Utama': { warna: PDF_WARNA.bar, putus: false, bulat: true }, 'Latihan Materi': { warna: PDF_WARNA.redam, putus: true, bulat: false } };
-      Object.keys(gaya).forEach(function (kat) {
-        const g = gaya[kat];
-        const idx = [];
-        seri.forEach(function (x, i) { if (x.kategori === kat) idx.push(i); });
-        if (idx.length >= 2) {
-          aktif.push(pdfAngka(1.4) + ' w ' + pdfWarna(g.warna) + ' RG ' + (g.putus ? '[3 2] 0 d ' : '[] 0 d ') +
-            idx.map(function (i, k) { return pdfAngka(px(i)) + ' ' + pdfAngka(py(seri[i].nilai)) + (k ? ' l' : ' m'); }).join(' ') + ' S [] 0 d');
-        }
-        idx.forEach(function (i) {
-          const cx = px(i), cy = py(seri[i].nilai), r = g.bulat ? 3.2 : 4;
-          const jalan = g.bulat
-            ? pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' m ' +
-              pdfAngka(cx + r) + ' ' + pdfAngka(cy + 0.5523 * r) + ' ' + pdfAngka(cx + 0.5523 * r) + ' ' + pdfAngka(cy + r) + ' ' + pdfAngka(cx) + ' ' + pdfAngka(cy + r) + ' c ' +
-              pdfAngka(cx - 0.5523 * r) + ' ' + pdfAngka(cy + r) + ' ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy + 0.5523 * r) + ' ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy) + ' c ' +
-              pdfAngka(cx - r) + ' ' + pdfAngka(cy - 0.5523 * r) + ' ' + pdfAngka(cx - 0.5523 * r) + ' ' + pdfAngka(cy - r) + ' ' + pdfAngka(cx) + ' ' + pdfAngka(cy - r) + ' c ' +
-              pdfAngka(cx + 0.5523 * r) + ' ' + pdfAngka(cy - r) + ' ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy - 0.5523 * r) + ' ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' c h'
-            : pdfAngka(cx) + ' ' + pdfAngka(cy + r) + ' m ' + pdfAngka(cx + r) + ' ' + pdfAngka(cy) + ' l ' + pdfAngka(cx) + ' ' + pdfAngka(cy - r) + ' l ' + pdfAngka(cx - r) + ' ' + pdfAngka(cy) + ' l h';
-          aktif.push(pdfAngka(1.1) + ' w ' + pdfWarna(g.warna) + ' RG ' + pdfWarna(seri[i].ulang ? PDF_WARNA.putih : g.warna) + ' rg ' + jalan + ' B');
+      function jalanBulat(cx, cy, r) {
+        const A = pdfAngka, c = 0.5523 * r;
+        return A(cx + r) + ' ' + A(cy) + ' m ' + A(cx + r) + ' ' + A(cy + c) + ' ' + A(cx + c) + ' ' + A(cy + r) + ' ' + A(cx) + ' ' + A(cy + r) + ' c ' +
+          A(cx - c) + ' ' + A(cy + r) + ' ' + A(cx - r) + ' ' + A(cy + c) + ' ' + A(cx - r) + ' ' + A(cy) + ' c ' +
+          A(cx - r) + ' ' + A(cy - c) + ' ' + A(cx - c) + ' ' + A(cy - r) + ' ' + A(cx) + ' ' + A(cy - r) + ' c ' +
+          A(cx + c) + ' ' + A(cy - r) + ' ' + A(cx + r) + ' ' + A(cy - c) + ' ' + A(cx + r) + ' ' + A(cy) + ' c h';
+      }
+      if (barisWawasan.length) {
+        const lh = 9 * 1.28, bh = barisWawasan.length * lh + 10;
+        persegiBulat(M, y - bh, lebarIsi, bh, 4, warna.lembut);
+        barisWawasan.forEach(function (b, i) { gambarTeks(b, M + 10, y - 5 - 9 * 0.92 - i * lh, 9, false, warna.teks); });
+        y -= bh + 6;
+      }
+      if (!seri.length) {
+        gambarTeks(pdfKodeTeks('Belum ada nilai Try Out Utama'), M + 10, y - tinggi / 2, 9, false, PDF_WARNA.redam);
+        y -= tinggi;
+        return api;
+      }
+      const k = 0.6, atasBlok = y;
+      const X = function (v) { return M + v * k; }, Y = function (v) { return atasBlok - v * k; };
+      const g = hitungGrafik(seri.map(function (x) {
+        return { nilai: x.nilai, kategori: 'Try Out Utama', ke: x.ke, namaPaket: x.namaPaket, waktu: x.waktu, nilaiTeks: x.nilaiTeks };
+      }), lebarIsi / k, tinggi / k, { atas: 38, adaptif: true });
+      const A = pdfAngka;
+      g.sumbuY.forEach(function (s) {
+        const dasar = s.y >= g.area.y1 - 0.5;
+        aktif.push(A(dasar ? 0.8 : 0.4) + ' w ' + pdfWarna(PDF_WARNA.garis) + ' RG ' + (dasar ? '[] 0 d ' : '[1.5 2.5] 0 d ') + A(X(g.area.x0)) + ' ' + A(Y(s.y)) + ' m ' + A(X(g.area.x1)) + ' ' + A(Y(s.y)) + ' l S [] 0 d');
+        const lab = pdfKodeTeks(String(s.nilai));
+        gambarTeks(lab, X(g.area.x0 - 6) - pdfLebarTeks(lab, false, 7), Y(s.y) - 2.5, 7, false, PDF_WARNA.redam);
+      });
+      if (g.terpotong) {
+        const px = g.area.x0 + 6, py = g.area.y1;
+        const zig = A(X(px)) + ' ' + A(Y(py)) + ' m ' + A(X(px + 4)) + ' ' + A(Y(py - 5)) + ' l ' + A(X(px + 9)) + ' ' + A(Y(py + 5)) + ' l ' + A(X(px + 14)) + ' ' + A(Y(py - 5)) + ' l ' + A(X(px + 18)) + ' ' + A(Y(py)) + ' l S';
+        aktif.push('4 w 1 J 1 j ' + pdfWarna(PDF_WARNA.putih) + ' RG ' + zig);
+        aktif.push('0.9 w 1 J 1 j ' + pdfWarna(PDF_WARNA.redam) + ' RG ' + zig);
+      }
+      g.sumbuX.forEach(function (s) {
+        s.baris.forEach(function (t, kk) {
+          const lab = pdfKodeTeks(t);
+          gambarTeks(lab, X(s.ax) - pdfLebarTeks(lab, false, 6.6) / 2, Y(g.area.y1 + 18 + kk * 14), 6.6, false, PDF_WARNA.redam);
         });
       });
-      if (!n) gambarTeks(pdfKodeTeks('Belum ada nilai'), x0 + 10, (yAtas + yBawah) / 2, 9, false, PDF_WARNA.redam);
+      if (g.garis.length) {
+        const l = g.garis[0], awal = l.titik[0], akhir = l.titik[l.titik.length - 1];
+        aktif.push(pdfWarna(pdfCampur(warna.aksen, 0.12)) + ' rg ' + pdfJalurDariSvg(grKurva(l.titik, g.area.y0, g.area.y1), X, Y) + ' ' + A(X(akhir.x)) + ' ' + A(Y(g.area.y1)) + ' l ' + A(X(awal.x)) + ' ' + A(Y(g.area.y1)) + ' l h f');
+      }
+      const warnaArah = { naik: PDF_WARNA.naik, turun: PDF_WARNA.turun, sama: warna.aksen };
+      g.segmen.forEach(function (sg) {
+        aktif.push('1.8 w 1 J 1 j ' + pdfWarna(warnaArah[sg.arah]) + ' RG ' + pdfJalurDariSvg(sg.d, X, Y) + ' S');
+      });
+      const baru = g.titik[g.titik.length - 1];
+      aktif.push(pdfWarna(pdfCampur(warna.aksen, 0.18)) + ' rg ' + jalanBulat(X(baru.x), Y(baru.y), 13 * k) + ' f');
+      aktif.push(pdfWarna(pdfCampur(warna.aksen, 0.3)) + ' rg ' + jalanBulat(X(baru.x), Y(baru.y), 9 * k) + ' f');
+      g.titik.forEach(function (p) {
+        const jalan = jalanBulat(X(p.x), Y(p.y), 5 * k);
+        if (p.ulang) aktif.push('1.8 w ' + pdfWarna(warna.aksen) + ' RG ' + pdfWarna(PDF_WARNA.putih) + ' rg ' + jalan + ' B');
+        else aktif.push('1.4 w ' + pdfWarna(PDF_WARNA.putih) + ' RG ' + pdfWarna(warna.aksen) + ' rg ' + jalan + ' B');
+      });
+      g.titik.forEach(function (p) {
+        if (p.angka) {
+          const lab = pdfKodeTeks(grAngkaPendek(p.nilaiTeks));
+          gambarTeks(lab, X(p.x) - pdfLebarTeks(lab, true, 6.6) / 2, Y(p.angkaBawah ? p.y + 19 : p.y - 10), 6.6, true, PDF_WARNA.redam);
+        }
+        if (p.ketUlang) {
+          const lab = pdfKodeTeks('ulang');
+          gambarTeks(lab, X(p.x) - pdfLebarTeks(lab, false, 6) / 2, Y(p.y + 21), 6, false, PDF_WARNA.redam);
+        }
+      });
+      const lencana = function (c, bg) {
+        persegiBulat(X(c.x), Y(c.y + c.h), c.w * k, c.h * k, 6, bg);
+        const lab = pdfKodeTeks(c.teks);
+        gambarTeks(lab, X(c.tx) - pdfLebarTeks(lab, true, 7.2) / 2, Y(c.ty), 7.2, true, PDF_WARNA.putih);
+      };
+      if (g.kotak) {
+        lencana(g.kotak.terbaru, g.kotak.gabung ? PDF_WARNA.terbaik : warna.teks);
+        if (g.kotak.terbaik) lencana(g.kotak.terbaik, PDF_WARNA.terbaik);
+      }
       y -= tinggi;
-      api.teks('Sumbu bawah: urutan pengerjaan (terlama ke terbaru). Garis utuh dan bulat = Try Out Utama; garis putus-putus dan belah ketupat = Latihan Materi; penanda berongga = pengerjaan ulang paket yang sama.', { ukuran: 7.5, warna: PDF_WARNA.redam, jarakBawah: 8 });
+      api.teks('Urutan pengerjaan Try Out Utama (terlama ke terbaru).' + (g.terpotong ? ' Sumbu nilai dimulai dari ' + g.bawah + ', bukan 0.' : '') +
+        ' Garis hijau = naik dari Try Out sebelumnya, jingga = turun. Penanda berongga ("ulang") = pengerjaan ulang paket yang sama.', { ukuran: 7.5, warna: PDF_WARNA.redam, jarakBawah: 8 });
       return api;
     },
     selesai: function () {
