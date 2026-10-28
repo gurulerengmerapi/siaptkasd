@@ -9851,7 +9851,200 @@ KIRIM['kr-hitung-ulang'] = function (form) {
 };
 
 
-const imSt = { tahap: 'pilih', idPaket: '', berkas: null, teks: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false };
+const IM_GAMBAR_MIME = { 'image/jpeg': true, 'image/png': true, 'image/webp': true };
+const IM_GAMBAR_EKS = /\.(jpe?g|png|webp)$/i;
+const IM_DOK_EKS = /\.(txt|md|docx)$/i;
+const IM_RE_PENANDA = /\[\[\s*gambar\s*:\s*([^\]|]*?)\s*(?:\|\s*([^\]]*?)\s*)?\]\]/gi;
+const IM_RE_CATATAN_GAMBAR = /^(Gambar|Nama gambar) "/;
+
+function imKunciNama(nama) {
+  let s = String(nama === null || nama === undefined ? '' : nama).replace(/[\u0000-\u001f\u007f<>:"\\|?*\/]/g, ' ').replace(/\s+/g, ' ').trim();
+  s = s.replace(/\.[A-Za-z0-9]{1,5}$/, '').trim();
+  s = s.slice(0, 60).trim();
+  return (s || 'gambar').toLowerCase();
+}
+
+function imAdaGambarBerkas(file) { return !!file && (IM_GAMBAR_MIME[file.type] === true || IM_GAMBAR_EKS.test(file.name || '')); }
+
+function imRujukanSoal(s) {
+  const hasil = [];
+  const pindai = function (teks, di) {
+    const re = new RegExp(IM_RE_PENANDA.source, 'gi');
+    let m;
+    while ((m = re.exec(String(teks || ''))) !== null) hasil.push({ di: di, nama: m[1], alt: m[2] || '' });
+  };
+  pindai(s.stimulus, 'Bacaan');
+  pindai(s.pertanyaan, 'Pertanyaan');
+  imOpsiN(s).forEach(function (t, k) { pindai(t, imNamaButir(s, k)); });
+  hasil.forEach(function (r) {
+    const ada = imKecocokan(r.nama);
+    r.status = ada.length === 0 ? 'hilang' : ada.length > 1 ? 'kembar' : 'ok';
+    r.item = ada.length === 1 ? ada[0] : null;
+  });
+  return hasil;
+}
+
+function imKecocokan(nama) {
+  if (!String(nama || '').trim()) return [];
+  const k = imKunciNama(nama);
+  const daftar = imSt.gambar ? imSt.gambar.pustaka : [];
+  return daftar.filter(function (g) { return imKunciNama(g.nama) === k; });
+}
+
+function imMasalahGambar(s) {
+  const k = [];
+  imRujukanSoal(s).forEach(function (r) {
+    const nama = String(r.nama || '').trim();
+    if (r.status === 'hilang') k.push(nama ? 'Gambar "' + nama + '" (' + r.di.toLowerCase() + ') belum ada di pustaka paket. Tambahkan gambarnya atau perbaiki namanya.' : 'Penanda gambar di ' + r.di.toLowerCase() + ' belum bernama.');
+    else if (r.status === 'kembar') k.push('Nama gambar "' + nama + '" (' + r.di.toLowerCase() + ') cocok dengan lebih dari satu gambar di pustaka. Ubah nama salah satunya di Pustaka Gambar.');
+  });
+  return k;
+}
+
+function htmlImGambarKartu(s) {
+  const rujukan = imRujukanSoal(s);
+  if (!rujukan.length) return '';
+  return h`<div class="im-gambar" data-uji="im-gambar"><p class="bantu tanpa-margin"><strong>Gambar di soal ini</strong></p>
+    <ul class="im-gambar-daftar">${rujukan.map(function (r) {
+      if (r.status === 'ok') {
+        const g = r.item;
+        return h`<li class="im-gambar-ok" data-uji="im-gambar-ok"><img src="${urlHttps(g.url)}" alt="" width="${g.lebar}" height="${g.tinggi}" loading="lazy" decoding="async"><span><strong>${r.di}</strong>: ${g.nama}${r.alt ? h` · teks pengganti: ${r.alt}` : ''}</span></li>`;
+      }
+      return h`<li class="im-gambar-masalah" data-uji="im-gambar-masalah">${ikon('alert-circle', 'ikon-sm')}<span><strong>${r.di}</strong>: ${r.status === 'kembar' ? 'nama kembar' : 'tidak ada'} — ${String(r.nama || '').trim() || '(tanpa nama)'}</span></li>`;
+    })}</ul></div>`;
+}
+
+function htmlImPanelGambar() {
+  const g = imSt.gambar;
+  if (!g) return '';
+  const l = imSt.laporanGambar;
+  const tak = g.tidakDirujuk || [];
+  return h`<div class="im-panel-gambar" data-uji="im-panel-gambar">
+    <p class="tanpa-margin"><strong>Gambar</strong> · ${formatAngka(g.pustaka.length)} di pustaka paket${tak.length ? h` · ${formatAngka(tak.length)} belum dirujuk soal mana pun` : ''}</p>
+    ${l ? h`<div class="im-laporan-gambar" data-uji="im-laporan-gambar" role="status">
+      <p class="tanpa-margin">${formatAngka(l.diunggah)} gambar baru diunggah${l.dilewati.length ? ', ' + formatAngka(l.dilewati.length) + ' dilewati' : ''}${l.gagal.length ? ', ' + formatAngka(l.gagal.length) + ' gagal' : ''}.</p>
+      ${l.dilewati.length || l.gagal.length ? h`<ul>${l.dilewati.map(function (x) { return h`<li><strong>${x.nama}</strong>: ${x.alasan}</li>`; })}${l.gagal.map(function (x) { return h`<li class="im-galat-gambar"><strong>${x.nama}</strong>: ${x.pesan}</li>`; })}</ul>` : ''}</div>` : ''}
+    ${tak.length ? h`<details class="im-tak-dirujuk" data-uji="im-tak-dirujuk"><summary>Gambar yang tidak dirujuk</summary><p class="bantu">Gambar ini ada di pustaka tetapi tidak muncul di berkas soal. Tidak masalah bila memang tidak dipakai; periksa bila seharusnya ada.</p><ul>${tak.map(function (n) { return h`<li>${n}</li>`; })}</ul></details>` : ''}
+    <div class="baris-bungkus"><button type="button" class="tombol tombol-garis" data-aksi="impor-tambah-gambar" data-uji="im-tambah-gambar">${ikon('image')}<span>Tambah gambar</span></button>
+      <input type="file" multiple hidden accept="image/jpeg,image/png,image/webp" id="im-gambar-input" data-masuk="im-gambar-tambah" data-uji="im-gambar-tambah" aria-label="Tambah gambar ke pustaka paket"></div>
+    <div id="im-progres-gambar" aria-live="polite"></div>
+  </div>`;
+}
+
+function imUnggahGambar(files, tulisProgres) {
+  const g = imSt.gambar;
+  const idPaket = imSt.idPaket;
+  const laporan = { diunggah: 0, dilewati: [], gagal: [] };
+  const antre = [];
+  const kunciAda = {};
+  g.pustaka.forEach(function (x) { kunciAda[imKunciNama(x.nama)] = true; });
+  files.forEach(function (f) {
+    const nama = f.name || 'gambar';
+    if (!imAdaGambarBerkas(f)) { laporan.gagal.push({ nama: nama, pesan: 'format tidak didukung (gunakan JPG, PNG, atau WebP).' }); return; }
+    const k = imKunciNama(nama);
+    if (kunciAda[k]) { laporan.dilewati.push({ nama: nama, alasan: 'sudah ada di pustaka dengan nama yang sama (nama dibandingkan tanpa ekstensi).' }); return; }
+    kunciAda[k] = true;
+    antre.push(f);
+  });
+  const ruang = Math.max(0, (g.batas || 150) - g.pustaka.length);
+  if (antre.length > ruang) {
+    antre.splice(ruang).forEach(function (f) { laporan.gagal.push({ nama: f.name || 'gambar', pesan: 'pustaka paket penuh (maksimal ' + formatAngka(g.batas || 150) + ' gambar).' }); });
+  }
+  let indeks = 0, selesai = 0, berhenti = false;
+  const total = antre.length;
+  if (!total) return Promise.resolve(laporan);
+  const satu = function () {
+    if (berhenti || indeks >= total) return Promise.resolve();
+    const file = antre[indeks++];
+    return gbKompres(file).then(function (hsl) {
+      return gbBase64(hsl.blob).then(function (b64) { return panggil('pustaka.unggah', { id_paket: idPaket, nama: file.name || 'gambar', tipe: hsl.tipe, data: b64 }); });
+    }).then(function (res) {
+      laporan.diunggah++;
+      const x = res.gambar;
+      g.pustaka.push({ id: x.id, nama: x.nama, url: x.url, lebar: x.lebar, tinggi: x.tinggi, alt: x.alt || '' });
+      mediaGabung((function () { const p = {}; p[x.id] = { u: x.url, w: x.lebar, h: x.tinggi }; return p; })());
+    }).catch(function (e) {
+      laporan.gagal.push({ nama: file.name || 'gambar', pesan: e && e.message ? e.message : 'Gagal diunggah.' });
+      if (e && (e.ditangani || ['BATAS', 'BELUM_PASANG', 'STATUS', 'DITOLAK', 'TIDAK_ADA'].indexOf(e.kode) >= 0)) berhenti = true;
+    }).then(function () {
+      selesai++;
+      if (tulisProgres) tulisProgres(Math.min(selesai + 1, total), total);
+      return satu();
+    });
+  };
+  if (tulisProgres) tulisProgres(1, total);
+  return Promise.all([satu(), satu()]).then(function () {
+    if (berhenti && indeks < total) laporan.gagal.push({ nama: formatAngka(total - indeks) + ' gambar sisanya', pesan: 'tidak diunggah karena proses dihentikan.' });
+    return laporan;
+  });
+}
+
+function imMuatPustaka() {
+  return panggil('pustaka.daftar', { id_paket: imSt.idPaket }, { ulang: true }).then(function (d) {
+    imSt.gambar = {
+      pustaka: d.gambar.map(function (x) { return { id: x.id, nama: x.nama, url: x.url, lebar: x.lebar, tinggi: x.tinggi, alt: x.alt || '' }; }),
+      tidakDirujuk: [], batas: d.batas
+    };
+  });
+}
+
+function imHitungTakDirujuk() {
+  const g = imSt.gambar;
+  if (!g) return;
+  const dirujuk = {};
+  imSt.soal.forEach(function (s) { imRujukanSoal(s).forEach(function (r) { dirujuk[imKunciNama(r.nama)] = true; }); });
+  g.tidakDirujuk = g.pustaka.filter(function (x) { return !dirujuk[imKunciNama(x.nama)]; }).map(function (x) { return x.nama; });
+}
+
+AKSI['impor-tambah-gambar'] = function () { const i = el('#im-gambar-input'); if (i) i.click(); };
+
+MASUKAN['im-gambar-tambah'] = function (r) {
+  const files = Array.prototype.slice.call(r.files || []);
+  r.value = '';
+  if (!files.length || !imSt.gambar || imSt.sibukGambar || !imSt.modal) return;
+  imSt.sibukGambar = true;
+  const api = imSt.modal;
+  const hidup = function () { return imSt.modal === api && document.body.contains(api.el); };
+  const tulis = function (a, b) {
+    const w = hidup() ? el('#im-progres-gambar', api.el) : null;
+    if (w) pasang(w, h`<div class="pk-progres"><span class="spinner" aria-hidden="true"></span><span>Mengunggah ${formatAngka(a)} dari ${formatAngka(b)}… Jangan tutup jendela ini.</span></div>`);
+  };
+  imUnggahGambar(files, tulis).then(function (lap) {
+    imSt.sibukGambar = false;
+    if (!hidup()) return;
+    imSt.laporanGambar = lap;
+    imSegarkanSemuaGambar();
+    const rg = el('#im-panel-gambar-wadah', api.el);
+    if (rg) pasang(rg, htmlImPanelGambar());
+    if (lap.diunggah) toast(formatAngka(lap.diunggah) + ' gambar ditambahkan ke pustaka.', 'sukses');
+  });
+};
+
+function imSegarkanSemuaGambar() {
+  imSt.soal.forEach(function (s, i) { imSegarkanKartu(i); });
+  imHitungTakDirujuk();
+}
+
+function imSegarkanGambarKartu(li, s) {
+  const wadah = el('[data-im-gambar-kartu]', li);
+  if (!wadah) return;
+  const tanda = JSON.stringify(imRujukanSoal(s).map(function (r) { return [r.di, r.nama, r.alt, r.status, r.item ? r.item.id : '']; }));
+  if (wadah.getAttribute('data-tanda') === tanda) return;
+  wadah.setAttribute('data-tanda', tanda);
+  pasang(wadah, htmlImGambarKartu(s));
+}
+
+function imPerbaruiPanelGambar() {
+  const g = imSt.gambar;
+  const wadah = el('#im-panel-gambar-wadah');
+  if (!g || !wadah || imSt.sibukGambar) return;
+  const sebelum = (g.tidakDirujuk || []).join('\u0001');
+  imHitungTakDirujuk();
+  if (sebelum !== g.tidakDirujuk.join('\u0001')) pasang(wadah, htmlImPanelGambar());
+}
+
+
+const imSt = { tahap: 'pilih', idPaket: '', berkas: null, teks: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false, gambar: null, gambarBerkas: [], laporanGambar: null, sibukGambar: false };
 const IM_TEKS_MAKS = 300000;
 const IM_STIMULUS_MAKS = 5000;
 const IM_PEMBAHASAN_MAKS = 1500;
@@ -9867,7 +10060,7 @@ function imBuatModel(x) {
   const s = {
     no: x.no, jenis: x.jenis || '', pertanyaan: x.pertanyaan || '', opsi: (x.opsi || []).slice(),
     kunciPg: x.kunci || '', kunciBs: [bs[0] || '', bs[1] || '', bs[2] || ''],
-    catatan: x.catatan || [], gambar: !!x.gambar, rumus: !!x.rumus, dariTabel: !!x.dariTabel, duplikat: x.duplikat || '', dipilih: false,
+    catatan: (x.catatan || []).filter(function (t) { return !IM_RE_CATATAN_GAMBAR.test(t); }), gambar: !!x.gambar, rumus: !!x.rumus, dariTabel: !!x.dariTabel, duplikat: x.duplikat || '', dipilih: false,
     dariFormat: !!x.dariFormat, stimulus: x.stimulus || '', pembahasan: x.pembahasan || '', kunciSumber: x.kunciSumber || '', keyakinan: x.keyakinan || ''
   };
   s.kunciAsli = imKunciSekarang(s);
@@ -9910,6 +10103,7 @@ function imKurang(s) {
     else if (s.jenis === 'MCMA' && kb.filter(function (x) { return x === 'B'; }).length !== 2) k.push('MCMA: tepat dua pernyataan Benar dan satu Salah.');
     else if (s.jenis === 'BS' && kb.every(function (x) { return x === kb[0]; })) k.push('Benar–Salah: kunci harus bervariasi, tidak boleh ketiganya sama.');
   }
+  imMasalahGambar(s).forEach(function (t) { k.push(t); });
   return k;
 }
 function imLengkap(s) { return imKurang(s).length === 0; }
@@ -9929,6 +10123,7 @@ function imGalat(s) {
       else if (s.jenis === 'BS' && kb.every(function (x) { return x === kb[0]; })) k.push('Benar–Salah: kunci harus bervariasi, tidak boleh ketiganya sama.');
     }
   }
+  imMasalahGambar(s).forEach(function (t) { k.push(t); });
   return k;
 }
 function imBisaSimpan(s) { return paketLonggar() ? imGalat(s).length === 0 : imLengkap(s); }
@@ -9948,17 +10143,18 @@ function htmlImPilih(pk) {
     <form id="f-impor" novalidate>
       <div data-galat aria-live="polite"></div>
       <div class="isian"><label for="im-berkas">Pilih berkas</label>
-        <input class="kontrol" id="im-berkas" name="berkas" type="file" accept=".txt,.md,text/plain,text/markdown,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" data-masuk="im-berkas" aria-describedby="im-berkas-b">
-        <p class="bantu" id="im-berkas-b"><strong>Cara yang disarankan:</strong> kirim dokumen soal Anda ke Claude dengan skill konversi soal Siap TKA SD, lalu unggah berkas <strong>.txt</strong> hasilnya di sini (maksimal ${formatAngka(IM_TEKS_MAKS)} karakter). Bacaan, jenis soal, kunci, dan pembahasan ikut terbaca. Berkas Word (.docx) langsung juga masih bisa, maksimal ${formatAngka(IM_UNGGAH_BYTE_MAKS / 1048576)} MB, tetapi pembacanya kurang pintar. Hasil impor masuk ke paket <strong>${pk.nama}</strong> (${MAPEL[pk.mapel] || pk.mapel}) sebagai soal baru di urutan paling akhir.</p></div>
+        <input class="kontrol" id="im-berkas" name="berkas" type="file" multiple accept=".txt,.md,text/plain,text/markdown,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp" data-masuk="im-berkas" aria-describedby="im-berkas-b">
+        <p class="bantu" id="im-berkas-b"><strong>Cara yang disarankan:</strong> kirim dokumen soal Anda ke Claude dengan skill konversi soal Siap TKA SD, lalu unggah berkas <strong>.txt</strong> hasilnya di sini (maksimal ${formatAngka(IM_TEKS_MAKS)} karakter). Bacaan, jenis soal, kunci, dan pembahasan ikut terbaca. <strong>Soal bergambar:</strong> pilih berkas .txt <em>bersama</em> semua file gambarnya sekaligus (tahan Ctrl atau Shift saat memilih; JPG, PNG, atau WebP). Gambar diunggah ke pustaka paket lebih dulu, lalu dicocokkan lewat namanya. Berkas Word (.docx) langsung juga masih bisa, maksimal ${formatAngka(IM_UNGGAH_BYTE_MAKS / 1048576)} MB, tetapi pembacanya kurang pintar. Hasil impor masuk ke paket <strong>${pk.nama}</strong> (${MAPEL[pk.mapel] || pk.mapel}) sebagai soal baru di urutan paling akhir.</p></div>
       <div id="im-pilihan" class="pb-pilihan" aria-live="polite"></div>
     </form>
     <details class="im-panduan" data-uji="im-panduan-teks"><summary>Tentang berkas teks hasil konversi Claude</summary>
       <ul>
-        <li>Baris pertama harus <code>#FORMAT-IMPOR v1</code>. Berkas lain ditolak dengan pesan yang jelas.</li>
+        <li>Baris pertama harus <code>#FORMAT-IMPOR v2</code> (v1 juga terbaca). Berkas lain ditolak dengan pesan yang jelas.</li>
         <li>Kunci yang tertulis di dokumen asli ditandai <strong>dari dokumen</strong>. Kunci yang dikarang Claude ditandai <strong>tebakan Claude</strong>: tetap bisa diimpor, tetapi paket <strong>tidak bisa diterbitkan</strong> sebelum Anda memeriksa tiap soalnya dan mencentang "Kunci sudah saya periksa" di editor soal.</li>
         <li>Pembahasan dari Claude juga perlu Anda baca dulu; siswa melihatnya di halaman hasil.</li>
         <li>Soal yang belum lengkap (opsi, kunci, atau pertanyaan masih kosong) tetap bisa diimpor sebagai draf, lalu dilengkapi bertahap lewat tombol ubah di daftar soal. Paket baru bisa diterbitkan setelah semua soal lengkap.</li>
-        <li>Gambar tidak ikut. Soal yang memerlukan gambar diberi catatan, dan gambarnya Anda tambahkan lewat editor soal.</li></ul></details>
+        <li><strong>Gambar</strong> ditulis di teks sebagai <code>[[gambar: nama.png]]</code> atau <code>[[gambar: nama.png | teks pengganti]]</code>, boleh di bacaan, pertanyaan, maupun opsi/pernyataan. Pilih file gambarnya bersama berkas .txt: gambar diunggah ke pustaka paket, namanya dicocokkan (huruf besar/kecil dan ekstensi diabaikan), dan soal langsung memuat gambarnya. Nama yang tidak ada atau kembar menahan soal itu sampai diperbaiki. Gambar yang namanya sudah ada di pustaka tidak diunggah ulang.</li>
+        <li>Penanda lama <code>[[gambar]]</code> (tanpa nama) hanya menandai soal yang perlu gambar; gambarnya Anda tambahkan lewat editor soal.</li></ul></details>
     <details class="im-panduan" data-uji="im-panduan"><summary>Format dokumen Word yang dikenali</summary>
       <ul>
         <li>Nomor soal di awal baris: <code>1.</code> atau <code>1)</code>, berurutan. Penomoran otomatis Word ikut dibaca.</li>
@@ -9976,16 +10172,25 @@ MASUKAN['im-berkas'] = function (r, e) {
   bersihGalat(form);
   imSt.berkas = null;
   imSt.teks = null;
+  imSt.gambarBerkas = [];
   const nomor = ++imSt.urut;
-  const file = r.files && r.files[0];
-  if (!file) { pasang(kotak, h``); return; }
+  const dipilih = Array.prototype.slice.call(r.files || []);
+  const gambar = dipilih.filter(imAdaGambarBerkas);
+  const lain = dipilih.filter(function (f) { return !imAdaGambarBerkas(f); });
+  const file = lain[0];
+  if (!dipilih.length) { pasang(kotak, h``); return; }
   const tolak = function (pesan) {
     if (nomor !== imSt.urut) return;
     r.value = '';
     imSt.berkas = null;
+    imSt.gambarBerkas = [];
     pasang(kotak, h``);
     galatIsian(form, 'berkas', pesan);
   };
+  if (lain.length > 1) { tolak('Pilih satu berkas soal saja (boleh bersama banyak gambar). Anda memilih ' + formatAngka(lain.length) + ' berkas selain gambar.'); return; }
+  if (!file) { tolak('Pilih juga berkas soalnya (.txt hasil konversi Claude) bersama gambar-gambarnya. Untuk menambah gambar saja, pakai Pustaka Gambar.'); return; }
+  if (gambar.length && !/\.(txt|md)$/i.test(file.name)) { tolak('Gambar hanya bisa dipilih bersama berkas teks (.txt) hasil konversi Claude, bukan bersama berkas Word.'); return; }
+  const infoGambar = gambar.length ? ' · ' + formatAngka(gambar.length) + ' gambar akan diunggah ke pustaka paket' : '';
   if (/\.(txt|md)$/i.test(file.name)) {
     if (file.size === 0) { tolak('Berkas ini kosong.'); return; }
     if (file.size > IM_TEKS_MAKS * 4) { tolak('Berkas teks terlalu besar (' + gbUkuranTeks(file.size) + '). Pecah menjadi beberapa berkas, maksimal ' + formatAngka(IM_TEKS_MAKS) + ' karakter.'); return; }
@@ -9996,10 +10201,11 @@ MASUKAN['im-berkas'] = function (r, e) {
       if (nomor !== imSt.urut) return;
       const isi = String(bacaTeks.result || '');
       if (isi.length > IM_TEKS_MAKS) { tolak('Berkas teks berisi ' + formatAngka(isi.length) + ' karakter; batasnya ' + formatAngka(IM_TEKS_MAKS) + '. Pecah menjadi beberapa berkas.'); return; }
-      if (isi.replace(/^\uFEFF/, '').trimStart().slice(0, 15).toUpperCase().indexOf('#FORMAT-IMPOR') !== 0) { tolak('Berkas ini bukan format impor Siap TKA SD (baris pertamanya harus #FORMAT-IMPOR v1). Buat berkasnya lewat skill konversi soal di Claude.'); return; }
+      if (isi.replace(/^\uFEFF/, '').trimStart().slice(0, 15).toUpperCase().indexOf('#FORMAT-IMPOR') !== 0) { tolak('Berkas ini bukan format impor Siap TKA SD (baris pertamanya harus #FORMAT-IMPOR v2). Buat berkasnya lewat skill konversi soal di Claude.'); return; }
       imSt.berkas = file;
       imSt.teks = isi;
-      pasang(kotak, h`<p class="bantu pb-dipilih" data-uji="im-dipilih">${ikon('file-text', 'ikon-sm')} <strong>${file.name}</strong> · berkas teks format impor · ${formatAngka(isi.length)} karakter</p>`);
+      imSt.gambarBerkas = gambar;
+      pasang(kotak, h`<p class="bantu pb-dipilih" data-uji="im-dipilih">${ikon('file-text', 'ikon-sm')} <strong>${file.name}</strong> · berkas teks format impor · ${formatAngka(isi.length)} karakter${infoGambar}</p>`);
     };
     bacaTeks.readAsText(file, 'utf-8');
     return;
@@ -10091,6 +10297,7 @@ function htmlImKartu(s, i) {
     </div>
     ${s.catatan.length || s.duplikat ? h`<div class="im-catatan" data-uji="im-catatan">${s.duplikat ? h`<p class="im-dup">${ikon('copy', 'ikon-sm')} ${s.duplikat}</p>` : ''}${s.catatan.length ? h`<ul>${s.catatan.map(function (t) { return h`<li>${t}</li>`; })}</ul>` : ''}</div>` : ''}
     <div class="im-badan" data-im-badan>${htmlImBadanKartu(s, i)}</div>
+    <div data-im-gambar-kartu>${htmlImGambarKartu(s)}</div>
     <div data-im-kurang>${htmlImKurang(s)}</div>
   </li>`;
 }
@@ -10105,6 +10312,7 @@ function htmlImPeriksa() {
         <button type="button" class="tombol tombol-diam" data-aksi="impor-kosongkan" data-uji="im-kosongkan">${ikon('x')}<span>Kosongkan pilihan</span></button></div>
     </div>
     <div id="im-galat" aria-live="assertive"></div>
+    <div id="im-panel-gambar-wadah">${htmlImPanelGambar()}</div>
     ${d.peringatan.length ? h`<div class="peringatan peringatan-waspada jarak-bawah" data-uji="im-peringatan">${ikon('alert-triangle')}<div>${d.peringatan.map(function (t) { return h`<p>${t}</p>`; })}</div></div>` : ''}
     <ol class="im-daftar" aria-label="Soal hasil bacaan dokumen, ${formatAngka(ada)} soal">${imSt.soal.map(function (s, i) { return htmlImKartu(s, i); })}</ol>
     ${d.jumlahTidakTerpakai ? h`<details class="im-tak-terpakai" data-uji="im-tak-terpakai"><summary>${formatAngka(d.jumlahTidakTerpakai)} baris di dokumen tidak terpakai</summary>
@@ -10153,7 +10361,9 @@ function imSegarkanKartu(i) {
   if (cb) { cb.checked = s.dipilih && bisa; cb.disabled = !bisa; }
   pasang(el('[data-im-status]', li), htmlImStatus(s));
   pasang(el('[data-im-kurang]', li), htmlImKurang(s));
+  imSegarkanGambarKartu(li, s);
   imPerbaruiRingkas();
+  imPerbaruiPanelGambar();
 }
 
 MASUKAN['impor-isi'] = function (t) {
@@ -10213,7 +10423,7 @@ AKSI['impor-kosongkan'] = function () {
 
 function imKePilih() {
   const api = imSt.modal; if (!api) return;
-  Object.assign(imSt, { tahap: 'pilih', berkas: null, teks: null, hasil: null, soal: [], kotor: false });
+  Object.assign(imSt, { tahap: 'pilih', berkas: null, teks: null, hasil: null, soal: [], kotor: false, gambar: null, gambarBerkas: [], laporanGambar: null, sibukGambar: false });
   imSt.urut++;
   api.ganti(htmlImPilih(edSt.paket));
   imPerbaruiKaki();
@@ -10233,11 +10443,21 @@ function imAnalisis(tombol) {
   const file = imSt.berkas;
   if (!file) { galatIsian(form, 'berkas', 'Pilih berkas dulu.'); return; }
   kerjakan(tombol, function () {
-    const minta = imSt.teks !== null
-      ? panggil('impor.teks', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), teks: imSt.teks })
-      : gbBase64(file).then(function (b64) { return panggil('impor.analisis', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), data: b64 }); });
-    return minta.then(function (d) {
+    const tulis = function (a, b) {
+      const kotak = el('#im-pilihan');
+      if (kotak) pasang(kotak, h`<p class="bantu" role="status"><span class="spinner" aria-hidden="true"></span> Mengunggah gambar ${formatAngka(a)} dari ${formatAngka(b)}… Jangan tutup jendela ini.</p>`);
+    };
+    imSt.laporanGambar = null;
+    const siap = imSt.teks !== null && imSt.gambarBerkas.length
+      ? imMuatPustaka().then(function () { return imUnggahGambar(imSt.gambarBerkas, tulis); }).then(function (lap) { imSt.laporanGambar = lap; imSt.gambarBerkas = []; })
+      : Promise.resolve();
+    return siap.then(function () {
+      return imSt.teks !== null
+        ? panggil('impor.teks', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), teks: imSt.teks })
+        : gbBase64(file).then(function (b64) { return panggil('impor.analisis', { id_paket: imSt.idPaket, nama: pbNamaKirim(file.name), data: b64 }); });
+    }).then(function (d) {
       if (!imSt.modal) return;
+      imSt.gambar = d.gambar ? { pustaka: d.gambar.pustaka.slice(), tidakDirujuk: d.gambar.tidakDirujuk.slice(), batas: d.gambar.batas } : null;
       imSt.hasil = d;
       imSt.soal = d.soal.map(imBuatModel);
       imSt.tahap = 'periksa';
@@ -10282,7 +10502,7 @@ function imSimpan(tombol) {
 AKSI['impor-buka'] = function () {
   const pk = edSt.paket;
   if (!pk || pk.status !== 'Draf') return;
-  Object.assign(imSt, { tahap: 'pilih', idPaket: pk.id, berkas: null, teks: null, hasil: null, soal: [], kotor: false });
+  Object.assign(imSt, { tahap: 'pilih', idPaket: pk.id, berkas: null, teks: null, hasil: null, soal: [], kotor: false, gambar: null, gambarBerkas: [], laporanGambar: null, sibukGambar: false });
   imSt.urut++;
   const api = modal({
     judul: 'Impor soal (prototipe)', lebar: true,

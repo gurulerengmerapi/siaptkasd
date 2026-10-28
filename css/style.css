@@ -1386,6 +1386,19 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
 .im-tak-terpakai > p, .im-tak-terpakai > ul { margin: 0 1rem 1rem; }
 .im-tak-terpakai ul { padding-left: 1.25rem; display: grid; gap: .25rem; overflow-wrap: anywhere; }
 .im-paham { margin-top: 1.25rem; }
+
+.im-gambar { padding: .75rem .875rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); display: grid; gap: .5rem; min-width: 0; }
+.im-gambar:empty { display: none; }
+.im-gambar-daftar { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.im-gambar-ok { display: flex; align-items: center; gap: .75rem; min-width: 0; overflow-wrap: anywhere; }
+.im-gambar-ok img { flex: none; width: auto; height: auto; max-width: 96px; max-height: 72px; object-fit: contain; background: #fff; border: 1px solid var(--border); border-radius: var(--r-sm, 6px); }
+.im-gambar-masalah { display: flex; align-items: flex-start; gap: .5rem; color: var(--danger-text); font-weight: 600; overflow-wrap: anywhere; }
+.im-panel-gambar { display: grid; gap: .625rem; margin-bottom: 1rem; padding: .875rem 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-md); min-width: 0; }
+.im-laporan-gambar ul { margin: .375rem 0 0; padding-left: 1.25rem; display: grid; gap: .25rem; overflow-wrap: anywhere; }
+.im-galat-gambar { color: var(--danger-text); }
+.im-tak-dirujuk > summary { cursor: pointer; min-height: var(--tap); display: flex; align-items: center; font-weight: 600; }
+.im-tak-dirujuk > summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.im-tak-dirujuk ul { margin: 0; padding-left: 1.25rem; overflow-wrap: anywhere; }
 @media (max-width: 599px) {
   .im-pernyataan { grid-template-columns: 1fr; }
   .im-status { margin-left: 0; }
