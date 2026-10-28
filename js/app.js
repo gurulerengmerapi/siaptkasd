@@ -1337,7 +1337,7 @@ const CACHE_BACA = {
 const BACA_NETRAL = {
   'app.mulai': 1, 'app.siap': 1, 'sesi.saya': 1, 'sesi.peserta': 1, 'token.periksa': 1, 'ujian.muat': 1, 'ujian.hasil': 1,
   'percobaan.detail': 1, 'pantau.sekarang': 1, 'perkembangan.cari': 1, 'perkembangan.siswa': 1, 'audit.daftar': 1, 'audit.verifikasi': 1, 'backup.status': 1, 'backup.daftar': 1, 'paket.ambil': 1,
-  'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1,
+  'akun.ambil': 1, 'materi.riwayat': 1, 'pembahasan.daftar': 1, 'soal.cari': 1, 'paket.dependensi': 1, 'koreksi.pratinjau': 1, 'pesertaKode.pratinjau': 1, 'pesertaKode.arsip': 1,
   'pembahasan.unduh': 1, 'materi.unduh': 1, 'materi.buka': 1, 'media.daftar': 1, 'pustaka.daftar': 1, 'berizin.pdfUji': 1
 };
 
@@ -2473,7 +2473,7 @@ function kartuRerataMapel(r) {
   const ada = r.mapel.some(function (m) { return m.n > 0; });
   return h`<section class="kartu" aria-labelledby="h-rr-mapel" data-uji="rerata-mapel"><div class="kartu-judul"><span class="ikon-bulat">${ikon('bar-chart')}</span><h3 id="h-rr-mapel">Rata-rata nilai per mata pelajaran</h3></div>
     <ul class="rr-daftar" role="list">${r.mapel.map(function (m) { return barisRerata(IKON_MAPEL[m.mapel], MAPEL[m.mapel] || m.mapel, '', m.rerata, m.n); })}</ul>
-    <p class="bantu jarak-atas">${ada ? 'Dihitung dari semua percobaan yang sudah selesai pada skala 0–100, termasuk peserta token. Percobaan yang masih berjalan atau dibatalkan tidak dihitung.' : 'Belum ada percobaan yang selesai. Rata-rata tampil di sini setelah ada siswa yang menyelesaikan ujian.'}</p></section>`;
+    <p class="bantu jarak-atas">${ada ? 'Dihitung dari semua percobaan siswa berakun yang sudah selesai pada skala 0–100. Peserta kode (token), percobaan yang masih berjalan, dan yang dibatalkan tidak dihitung.' : 'Belum ada percobaan yang selesai. Rata-rata tampil di sini setelah ada siswa yang menyelesaikan ujian.'}</p></section>`;
 }
 
 function kartuRerataPaket(r) {
@@ -8630,6 +8630,152 @@ AKSI['pantau-segarkan'] = function () { if (pnSt.c && pnSt.c.ok()) ambilPantau(p
 
 if (window.__siapUji && typeof window.__siapUji === 'object') window.__siapUji.pantau = pnSt;
 
+'use strict';
+
+const bkSt = { hasil: null, kriteria: null };
+const BK_KOLOM_ARSIP = [
+  { judul: 'Nama', lebar: 26 }, { judul: 'Sekolah', lebar: 26 }, { judul: 'L/P', lebar: 6 }, { judul: 'Paket', lebar: 30 }, { judul: 'Mapel', lebar: 8 },
+  { judul: 'Kategori', lebar: 16 }, { judul: 'Kode', lebar: 12 }, { judul: 'Status', lebar: 13 }, { judul: 'Mulai (WIB)', lebar: 17 }, { judul: 'Selesai (WIB)', lebar: 17 },
+  { judul: 'Skor', lebar: 8, tipe: 'desimal2' }, { judul: 'Skor maks', lebar: 9, tipe: 'desimal2' }, { judul: 'Nilai', lebar: 8, tipe: 'desimal2' },
+  { judul: 'Pindah tab', lebar: 10, tipe: 'bulat' }, { judul: 'Koneksi putus', lebar: 12, tipe: 'bulat' }
+];
+
+function kartuBersihKode() {
+  return h`<section class="kartu jarak-atas" aria-labelledby="h-bersih-kode" data-uji="bersih-kode"><div class="kartu-judul"><span class="ikon-bulat">${ikon('trash')}</span><h3 id="h-bersih-kode">Bersihkan data peserta kode</h3></div>
+    <p class="teks-redam">Menghapus massal data pengerjaan peserta yang masuk dengan kode (tanpa akun) agar Spreadsheet tidak penuh. Yang dihapus hanya pengerjaan yang sudah selesai, waktu habis, atau dibatalkan. Kode ujian, data siswa berakun, dan pengerjaan yang masih berjalan tidak ikut terhapus. Penghapusan tidak bisa dibatalkan, jadi unduh arsipnya dulu.</p>
+    <div class="baris-bungkus">
+      <div class="isian"><label for="bk-paket">Paket</label><select class="kontrol" id="bk-paket" data-masuk="bk-ubah"><option value="">Semua paket</option>${pcSt.paket.map(function (x) { return h`<option value="${x.id}">${x.nama} (${MAPEL[x.mapel] || x.mapel})</option>`; })}</select></div>
+      <div class="isian"><label for="bk-hari">Hanya yang lebih lama dari (hari)</label><input class="kontrol" id="bk-hari" type="number" inputmode="numeric" min="0" max="3650" step="1" placeholder="Kosongkan = semua umur" data-masuk="bk-ubah"></div>
+      <button type="button" class="tombol tombol-garis" data-aksi="bk-periksa" data-uji="bk-periksa">${ikon('search')}<span>Periksa dampak</span></button>
+    </div>
+    <div id="bk-hasil" class="jarak-atas" aria-live="polite"></div></section>`;
+}
+
+function bkIsiPaket() {
+  const sel = el('#bk-paket');
+  if (!sel) return;
+  const dipilih = sel.value;
+  pasang(sel, h`<option value="">Semua paket</option>${pcSt.paket.map(function (x) { return h`<option value="${x.id}"${dipilih === x.id ? mentah(' selected') : ''}>${x.nama} (${MAPEL[x.mapel] || x.mapel})</option>`; })}`);
+}
+
+function bkKriteria() {
+  const data = {};
+  const pk = el('#bk-paket'), hr = el('#bk-hari');
+  if (pk && pk.value) data.id_paket = pk.value;
+  const t = hr ? hr.value.trim() : '';
+  if (t !== '') {
+    if (!/^\d{1,4}$/.test(t) || Number(t) > 3650) {
+      pasang(el('#bk-hasil'), h`<div class="peringatan peringatan-waspada" role="alert">${ikon('alert-triangle')}<div><p>Jumlah hari harus bilangan bulat 0 sampai 3650, atau dikosongkan.</p></div></div>`);
+      return null;
+    }
+    data.hari = Number(t);
+  }
+  return data;
+}
+
+MASUKAN['bk-ubah'] = function () {
+  if (!bkSt.hasil) return;
+  bkSt.hasil = null; bkSt.kriteria = null;
+  pasang(el('#bk-hasil'), h`<p class="bantu tanpa-margin">Kriteria diubah. Tekan “Periksa dampak” lagi.</p>`);
+};
+
+function bkHtmlDampak(d) {
+  if (!d.jumlah) {
+    return h`<div class="peringatan" data-uji="bk-kosong">${ikon('info')}<div><p><strong>Tidak ada data yang cocok.</strong> Tidak ada pengerjaan peserta kode yang selesai${d.kriteria && d.kriteria.hari !== undefined ? ' dan lebih lama dari ' + formatAngka(d.kriteria.hari) + ' hari' : ''} untuk dibersihkan.</p>${d.sedangBerjalan ? h`<p class="bantu">Ada ${formatAngka(d.sedangBerjalan)} pengerjaan yang masih berjalan; itu tidak pernah ikut dihapus.</p>` : ''}</div></div>`;
+  }
+  const st = d.status || {};
+  return h`<div data-uji="bk-dampak">
+    <dl class="data">
+      <div class="data-baris"><dt>Pengerjaan yang dihapus</dt><dd class="angka"><strong>${formatAngka(d.jumlah)}</strong> (${formatAngka(st.Selesai || 0)} selesai · ${formatAngka(st['Waktu habis'] || 0)} waktu habis · ${formatAngka(st.Dibatalkan || 0)} dibatalkan)</dd></div>
+      <div class="data-baris"><dt>Rentang waktu</dt><dd>${d.tertua ? tanggalWIB(d.tertua) : '—'} sampai ${d.terbaru ? tanggalWIB(d.terbaru) : '—'}</dd></div>
+      <div class="data-baris"><dt>Perkiraan sel dibebaskan</dt><dd class="angka"><strong>${formatAngka(d.selDibebaskan)}</strong> sel <span class="teks-redam">(${formatAngka(d.baris.percobaan)} pengerjaan, ${formatAngka(d.baris.kejadian)} kejadian ujian, ${formatAngka(d.baris.jejakNilai)} riwayat nilai, ${formatAngka(d.baris.jawabanLama)} jawaban lama)</span></dd></div>
+      <div class="data-baris"><dt>Dihapus dalam</dt><dd class="angka">${formatAngka(d.tahap)} tahap</dd></div>
+    </dl>
+    <h4 class="jarak-atas-kecil">Per paket</h4>
+    <ul class="daftar-kejadian">${d.paket.map(function (p) { return h`<li><span>${p.nama}${p.mapel ? ' (' + (MAPEL[p.mapel] || p.mapel) + ')' : ''}</span><span class="angka">${formatAngka(p.jumlah)}</span></li>`; })}${d.paketLain ? h`<li><span class="teks-redam">dan ${formatAngka(d.paketLain)} paket lain</span><span></span></li>` : ''}</ul>
+    ${d.sedangBerjalan ? h`<div class="peringatan peringatan-waspada jarak-atas-kecil" data-uji="bk-berjalan">${ikon('alert-triangle')}<div><p>Masih ada <strong>${formatAngka(d.sedangBerjalan)}</strong> pengerjaan yang berjalan. Penghapusan <strong>ditolak</strong> sampai semuanya selesai, supaya tidak ada yang kehilangan jawaban.</p></div></div>` : ''}
+    <div class="peringatan jarak-atas-kecil">${ikon('info')}<div>
+      <p><strong>Efek ke angka lain.</strong> Dasbor tidak terpengaruh (hanya menghitung siswa berakun). Menu Hasil &amp; Nilai, Analisis Soal, dan daftar Percobaan tidak lagi memuat pengerjaan yang dihapus, jadi angkanya ikut berubah. Kode ujian dan jumlah pemakaiannya tetap.</p>
+      <p class="bantu">Sel hanya benar-benar bebas bila barisnya dihapus (bukan dikosongkan). Itu yang dilakukan di sini.</p></div></div>
+    <h4 class="jarak-atas">1. Simpan arsip (disarankan)</h4>
+    <p class="teks-redam">Berkas Excel berisi nama, sekolah, paket, kode, status, dan nilai. Tanpa tanggal lahir dan tanpa isi jawaban.</p>
+    <div class="baris-bungkus"><button type="button" class="tombol tombol-garis" data-aksi="bk-arsip" data-uji="bk-arsip">${ikon('download')}<span>Unduh arsip (Excel)</span></button></div>
+    <div id="bk-arsip" class="jarak-atas-kecil" aria-live="polite"></div>
+    <h4 class="jarak-atas">2. Hapus</h4>
+    <form id="f-bk-hapus" data-kirim="bk-hapus" novalidate>
+      <div data-galat aria-live="polite"></div>
+      <div class="isian"><label for="bk-ketik">Ketik <strong>HAPUS</strong> untuk melanjutkan</label><input class="kontrol" id="bk-ketik" name="ketik" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" data-uji="bk-ketik"></div>
+      <div class="baris-bungkus jarak-atas-kecil"><button type="submit" class="tombol tombol-bahaya" data-uji="bk-hapus">${ikon('trash')}<span>Hapus ${formatAngka(d.jumlah)} pengerjaan</span></button></div>
+    </form>
+    <div id="bk-progres" class="jarak-atas-kecil" aria-live="polite"></div>
+  </div>`;
+}
+
+AKSI['bk-periksa'] = function (b) {
+  const data = bkKriteria();
+  if (!data) return;
+  kerjakan(b, function () {
+    return panggil('pesertaKode.pratinjau', data).then(function (d) {
+      bkSt.hasil = d; bkSt.kriteria = data;
+      pasang(el('#bk-hasil'), bkHtmlDampak(d));
+    });
+  }, 'Memeriksa…').catch(gagalUmum);
+};
+
+AKSI['bk-arsip'] = function (b) {
+  const data = bkSt.kriteria, wadah = el('#bk-arsip');
+  if (!data) return;
+  kerjakan(b, function () {
+    const baris = [];
+    function ambil(halaman) {
+      return panggil('pesertaKode.arsip', Object.assign({ halaman: halaman }, data)).then(function (d) {
+        d.baris.forEach(function (x) {
+          baris.push([x.nama, x.sekolah, x.jenisKelamin, x.paket, x.mapel, x.kategori, x.kode, x.status, ekWaktuAngka(x.mulai), ekWaktuAngka(x.selesai),
+            typeof x.skor === 'number' ? x.skor : '', typeof x.skorMaks === 'number' ? x.skorMaks : '', typeof x.nilaiAkhir === 'number' ? x.nilaiAkhir : '', x.pindahTab, x.putus]);
+        });
+        pasang(wadah, h`<p class="bantu">Mengambil data… ${formatAngka(baris.length)} dari ${formatAngka(d.jumlah)} baris.</p>`);
+        return halaman < d.halamanTotal ? ambil(halaman + 1) : d.jumlah;
+      });
+    }
+    return ambil(1).then(function (total) {
+      const bytes = xlsxBuat([{ nama: 'Arsip peserta kode', arah: 'datar', kolom: BK_KOLOM_ARSIP, baris: baris }], { judul: 'Arsip pengerjaan peserta kode', penulis: ekPenulis() });
+      ekLapor(wadah, ekNamaBerkas(['arsip-peserta-kode'], 'xlsx'), bytes, XLSX_TIPE);
+      if (baris.length !== total) pasang(wadah, h`<div class="peringatan peringatan-waspada">${ikon('alert-triangle')}<div><p>Jumlah baris arsip (${formatAngka(baris.length)}) berbeda dari hasil pemeriksaan (${formatAngka(total)}). Data berubah selama pengunduhan; periksa dampak lagi sebelum menghapus.</p></div></div>`);
+    });
+  }, 'Menyiapkan arsip…').catch(function (e) { ekLaporGalat(wadah, e); });
+};
+
+KIRIM['bk-hapus'] = function (form) {
+  bersihGalat(form);
+  const v = nilaiForm(form), d = bkSt.hasil, prog = el('#bk-progres');
+  if (!d || !d.konfirmasi) { galatForm(form, 'Periksa dampak dulu sebelum menghapus.'); return; }
+  if (v.ketik !== 'HAPUS') { galatIsian(form, 'ketik', 'Ketik HAPUS (huruf besar) untuk melanjutkan.'); return; }
+  form.setAttribute('data-sibuk', 'ya');
+  let terhapus = 0;
+  function tahap() {
+    return panggil('pesertaKode.hapus', { konfirmasi: d.konfirmasi, ketik: 'HAPUS' }).then(function (r) {
+      terhapus += (r.dihapus && r.dihapus.percobaan) || 0;
+      const total = terhapus + r.sisa;
+      pasang(prog, h`<p class="bantu" data-uji="bk-progres">Menghapus… ${formatAngka(terhapus)} dari ${formatAngka(total)} pengerjaan.</p>`);
+      return r.selesai ? r : tahap();
+    });
+  }
+  kerjakan(tombolKirim(form), tahap, 'Menghapus…').then(function () {
+    bkSt.hasil = null; bkSt.kriteria = null;
+    pasang(el('#bk-hasil'), h`<div class="peringatan peringatan-sukses" data-uji="bk-selesai">${ikon('check-circle')}<div><p><strong>Selesai.</strong> ${formatAngka(terhapus)} pengerjaan peserta kode dihapus. Tindakan ini tercatat di log audit.</p></div></div>`);
+    toast(formatAngka(terhapus) + ' pengerjaan dihapus.', 'sukses');
+    return muatPercobaan();
+  }).catch(function (e) {
+    bkSt.hasil = null; bkSt.kriteria = null;
+    const sebagian = terhapus ? ' ' + formatAngka(terhapus) + ' pengerjaan sudah terhapus sebelum berhenti.' : '';
+    if (e.kode === 'SIBUK_UJIAN' || e.kode === 'KONFIRMASI' || e.kode === 'VALIDASI') {
+      pasang(el('#bk-hasil'), h`<div class="peringatan peringatan-bahaya" role="alert" data-uji="bk-galat">${ikon('alert-circle')}<div><p>${e.message}${sebagian}</p><p class="bantu">Tekan “Periksa dampak” lagi untuk melanjutkan.</p></div></div>`);
+    } else {
+      pasang(el('#bk-hasil'), h`<div class="peringatan peringatan-bahaya" role="alert" data-uji="bk-galat">${ikon('alert-circle')}<div><p>${e.message || 'Penghapusan berhenti karena terjadi kesalahan.'}${sebagian}</p><p class="bantu">Aman diulang: tekan “Periksa dampak” lagi untuk melihat sisanya, lalu hapus kembali.</p></div></div>`);
+    }
+  }).then(function () { form.removeAttribute('data-sibuk'); });
+};
+
 
 const pcSt = { id_paket: '', status: '', jalur: '', q: '', halaman: 1, ukuran: 30, data: null, paket: [], seq: 0 };
 
@@ -8649,12 +8795,13 @@ function renderPercobaan(p, c) {
     <div class="baris-bungkus jarak-bawah" id="pc-ringkas" aria-live="polite"></div>
     <div id="pc-daftar"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat percobaan…</span></div></div>
     <div id="pc-halaman" class="halaman-nav"></div>
-    ${admin ? kartuPeringkatAdmin() : ''}`);
+    ${admin ? kartuPeringkatAdmin() : ''}${admin ? kartuBersihKode() : ''}`);
   fokusJudul();
   panggil('paket.daftar', {}, { ulang: true }).then(function (d) {
     if (!c.ok()) return;
     pcSt.paket = d;
     const sel = el('#pc-paket');
+    bkIsiPaket();
     if (sel) {
       pasang(sel, h`<option value="">Semua paket</option>${d.map(function (x) { return h`<option value="${x.id}"${pcSt.id_paket === x.id ? mentah(' selected') : ''}>${x.nama} (${MAPEL[x.mapel] || x.mapel})</option>`; })}`);
     }
