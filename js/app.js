@@ -7334,7 +7334,7 @@ function gambarEditor() {
       <button type="button" class="tombol" data-aksi="soal-baru"${bisaUbahSoal && soal.length < 100 ? '' : mentah(' aria-disabled="true"')}>${ikon('plus')}<span>Tambah soal</span></button></div></div>`}
     ${soal.length ? h`<ol class="daftar-soal">${soal.map(function (s, i) {
       return h`<li class="soal-butir"><span class="nomor">${i + 1}</span>
-        <div><div class="pertanyaan ky">${s.pertanyaan ? kayaHtml(s.pertanyaan) : h`<em class="teks-redam">(Pertanyaan belum diisi)</em>`}</div><div class="meta"><span class="lencana lencana-primer">${LABEL_JENIS_PENDEK[s.jenis]}</span><span class="lencana ${s.kunci ? 'lencana-sukses' : 'lencana-peringatan'}">Kunci: ${kunciTeks(s)}</span>${s.kurang && s.kurang.length ? h`<span class="lencana lencana-peringatan" data-uji="soal-belum-lengkap">${ikon('alert-triangle', 'ikon-sm')} Belum lengkap</span>` : ''}${s.kunciStatus === 'claude' ? h`<span class="lencana lencana-peringatan" data-uji="kunci-belum-diperiksa">${ikon('alert-triangle', 'ikon-sm')} Kunci tebakan Claude, belum diperiksa</span>` : ''}${s.pembahasan ? h`<span class="lencana lencana-info" data-uji="ada-pembahasan">Ada pembahasan</span>` : ''}</div>${s.kurang && s.kurang.length ? h`<p class="bantu tanpa-margin" data-uji="soal-kurang-alasan">Masih kurang: ${s.kurang.join('; ')}.</p>` : ''}</div>
+        <div><div class="pertanyaan ky">${s.pertanyaan ? kayaHtml(s.pertanyaan) : h`<em class="teks-redam">(Pertanyaan belum diisi)</em>`}</div><div class="meta"><span class="lencana lencana-primer">${LABEL_JENIS_PENDEK[s.jenis]}</span><span class="lencana ${s.kunci ? 'lencana-sukses' : 'lencana-peringatan'}">Kunci: ${kunciTeks(s)}</span>${s.kurang && s.kurang.length ? h`<span class="lencana lencana-peringatan" data-uji="soal-belum-lengkap">${ikon('alert-triangle', 'ikon-sm')} Belum lengkap</span>` : ''}${s.kunciStatus === 'claude' ? h`<span class="lencana lencana-peringatan" data-uji="kunci-belum-diperiksa">${ikon('alert-triangle', 'ikon-sm')} Kunci tebakan Claude, belum diperiksa</span>` : ''}${s.kunciStatus === 'beda' ? h`<span class="lencana lencana-peringatan" data-uji="kunci-beda-belum-diperiksa">${ikon('alert-triangle', 'ikon-sm')} Kunci beda dari hitungan Claude, belum diperiksa</span>` : ''}${s.pembahasan ? h`<span class="lencana lencana-info" data-uji="ada-pembahasan">Ada pembahasan</span>` : ''}</div>${s.kurang && s.kurang.length ? h`<p class="bantu tanpa-margin" data-uji="soal-kurang-alasan">Masih kurang: ${s.kurang.join('; ')}.</p>` : ''}</div>
         ${bisaUbahSoal ? h`<div class="aksi">
           <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="soal-geser" data-id="${s.id}" data-arah="naik" aria-label="Naikkan soal nomor ${i + 1}"${i === 0 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-up')}</button>
           <button type="button" class="tombol tombol-diam tombol-ikon" data-aksi="soal-geser" data-id="${s.id}" data-arah="turun" aria-label="Turunkan soal nomor ${i + 1}"${i === soal.length - 1 ? mentah(' aria-disabled="true"') : ''}>${ikon('arrow-down')}</button>
@@ -7484,6 +7484,10 @@ function bukaFormSoal(s) {
       <div class="isian"><label id="so-tanya-l" for="so-tanya">Pertanyaan</label>${htmlIsianKaya({ nama: 'pertanyaan', id: 'so-tanya', labelId: 'so-tanya-l', nilai: s ? s.pertanyaan : '', placeholder: 'Tulis pertanyaan', fokusAwal: !baru, utama: true })}</div>
       <div id="soal-opsi">${htmlOpsiSoal(jenis, s ? s.opsi : [], s ? s.kunci : '')}</div>
       <div id="soal-status-kunci" aria-live="polite"></div>
+      ${s && s.kunciStatus === 'beda' ? h`<div class="peringatan peringatan-waspada" role="note" data-uji="so-kunci-beda">${ikon('alert-triangle')}<div>
+        <p class="tanpa-margin"><strong>Kunci beda dari hitungan Claude.</strong> Kunci dari dokumen: <strong data-uji="so-beda-guru">${kunciTeks(s)}</strong>. Hitungan Claude: <strong data-uji="so-beda-claude">${kunciTeks({ jenis: s.jenis, kunci: s.kunciClaude })}</strong>.</p>
+        <p class="bantu">Paket belum bisa diterbitkan sebelum Anda memeriksanya. Ubah kunci bila hitungan Claude yang benar, atau tekan tombol ini bila kunci dokumen sudah benar, lalu simpan soal.</p>
+        <button type="button" class="tombol tombol-garis" data-aksi="soal-tandai-periksa" aria-pressed="false" data-uji="so-diperiksa-tombol">${ikon('check-circle')}<span>Kunci sudah saya periksa</span></button></div></div>` : ''}
       ${s && s.kunciStatus === 'claude' ? h`<label class="saklar im-paham" data-uji="so-diperiksa-label"><input type="checkbox" id="so-diperiksa" name="kunci_diperiksa" data-uji="so-diperiksa"><span class="jalur"></span><span>Kunci sudah saya periksa. Kunci soal ini awalnya tebakan Claude, dan paket belum bisa diterbitkan sebelum Anda mencentang ini (atau mengubah kuncinya sendiri).</span></label>` : ''}
       <div class="isian"><label for="so-pembahasan">Pembahasan <span class="opsional">(opsional)</span></label>
         <textarea class="kontrol" id="so-pembahasan" name="pembahasan" rows="4" maxlength="1500" data-uji="so-pembahasan" placeholder="Penjelasan singkat jawaban yang benar">${s ? s.pembahasan || '' : ''}</textarea>
@@ -7495,6 +7499,12 @@ function bukaFormSoal(s) {
   if (form) { perbaruiStatusKunci(form); aktifkanPenyunting(form); }
 }
 AKSI['soal-baru'] = function () { bukaFormSoal(null); };
+AKSI['soal-tandai-periksa'] = function (b) {
+  const on = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  const t = el('span', b);
+  if (t) t.textContent = on ? 'Kunci ditandai sudah diperiksa (simpan soal)' : 'Kunci sudah saya periksa';
+};
 AKSI['soal-ubah'] = function (b) {
   const s = edSt.soal.filter(function (x) { return x.id === b.getAttribute('data-id'); })[0];
   if (s) bukaFormSoal(s);
@@ -7532,7 +7542,8 @@ KIRIM['soal-simpan'] = function (form) {
   const pem = el('#so-pembahasan', form);
   const data = { id_paket: edSt.paket.id, jenis: jenis, pertanyaan: tanya.nilai, stimulus: st1.nilai, opsi: opsi, kunci: kunci, pembahasan: pem ? pem.value : '' };
   const dip = el('#so-diperiksa', form);
-  if (dip && dip.checked) data.kunci_diperiksa = true;
+  const tombolPeriksa = el('[data-aksi="soal-tandai-periksa"]', form);
+  if ((dip && dip.checked) || (tombolPeriksa && tombolPeriksa.getAttribute('aria-pressed') === 'true')) data.kunci_diperiksa = true;
   if (id) data.id_soal = id;
   form.setAttribute('data-sibuk', 'ya');
   kerjakan(tombolKirim(form), function () {
@@ -10047,7 +10058,7 @@ function imPerbaruiPanelGambar() {
 }
 
 
-const imSt = { tahap: 'pilih', idPaket: '', berkas: null, teks: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false, gambar: null, gambarBerkas: [], laporanGambar: null, sibukGambar: false };
+const imSt = { tahap: 'pilih', idPaket: '', berkas: null, teks: null, urut: 0, hasil: null, soal: [], paham: false, modal: null, kotor: false, gambar: null, gambarBerkas: [], laporanGambar: null, sibukGambar: false, hanyaBeda: false };
 const IM_TEKS_MAKS = 300000;
 const IM_STIMULUS_MAKS = 5000;
 const IM_PEMBAHASAN_MAKS = 1500;
@@ -10064,10 +10075,16 @@ function imBuatModel(x) {
     no: x.no, jenis: x.jenis || '', pertanyaan: x.pertanyaan || '', opsi: (x.opsi || []).slice(),
     kunciPg: x.kunci || '', kunciBs: [bs[0] || '', bs[1] || '', bs[2] || ''],
     catatan: (x.catatan || []).filter(function (t) { return !IM_RE_CATATAN_GAMBAR.test(t); }), gambar: !!x.gambar, rumus: !!x.rumus, dariTabel: !!x.dariTabel, duplikat: x.duplikat || '', dipilih: false,
-    dariFormat: !!x.dariFormat, stimulus: x.stimulus || '', pembahasan: x.pembahasan || '', kunciSumber: x.kunciSumber || '', keyakinan: x.keyakinan || ''
+    dariFormat: !!x.dariFormat, stimulus: x.stimulus || '', pembahasan: x.pembahasan || '', kunciSumber: x.kunciSumber || '', keyakinan: x.keyakinan || '',
+    kunciClaude: x.kunciClaude || '', kunciBanding: x.kunciBanding || 'tidak_dicocokkan', alasanBeda: ''
   };
   s.kunciAsli = imKunciSekarang(s);
-  s.dipilih = paketLonggar() ? (!x.duplikat && imGalat(s).length === 0) : (!!x.lengkap && !x.duplikat && !s.catatan.length);
+  if (s.kunciBanding === 'beda') {
+    for (let k = 0; k < s.catatan.length; k++) {
+      if (/^Catatan dari Claude:\s*KUNCI BEDA:/i.test(s.catatan[k])) { s.alasanBeda = s.catatan[k].replace(/^Catatan dari Claude:\s*/i, ''); s.catatan.splice(k, 1); break; }
+    }
+  }
+  s.dipilih = s.kunciBanding === 'beda' ? false : (paketLonggar() ? (!x.duplikat && imGalat(s).length === 0) : (!!x.lengkap && !x.duplikat && !s.catatan.length));
   return s;
 }
 function imKunciLengkap(s) {
@@ -10077,9 +10094,17 @@ function imKunciLengkap(s) {
 }
 function imKunciSekarang(s) { return s.jenis === 'PG' ? s.kunciPg : s.kunciBs.slice(0, 3).join(','); }
 function imKunciStatus(s) {
-  if (s.kunciSumber === 'dokumen') return 'dokumen';
+  if (s.kunciSumber === 'dokumen') {
+    if (!s.kunciClaude) return 'dokumen';
+    return imKunciSekarang(s) === s.kunciAsli ? (s.kunciBanding === 'beda' ? 'beda' : 'dokumen') : 'diperiksa';
+  }
   if (s.kunciSumber === 'claude' && imKunciSekarang(s) === s.kunciAsli) return 'claude';
   return '';
+}
+function imTeksKunci(jenis, k) {
+  if (!k) return 'belum dipilih';
+  if (jenis === 'PG') return k;
+  return String(k).split(',').map(function (x, i) { return (i + 1) + ': ' + (x === 'B' ? 'Benar' : x === 'S' ? 'Salah' : '?'); }).join(' · ');
 }
 function imJumlahButir(s) { return s.jenis === 'PG' ? 4 : 3; }
 function imOpsiN(s) { const n = imJumlahButir(s); const o = []; for (let i = 0; i < n; i++) o.push(s.opsi[i] || ''); return o; }
@@ -10136,7 +10161,7 @@ function imRuang() { return imSt.hasil ? imSt.hasil.ruang : 0; }
 function imBentukKirim(s) {
   return {
     no: s.no, jenis: s.jenis, pertanyaan: s.pertanyaan.trim(), opsi: imOpsiN(s).map(function (t) { return t.trim(); }),
-    kunci: imKunciLengkap(s), stimulus: s.stimulus.trim(), pembahasan: s.pembahasan.trim(), kunciStatus: imKunciStatus(s)
+    kunci: imKunciLengkap(s), stimulus: s.stimulus.trim(), pembahasan: s.pembahasan.trim(), kunciStatus: imKunciStatus(s), kunciClaude: s.kunciClaude
   };
 }
 
@@ -10154,6 +10179,7 @@ function htmlImPilih(pk) {
       <ul>
         <li>Baris pertama harus <code>#FORMAT-IMPOR v2</code> (v1 juga terbaca). Berkas lain ditolak dengan pesan yang jelas.</li>
         <li>Kunci yang tertulis di dokumen asli ditandai <strong>dari dokumen</strong>. Kunci yang dikarang Claude ditandai <strong>tebakan Claude</strong>: tetap bisa diimpor, tetapi paket <strong>tidak bisa diterbitkan</strong> sebelum Anda memeriksa tiap soalnya dan mencentang "Kunci sudah saya periksa" di editor soal.</li>
+        <li>Bila berkas memuat <code>kunci_claude:</code> (hitungan Claude atas kunci dokumen), kunci yang <strong>beda</strong> ditandai dan harus Anda periksa dulu sebelum paket bisa diterbitkan. Kunci Anda tidak pernah diganti oleh hitungan Claude.</li>
         <li>Pembahasan dari Claude juga perlu Anda baca dulu; siswa melihatnya di halaman hasil.</li>
         <li>Soal yang belum lengkap (opsi, kunci, atau pertanyaan masih kosong) tetap bisa diimpor sebagai draf, lalu dilengkapi bertahap lewat tombol ubah di daftar soal. Paket baru bisa diterbitkan setelah semua soal lengkap.</li>
         <li><strong>Gambar</strong> ditulis di teks sebagai <code>[[gambar: nama.png]]</code> atau <code>[[gambar: nama.png | teks pengganti]]</code>, boleh di bacaan, pertanyaan, maupun opsi/pernyataan. Pilih file gambarnya bersama berkas .txt: gambar diunggah ke pustaka paket, namanya dicocokkan (huruf besar/kecil dan ekstensi diabaikan), dan soal langsung memuat gambarnya. Nama yang tidak ada atau kembar menahan soal itu sampai diperbaiki. Gambar yang namanya sudah ada di pustaka tidak diunggah ulang.</li>
@@ -10290,15 +10316,26 @@ function htmlImKurang(s) {
   return h`${lunak ? h`<p class="bantu" data-uji="im-kurang-lunak">Belum lengkap, tetapi tetap bisa disimpan sebagai draf dan dilengkapi nanti lewat tombol ubah pada soal:</p>` : ''}<ul class="im-kurang" data-uji="im-kurang">${kurang.map(function (t) { return h`<li>${t}</li>`; })}</ul>`;
 }
 
+function htmlImBeda(s) {
+  if (s.kunciBanding !== 'beda') return '';
+  const diubah = imKunciSekarang(s) !== s.kunciAsli;
+  return h`<div class="im-beda" role="note" data-uji="im-kunci-beda">${ikon('alert-triangle')}<div>
+    <strong>Kunci beda dari hitungan Claude</strong>
+    <dl class="im-beda-kunci"><div><dt>Kunci dari guru (dokumen)</dt><dd data-uji="im-beda-guru">${imTeksKunci(s.jenis, s.kunciAsli)}</dd></div><div><dt>Hitungan Claude</dt><dd data-uji="im-beda-claude">${imTeksKunci(s.jenis, s.kunciClaude)}</dd></div></dl>
+    ${s.alasanBeda ? h`<p class="tanpa-margin" data-uji="im-beda-alasan">${s.alasanBeda}</p>` : ''}
+    <p class="bantu tanpa-margin">${diubah ? 'Anda sudah mengubah kunci soal ini, jadi dianggap sudah diperiksa.' : 'Setelah diimpor, paket belum bisa diterbitkan sebelum Anda memeriksa soal ini di editor.'}</p></div></div>`;
+}
+
 function htmlImKartu(s, i) {
   const bisa = imBisaSimpan(s);
-  return h`<li class="im-kartu${s.dipilih && bisa ? ' terpilih' : ''}" data-i="${i}" data-uji="im-kartu">
+  return h`<li class="im-kartu${s.dipilih && bisa ? ' terpilih' : ''}" data-i="${i}" data-beda="${s.kunciBanding === 'beda' ? '1' : ''}"${s.kunciBanding !== 'beda' && imSt.hanyaBeda ? mentah(' hidden') : ''} data-uji="im-kartu">
     <div class="im-kepala">
       <label class="im-pilih"><input type="checkbox" data-masuk="impor-isi" data-i="${i}" data-bidang="pilih"${s.dipilih && bisa ? mentah(' checked') : ''}${bisa ? '' : mentah(' disabled')}><span>Simpan soal ini</span></label>
       <strong class="im-no">Soal nomor ${formatAngka(s.no)} di dokumen</strong>
       <span class="im-status" data-im-status>${htmlImStatus(s)}</span>
     </div>
     ${s.catatan.length || s.duplikat ? h`<div class="im-catatan" data-uji="im-catatan">${s.duplikat ? h`<p class="im-dup">${ikon('copy', 'ikon-sm')} ${s.duplikat}</p>` : ''}${s.catatan.length ? h`<ul>${s.catatan.map(function (t) { return h`<li>${t}</li>`; })}</ul>` : ''}</div>` : ''}
+    <div data-im-beda>${htmlImBeda(s)}</div>
     <div class="im-badan" data-im-badan>${htmlImBadanKartu(s, i)}</div>
     <div data-im-gambar-kartu>${htmlImGambarKartu(s)}</div>
     <div data-im-kurang>${htmlImKurang(s)}</div>
@@ -10310,6 +10347,7 @@ function htmlImPeriksa() {
   const ada = d.soal.length;
   return h`<div class="im-ringkas" data-uji="im-ringkas" tabindex="-1" id="im-ringkas">
       <p class="tanpa-margin" id="im-hitung" data-uji="im-hitung"></p>
+      ${htmlImBanding()}
       <div class="baris-bungkus">
         <button type="button" class="tombol tombol-garis" data-aksi="impor-pilih-lengkap" data-uji="im-pilih-lengkap">${ikon('check-circle')}<span>${paketLonggar() ? 'Pilih semua yang bisa disimpan' : 'Pilih semua yang lengkap'}</span></button>
         <button type="button" class="tombol tombol-diam" data-aksi="impor-kosongkan" data-uji="im-kosongkan">${ikon('x')}<span>Kosongkan pilihan</span></button></div>
@@ -10322,6 +10360,15 @@ function htmlImPeriksa() {
       <p class="bantu">Teks di bawah tidak dikenali sebagai bagian soal mana pun, jadi tidak ikut diimpor. Periksa apakah ada soal yang terlewat.</p>
       <ul>${d.tidakTerpakai.map(function (t) { return h`<li>${t}</li>`; })}</ul>${d.jumlahTidakTerpakai > d.tidakTerpakai.length ? h`<p class="bantu">… dan ${formatAngka(d.jumlahTidakTerpakai - d.tidakTerpakai.length)} baris lainnya.</p>` : ''}</details>` : ''}
     <label class="saklar im-paham"><input type="checkbox" id="im-paham" data-masuk="impor-paham" data-uji="im-paham"${imSt.paham ? mentah(' checked') : ''}><span class="jalur"></span><span>Saya sudah memeriksa teks, opsi, dan kunci setiap soal yang dipilih. Saya mengerti bahwa pembaca dokumen ini masih prototipe.</span></label>`;
+}
+
+function htmlImBanding() {
+  const cocok = imSt.soal.filter(function (s) { return s.kunciBanding === 'cocok'; }).length;
+  const beda = imSt.soal.filter(function (s) { return s.kunciBanding === 'beda'; }).length;
+  if (!cocok && !beda) return '';
+  const lain = imSt.soal.length - cocok - beda;
+  return h`<p class="tanpa-margin${beda ? ' im-banding-beda' : ''}" id="im-banding" data-uji="im-banding">${beda ? ikon('alert-triangle', 'ikon-sm') : ''} ${formatAngka(cocok)} soal cocok, ${formatAngka(beda)} soal kunci beda dari hitungan Claude, ${formatAngka(lain)} soal tidak dicocokkan.</p>
+    ${beda ? h`<label class="saklar" data-uji="im-hanya-beda-label"><input type="checkbox" data-masuk="impor-hanya-beda" data-uji="im-hanya-beda"${imSt.hanyaBeda ? mentah(' checked') : ''}><span class="jalur"></span><span>Hanya yang beda</span></label>` : ''}`;
 }
 
 function imPerbaruiKaki() {
@@ -10364,6 +10411,7 @@ function imSegarkanKartu(i) {
   if (cb) { cb.checked = s.dipilih && bisa; cb.disabled = !bisa; }
   pasang(el('[data-im-status]', li), htmlImStatus(s));
   pasang(el('[data-im-kurang]', li), htmlImKurang(s));
+  pasang(el('[data-im-beda]', li), htmlImBeda(s));
   imSegarkanGambarKartu(li, s);
   imPerbaruiRingkas();
   imPerbaruiPanelGambar();
@@ -10397,6 +10445,11 @@ MASUKAN['impor-isi'] = function (t) {
     }
   }
   imSegarkanKartu(i);
+};
+
+MASUKAN['impor-hanya-beda'] = function (cb) {
+  imSt.hanyaBeda = !!cb.checked;
+  semua('.im-kartu').forEach(function (li) { li.hidden = imSt.hanyaBeda && li.getAttribute('data-beda') !== '1'; });
 };
 
 MASUKAN['impor-paham'] = function (cb) {
@@ -10465,6 +10518,7 @@ function imAnalisis(tombol) {
       imSt.soal = d.soal.map(imBuatModel);
       imSt.tahap = 'periksa';
       imSt.paham = false;
+      imSt.hanyaBeda = false;
       imSt.kotor = false;
       imSt.modal.ganti(htmlImPeriksa());
       imPerbaruiRingkas();
@@ -10488,7 +10542,8 @@ function imSimpan(tombol) {
       if (imSt.modal) imSt.modal.tutup('disimpan');
       const tebakan = muatan.soal.filter(function (x) { return x.kunciStatus === 'claude'; }).length;
       const kurangSimpan = r.belumLengkap || 0;
-      toast(formatAngka(r.tersimpan) + ' soal diimpor sebagai Draf.' + (kurangSimpan ? ' ' + formatAngka(kurangSimpan) + ' di antaranya belum lengkap dan ditandai di daftar soal; lengkapi lewat tombol ubah sebelum paket diterbitkan.' : '') + (tebakan ? ' ' + formatAngka(tebakan) + ' di antaranya berkunci tebakan Claude dan harus Anda periksa dulu sebelum paket bisa diterbitkan.' : (kurangSimpan ? '' : ' Periksa sekali lagi di daftar soal sebelum menerbitkan.')), 'sukses');
+      const bedaSimpan = r.kunciBeda || 0;
+      toast(formatAngka(r.tersimpan) + ' soal diimpor sebagai Draf.' + (kurangSimpan ? ' ' + formatAngka(kurangSimpan) + ' di antaranya belum lengkap dan ditandai di daftar soal; lengkapi lewat tombol ubah sebelum paket diterbitkan.' : '') + (bedaSimpan ? ' ' + formatAngka(bedaSimpan) + ' di antaranya berkunci beda dari hitungan Claude dan harus Anda periksa dulu sebelum paket bisa diterbitkan.' : '') + (tebakan ? ' ' + formatAngka(tebakan) + ' di antaranya berkunci tebakan Claude dan harus Anda periksa dulu sebelum paket bisa diterbitkan.' : (kurangSimpan || bedaSimpan ? '' : ' Periksa sekali lagi di daftar soal sebelum menerbitkan.')), 'sukses');
       return segarkanEditor();
     });
   }).catch(function (e) {

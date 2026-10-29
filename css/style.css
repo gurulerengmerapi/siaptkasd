@@ -1407,6 +1407,14 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
   .im-kartu { padding: .875rem; }
 }
 
+.im-kartu[hidden] { display: none; }
+.im-beda { display: flex; gap: .625rem; align-items: flex-start; padding: .75rem .875rem; background: var(--warn-bg); color: var(--warn-text); border: 1px solid var(--warn-border); border-radius: var(--r-md); }
+.im-beda > div { display: grid; gap: .375rem; min-width: 0; }
+.im-beda-kunci { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; margin: 0; }
+.im-beda-kunci dt { font-size: .8125rem; }
+.im-beda-kunci dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+.im-banding-beda { font-weight: 600; }
+
 
 .sembunyi-sempit { }
 @media (max-width: 767px) { .sembunyi-sempit { display: none; } }
