@@ -2194,13 +2194,14 @@ function htmlPeringkatIsi(kode) {
   }
   return h`<div class="bungkus-tabel papan-tabel"><table class="tabel papan" data-uji="peringkat-tabel">
     <caption class="sr-only">Peringkat ${MAPEL[kode]}, paling banyak ${formatAngka(daftar.length)} baris</caption>
-    <thead><tr><th scope="col">Peringkat</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col">Rerata</th></tr></thead>
+    <thead><tr><th scope="col">Peringkat</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col" class="angka">Paket</th><th scope="col">Rerata</th></tr></thead>
     <tbody>${daftar.map(function (r) {
       const atas = r.peringkat <= 3;
       return h`<tr class="${atas ? 'papan-atas' : ''}" data-uji="peringkat-baris">
         <td data-label="Peringkat" class="papan-no"><span class="papan-lencana${atas ? ' papan-lencana-atas' : ''}">${atas ? ikon('award', 'ikon-sm') : ''}<span class="angka">${formatAngka(r.peringkat)}</span></span></td>
         <td data-label="Nama" class="pecah papan-nama">${r.nama}</td>
         <td data-label="Sekolah" class="pecah papan-sekolah">${r.sekolah || '—'}</td>
+        <td data-label="Paket" class="angka papan-paket" data-uji="peringkat-paket">${formatAngka(r.paket || 0)}</td>
         <td data-label="Rerata" class="angka papan-rerata">${formatAngka(r.rerata, 2)}</td></tr>`;
     })}</tbody></table></div>`;
 }
@@ -2210,7 +2211,7 @@ function htmlPapanPeringkat(data, maks) {
   prSt.mapel = prMapelAwal(prSt.data);
   return h`<section class="papan-peringkat" aria-labelledby="h-papan" data-uji="papan">
     <div class="papan-kepala"><div><h2 id="h-papan">Peringkat per mata pelajaran</h2>
-      <p class="pengantar">Dihitung dari rerata nilai Try Out Utama. Tiap mata pelajaran dihitung sendiri, dan rerata yang sama berarti peringkat bersama. Nama siswa yang disembunyikan Admin tampil sebagai &quot;Nama disembunyikan&quot;${maks ? ' (paling banyak ' + formatAngka(maks) + ' baris)' : ''}.</p></div></div>
+      <p class="pengantar">Dihitung dari rerata nilai Try Out Utama: rerata tiap paket dijumlahkan lalu dibagi jumlah paket yang dikerjakan, sehingga mengulang satu paket tidak menambah bobotnya. Tiap mata pelajaran dihitung sendiri, dan rerata yang sama berarti peringkat bersama. Nama siswa yang disembunyikan Admin tampil sebagai &quot;Nama disembunyikan&quot;${maks ? ' (paling banyak ' + formatAngka(maks) + ' baris)' : ''}.</p></div></div>
     <div class="papan-tab" role="tablist" aria-label="Mata pelajaran">${MAPEL_URUT.map(function (k) {
       const aktif = k === prSt.mapel;
       return h`<button type="button" class="papan-tab-btn" role="tab" id="pr-tab-${k}" aria-controls="pr-panel" aria-selected="${aktif ? 'true' : 'false'}" tabindex="${aktif ? '0' : '-1'}" data-aksi="pr-tab" data-mapel="${k}" data-pr-tab>${ikon(IKON_MAPEL[k], 'ikon-sm')}<span>${MAPEL[k]}</span></button>`;
@@ -9263,7 +9264,7 @@ function psNamaPilihan(k) { return k === 'RERATA' ? 'rerata tiga mapel' : (MAPEL
 function renderPeringkatSiswa(p, c) {
   psSt.mapel = 'RERATA'; psSt.lingkup = 'global'; psSt.sekolah = ''; psSt.q = ''; psSt.halaman = 1; psSt.data = null; psSt.opsi = null;
   pasang(c.wadah, h`
-    ${kepalaHalaman('Peringkat Siswa', 'Peringkat semua siswa berakun menurut Try Out Utama, secara global atau per sekolah. Dasar hitungnya sama dengan papan peringkat di beranda.')}
+    ${kepalaHalaman('Peringkat Siswa', 'Peringkat semua siswa berakun menurut Try Out Utama, secara global atau per sekolah. Rerata dihitung dari rerata tiap paket dibagi jumlah paket yang dikerjakan, sama dengan papan peringkat di beranda.')}
     <div class="ps-kontrol" data-uji="ps-kontrol">
       <fieldset class="isian fieldset-polos"><legend class="label">Peringkat berdasarkan</legend>
         <div class="segmen" role="radiogroup" aria-label="Peringkat berdasarkan" data-uji="ps-mapel">
@@ -9373,7 +9374,7 @@ function psSel(x, gabung, d) {
     <td class="pecah ps-sekolah" data-label="Sekolah">${x.sekolah || '—'}</td>
     <td class="angka ps-rerata" data-label="Rerata">${rerata}</td>
     ${gabung ? d.kodeMapel.map(function (k, i) { return h`<td class="angka ps-mapel" data-label="${NAMA_MENU_MAPEL[k] || k}">${x.perMapel && x.perMapel[i] !== null && x.perMapel[i] !== undefined ? formatAngka(x.perMapel[i], 2) : '—'}</td>`; }) : ''}
-    <td class="angka ps-jumlah" data-label="Try Out">${formatAngka(x.jumlah)}</td></tr>`;
+    <td class="angka ps-jumlah" data-label="Paket">${formatAngka(x.jumlah)}</td></tr>`;
 }
 
 function psGambar() {
@@ -9391,7 +9392,7 @@ function psGambar() {
     <div class="bungkus-tabel ps-bungkus"><table class="tabel ps-tabel${gabung ? ' ps-gabung' : ''}" data-uji="ps-tabel">
       <caption class="sr-only">Peringkat ${psNamaPilihan(d.mapel)}${d.lingkup === 'sekolah' ? ' di ' + d.sekolah : ' global'}, ${formatAngka(d.total)} siswa</caption>
       <thead><tr><th scope="col">Peringkat</th><th scope="col">Nama</th><th scope="col">Sekolah</th><th scope="col" class="angka">${gabung ? 'Rerata 3 mapel' : 'Rerata'}</th>
-        ${gabung ? d.kodeMapel.map(function (k) { return h`<th scope="col" class="angka">${NAMA_MENU_MAPEL[k] || k}</th>`; }) : ''}<th scope="col" class="angka">Try Out</th></tr></thead>
+        ${gabung ? d.kodeMapel.map(function (k) { return h`<th scope="col" class="angka">${NAMA_MENU_MAPEL[k] || k}</th>`; }) : ''}<th scope="col" class="angka">Paket</th></tr></thead>
       <tbody>${d.daftar.map(function (x) { return psSel(x, gabung, d); })}</tbody></table></div>
     ${maks > 1 ? h`<div class="baris-bungkus jarak-atas" data-uji="ps-halaman">
       <button type="button" class="tombol tombol-garis" data-aksi="ps-halaman" data-ke="${d.halaman - 1}"${d.halaman <= 1 ? mentah(' disabled') : ''}>${ikon('chevron-left')}<span>Sebelumnya</span></button>
@@ -9434,7 +9435,7 @@ function psXlsx(d) {
   const gabung = d.mapel === 'RERATA';
   const kolom = [{ judul: 'Peringkat', lebar: 11, tipe: 'bulat' }, { judul: 'Nama', lebar: 34 }, { judul: 'Sekolah', lebar: 30 }, { judul: gabung ? 'Rerata 3 mapel' : 'Rerata', lebar: 16, tipe: 'desimal2' }];
   if (gabung) d.kodeMapel.forEach(function (k) { kolom.push({ judul: NAMA_MENU_MAPEL[k] || k, lebar: 14, tipe: 'desimal2' }); });
-  kolom.push({ judul: 'Jumlah Try Out', lebar: 15, tipe: 'bulat' }, { judul: 'Keterangan', lebar: 34 });
+  kolom.push({ judul: 'Jumlah Paket', lebar: 15, tipe: 'bulat' }, { judul: 'Keterangan', lebar: 34 });
   const baris = d.daftar.map(function (x) {
     const r = [x.peringkat === null ? '' : x.peringkat, x.nama, x.sekolah || '', x.rerata === null ? '' : x.rerata];
     if (gabung) d.kodeMapel.forEach(function (k, i) { r.push(x.perMapel && x.perMapel[i] !== null && x.perMapel[i] !== undefined ? x.perMapel[i] : ''); });
@@ -9446,7 +9447,7 @@ function psXlsx(d) {
     return r;
   });
   const lingkupTeks = d.lingkup === 'sekolah' ? 'Per sekolah: ' + d.sekolah : 'Global (semua siswa)' + (d.sekolah ? ', ditampilkan hanya ' + d.sekolah : '');
-  const catatan = ['Dasar hitung sama dengan papan peringkat beranda: Try Out Utama, siswa berakun aktif, urutan rerata, lalu jumlah Try Out, lalu nama; rerata yang sama berbagi peringkat.'];
+  const catatan = ['Dasar hitung sama dengan papan peringkat beranda: Try Out Utama, siswa berakun aktif, urutan rerata, lalu jumlah paket, lalu nama; rerata yang sama berbagi peringkat. Rerata = jumlah rerata tiap paket dibagi jumlah paket yang dikerjakan (mengulang satu paket tidak menambah bobotnya).'];
   if (gabung) catatan.push('Rerata 3 mapel = rata-rata tiga rerata mapel (bobot sama); hanya siswa yang punya nilai ketiga mapel yang berperingkat.');
   if (d.terpotong) catatan.push('Daftar dipotong pada ' + formatAngka(d.daftar.length) + ' baris pertama dari ' + formatAngka(d.total) + '.');
   const lembar = [{

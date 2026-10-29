@@ -1504,15 +1504,18 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
 }
 .papan-lencana-atas { background: var(--primary-soft); color: var(--on-primary-soft); border: 2px solid var(--primary-text); }
 .papan .papan-rerata { font-weight: 700; text-align: right; }
+.papan .papan-paket { color: var(--text-muted); text-align: right; }
 .papan th:last-child { text-align: right; }
 .papan-kosong { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); }
 @media (max-width: 1179px) {
-  .papan tr { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "no nama rerata" "no sekolah rerata"; column-gap: .875rem; align-items: center; }
+  .papan tr { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "no nama rerata" "no sekolah rerata" "no paket rerata"; column-gap: .875rem; align-items: center; }
   .papan td { display: block; padding: .125rem 0; border: 0; text-align: left; }
   .papan td::before { content: none; }
   .papan td.papan-no { grid-area: no; width: auto; }
   .papan td.papan-nama { grid-area: nama; font-weight: 600; }
   .papan td.papan-sekolah { grid-area: sekolah; color: var(--text-muted); font-size: .9375rem; }
+  .papan td.papan-paket { grid-area: paket; font-size: .875rem; text-align: left; }
+  .papan td.papan-paket::before { content: "Paket dikerjakan: "; }
   .papan td.papan-rerata { grid-area: rerata; font-size: 1.125rem; text-align: right; }
 }
 
