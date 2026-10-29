@@ -7210,7 +7210,7 @@ function formPaket(pk, kunci) {
     </div>
     <div class="kelompok-isian">
       <div class="isian"><label for="pk-f-tampil">Hasil untuk siswa</label><select class="kontrol" id="pk-f-tampil" name="tampil_hasil">${Object.keys(LABEL_TAMPIL).map(function (k) { return h`<option value="${k}"${v.tampilHasil === k ? mentah(' selected') : ''}>${LABEL_TAMPIL[k]}</option>`; })}</select></div>
-      <div class="isian"><label for="pk-f-jalur">Jalur akses</label><select class="kontrol" id="pk-f-jalur" name="jalur_akses">${Object.keys(LABEL_JALUR).map(function (k) { return h`<option value="${k}"${v.jalurAkses === k ? mentah(' selected') : ''}>${LABEL_JALUR[k]}</option>`; })}</select></div>
+      <div class="isian"><label for="pk-f-jalur">Jalur akses</label><select class="kontrol" id="pk-f-jalur" name="jalur_akses">${Object.keys(LABEL_JALUR).filter(function (k) { return S.pengguna.peran === PERAN.ADMIN || k === 'Member' || k === v.jalurAkses; }).map(function (k) { return h`<option value="${k}"${v.jalurAkses === k ? mentah(' selected') : ''}>${LABEL_JALUR[k]}</option>`; })}</select>${S.pengguna.peran === PERAN.ADMIN ? '' : h`<p class="bantu" data-uji="pk-jalur-guru">Guru membuat paket untuk siswa member. Paket dengan kode ujian (token) hanya diatur oleh Admin.</p>`}</div>
     </div>
   </form>`;
 }
@@ -8631,7 +8631,7 @@ KIRIM['video-simpan'] = function (form) {
 const KELAS_STATUS_TOKEN = { Aktif: 'lencana-sukses', 'Belum berlaku': 'lencana-info', Kedaluwarsa: 'lencana-peringatan', Habis: 'lencana-peringatan', Dicabut: 'lencana-bahaya' };
 let tokenStaf = { idPaket: '', daftar: [] };
 
-function adaJalurToken(pk) { return pk && (pk.jalurAkses === 'Token' || pk.jalurAkses === 'Keduanya'); }
+function adaJalurToken(pk) { return !!pk && S.pengguna.peran === PERAN.ADMIN && (pk.jalurAkses === 'Token' || pk.jalurAkses === 'Keduanya'); }
 
 function kerangkaPanelToken(pk) {
   const bisaBuat = pk.status === 'Terbit';
