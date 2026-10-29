@@ -780,6 +780,8 @@ dl.data { margin: 0; }
 .ky-isi { border-top: 1.5px solid currentColor; padding: 0 .2em; margin-top: .15em; }
 .ky-gambar-bungkus { display: block; margin: .4em 0; }
 .ky-gambar { display: block; max-width: 100%; height: auto; border-radius: var(--r); }
+.ky-gambar-bungkus.ky-sebaris { display: inline-block; margin: 0 .15em; vertical-align: middle; max-width: 100%; }
+.ky-sebaris .ky-gambar { display: inline-block; vertical-align: middle; background: #fff; }    
 .ky-gambar-kosong { display: inline-block; padding: .1em .5em; border: 1px dashed var(--border-strong, currentColor); border-radius: 6px; color: var(--text-muted); font-size: .9em; }
 
 .penyunting-bar { border: 1px solid var(--input-border); border-radius: var(--r); background: var(--surface-2); position: sticky; top: -1.5rem; z-index: 3; margin-bottom: 12px; }  

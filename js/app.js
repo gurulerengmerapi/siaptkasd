@@ -753,6 +753,8 @@ function kayaSimpul(x, o) {
   return '<' + tag + '>' + kayaIsi(Array.isArray(x.c) ? x.c : [], o) + '</' + tag + '>';
 }
 
+const KY_SEBARIS_TINGGI_MAKS = 90;
+const KY_SEBARIS_LEBAR_MAKS = 400;
 function kayaGambar(x, o) {
   const info = typeof o.gambar === 'function' ? o.gambar(x.m) : mediaInfo(x.m);
   const url = urlHttps(info && typeof info === 'object' ? info.u : info);
@@ -761,7 +763,8 @@ function kayaGambar(x, o) {
   if (!url) return '<span class="ky-gambar-kosong" ' + (o.penyunting ? '' : 'role="img" aria-label="' + esc(label) + '"') + atom + '>[gambar]</span>';
   const w = info && typeof info === 'object' ? (info.w | 0) : 0, hh = info && typeof info === 'object' ? (info.h | 0) : 0;
   const ukuran = w > 0 && hh > 0 ? ' width="' + w + '" height="' + hh + '"' : '';
-  return '<span class="ky-gambar-bungkus"' + atom + '><img class="ky-gambar" src="' + esc(url) + '" alt="' + esc(o.penyunting ? '' : (x.alt || '')) + '"' + ukuran + ' loading="lazy" decoding="async" draggable="false"></span>';
+  const sebaris = w > 0 && hh > 0 && hh <= KY_SEBARIS_TINGGI_MAKS && w <= KY_SEBARIS_LEBAR_MAKS;
+  return '<span class="ky-gambar-bungkus' + (sebaris ? ' ky-sebaris' : '') + '"' + atom + '><img class="ky-gambar" src="' + esc(url) + '" alt="' + esc(o.penyunting ? '' : (x.alt || '')) + '"' + ukuran + ' loading="lazy" decoding="async" draggable="false"></span>';
 }
 
 function kayaBlokTampil(b, o) {
