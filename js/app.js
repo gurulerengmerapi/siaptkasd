@@ -2060,8 +2060,10 @@ function htmlBanner(daftar, o) {
       const tautan = urlHttps(b.tautan);
       const w = Math.max(0, parseInt(b.lebar, 10) || 0), t = Math.max(0, parseInt(b.tinggi, 10) || 0);
       return h`<article class="banner-slaid" role="group" aria-roledescription="slide" aria-label="${(i + 1) + ' dari ' + n}" data-bn-slaid${i ? mentah(' aria-hidden="true" inert') : ''}>
-        <div class="banner-gambar"><img src="${u}" alt="${b.alt || ''}"${w && t ? mentah(' width="' + w + '" height="' + t + '"') : ''} decoding="async" referrerpolicy="no-referrer"${i ? mentah(' loading="lazy"') : ''} data-bn-gambar></div>
-        ${b.judul || b.teks || tautan ? h`<div class="banner-teks">${b.judul ? h`<h3>${b.judul}</h3>` : ''}${b.teks ? h`<p>${b.teks}</p>` : ''}${tautan ? h`<a class="tombol tombol-garis tombol-kecil" href="${tautan}" target="_blank" rel="noopener noreferrer" data-uji="banner-tautan">${b.labelTautan || 'Buka tautan'}${ikon('external-link', 'ikon-sm')}<span class="sr-only"> (dibuka di tab baru)</span></a>` : ''}</div>` : ''}
+        ${tautan
+          ? h`<a class="banner-gambar banner-gambar-tautan" href="${tautan}" target="_blank" rel="noopener noreferrer" data-uji="banner-tautan"><img src="${u}" alt="${b.alt || ''}"${w && t ? mentah(' width="' + w + '" height="' + t + '"') : ''} decoding="async" referrerpolicy="no-referrer"${i ? mentah(' loading="lazy"') : ''} data-bn-gambar><span class="sr-only"> Buka tautan (dibuka di tab baru)</span></a>`
+          : h`<div class="banner-gambar"><img src="${u}" alt="${b.alt || ''}"${w && t ? mentah(' width="' + w + '" height="' + t + '"') : ''} decoding="async" referrerpolicy="no-referrer"${i ? mentah(' loading="lazy"') : ''} data-bn-gambar></div>`}
+        ${b.judul || b.teks ? h`<div class="banner-teks">${b.judul ? h`<h3>${b.judul}</h3>` : ''}${b.teks ? h`<p>${b.teks}</p>` : ''}</div>` : ''}
       </article>`;
     })}</div>
     ${banyak ? h`<button type="button" class="banner-panah banner-panah-kiri" data-aksi="bn-sebelumnya" aria-label="Banner sebelumnya">${ikon('chevron-left')}</button>
@@ -12734,11 +12736,8 @@ function formBanner(m) {
     <div class="isian"><label for="bn-f-teks">Teks</label><textarea class="kontrol" id="bn-f-teks" name="teks" rows="3" maxlength="200" placeholder="Satu atau dua kalimat singkat">${v.teks}</textarea></div>
     <div class="isian"><label for="bn-f-alt">Teks pengganti gambar</label><input class="kontrol" id="bn-f-alt" name="alt" type="text" maxlength="200" value="${v.alt}" aria-describedby="bn-f-alt-b" placeholder="Contoh: Siswa sedang mengerjakan try out di kelas">
       <p class="bantu" id="bn-f-alt-b">Dibacakan pembaca layar dan tampil bila gambar gagal dimuat. Isi judul atau teks pengganti (boleh keduanya).</p></div>
-    <div class="kelompok-isian">
-      <div class="isian"><label for="bn-f-tautan">Tautan (opsional)</label><input class="kontrol" id="bn-f-tautan" name="tautan" type="url" maxlength="500" inputmode="url" value="${v.tautan}" autocomplete="off" placeholder="https:&#47;&#47;…"></div>
-      <div class="isian"><label for="bn-f-label">Label tautan</label><input class="kontrol" id="bn-f-label" name="label_tautan" type="text" maxlength="30" value="${v.labelTautan}" placeholder="Selengkapnya"></div>
-    </div>
-    <p class="bantu">Tautan harus diawali https:&#47;&#47; dan dibuka di tab baru. Label hanya berlaku bila tautan diisi.</p>
+    <div class="isian"><label for="bn-f-tautan">Tautan (opsional)</label><input class="kontrol" id="bn-f-tautan" name="tautan" type="url" maxlength="500" inputmode="url" value="${v.tautan}" autocomplete="off" placeholder="https:&#47;&#47;…"></div>
+    <p class="bantu">Bila diisi, seluruh gambar banner menjadi tautan: pengunjung cukup mengklik banner untuk membukanya di tab baru. Tautan harus diawali https:&#47;&#47;.</p>
     ${baru ? h`<label class="gb-hiasan"><input type="checkbox" name="aktif" checked><span>Langsung aktifkan di beranda</span></label>` : ''}
   </form>`;
 }
@@ -12800,11 +12799,10 @@ KIRIM['banner-simpan'] = function (form) {
   if (bnSt.hasil && (bnSt.hasil.lebar < 320 || bnSt.hasil.tinggi < 120)) { galatIsian(form, 'berkas', 'Gambar terlalu kecil. Pakai gambar minimal 320×120 piksel.'); return; }
   if (!v.judul && !v.alt) { galatIsian(form, 'alt', 'Isi judul atau teks pengganti gambar, supaya pembaca layar dapat menjelaskan banner ini.'); return; }
   if (v.tautan && !urlHttps(v.tautan)) { galatIsian(form, 'tautan', 'Tautan harus diawali https:\/\/ dan tidak boleh berisi spasi.'); return; }
-  if (v.label_tautan && !v.tautan) { galatIsian(form, 'label_tautan', 'Label hanya berarti bila tautan diisi.'); return; }
   form.setAttribute('data-sibuk', 'ya');
   const hsl = bnSt.hasil;
   kerjakan(tombolKirim(form), function () {
-    const data = { judul: v.judul, teks: v.teks, alt: v.alt, tautan: v.tautan, label_tautan: v.label_tautan };
+    const data = { judul: v.judul, teks: v.teks, alt: v.alt, tautan: v.tautan };
     if (id) data.id = id; else data.aktif = !!v.aktif;
     const langkah = hsl ? gbBase64(hsl.blob).then(function (b64) { data.gambar = { data: b64, tipe: hsl.tipe, nama: bnSt.nama || 'banner' }; }) : Promise.resolve();
     return langkah.then(function () { return panggil('banner.simpan', data); });

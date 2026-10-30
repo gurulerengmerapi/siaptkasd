@@ -1448,6 +1448,8 @@ input:checked + .penanda.penanda-kotak .ikon { opacity: 1; }
   overflow: hidden; box-shadow: var(--shadow-1); container-type: inline-size;
 }
 .banner-gambar { position: relative; aspect-ratio: 16 / 7; background: var(--surface-2); overflow: hidden; }
+.banner-gambar-tautan { display: block; cursor: pointer; color: inherit; text-decoration: none; }
+.banner-gambar-tautan:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
 .banner-gambar img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .banner-ruang .banner-gambar { border-radius: 0; }
 .banner-ruang .kerangka { width: 100%; height: 100%; border-radius: 0; }
