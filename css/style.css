@@ -1921,3 +1921,25 @@ tr[data-koneksi="lambat"] td:first-child { box-shadow: inset 4px 0 0 var(--warn-
   .ps-tabel td.ps-nama { font-weight: 600; }
   .ps-tabel td.ps-no { align-items: center; }
 }
+
+
+.target-kisi { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: .75rem 0 1rem; }
+@media (max-width: 767px) { .target-kisi { grid-template-columns: 1fr; } }
+.target-isian > label { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+.target-masuk { display: flex; align-items: center; gap: .5rem; }
+.target-masuk .kontrol { flex: 1 1 auto; min-width: 0; font-variant-numeric: tabular-nums; }
+.target-masuk .tombol { flex: none; }
+.target-aksi { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.target-bagus { background: var(--success-bg); color: var(--success-text); border-color: color-mix(in srgb, var(--success-text) 25%, transparent); }
+.target-bagus .ikon-bulat { background: color-mix(in srgb, var(--success-text) 18%, transparent); color: var(--success-text); }
+.target-bar { margin: .5rem 0; }
+.target-bar .progres-isi { background: var(--aksen, var(--primary-text)); }
+.target-motivasi { margin: .5rem 0 0; color: var(--text-muted); font-size: .9375rem; }
+
+.judul-bagian-baris { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem .75rem; margin: 1.5rem 0 .75rem; }
+.judul-bagian-baris .judul-bagian { margin: 0; }
+
+.hasil-target { display: inline-flex; align-items: flex-start; gap: .5rem; max-width: 36rem; margin: .5rem 0 0; padding: .5rem .875rem; border-radius: var(--r-lg, 12px); background: var(--surface); color: var(--text); font-weight: 600; font-size: .9375rem; border: 1px solid var(--border-strong); text-align: left; }
+.hasil-target .ikon { flex: none; margin-top: .125rem; color: var(--primary-text); }
+.hasil-target.tercapai { background: var(--success-bg); color: var(--success-text); border-color: color-mix(in srgb, var(--success-text) 25%, transparent); }
+.hasil-target.tercapai .ikon { color: var(--success-text); }

@@ -3671,6 +3671,7 @@ function htmlNilaiMeriah(d) {
     ${d.skor !== undefined ? h`<span class="teks-redam angka">Skor ${angkaSkor(d.skor)} dari ${angkaSkor(d.skorMaks)}</span>` : ''}
     <div class="hasil-pesan" data-uji="hasil-pesan"><h3>${ikon(pesan.ikon)}<span>${pesan.judul}</span></h3><p>${pesan.isi}</p></div>
     ${bandingHasil(nilai, d.sebelumnya)}
+    ${htmlTargetHasil(d.target, nilai)}
   </div>`;
 }
 function isiCincin() {
@@ -4381,13 +4382,18 @@ function renderBerandaSiswa(p, c) {
     pasang(c.wadah, h`
       ${sapaBeranda(u.nama, d)}
       ${peringatanBerjalan(d.berjalan)}
+      ${d.target && d.target.siap && d.target.belumDiisi > 0 ? h`<div class="jarak-bawah">${kartuTargetSiswa(d)}</div>` : ''}
       <div class="kisi-kpi kisi-kpi-2">
         ${kpi('check-circle', 'Ujian selesai', d.selesai, d.tersembunyi > 0 ? formatAngka(d.tersembunyi) + ' tanpa nilai tampil' : 'Semua percobaan yang diselesaikan', 'sukses')}
         ${kpi('package', 'Paket tersedia', d.jumlahPaket, 'Try Out dan Latihan untuk Anda')}
         ${kpiTeks('award', 'Nilai tertinggi', tertinggi ? tertinggi.nilaiTeks : '—', tertinggi ? tertinggiMapel + ' · ' + tertinggi.namaPaket : 'Belum ada nilai yang tampil')}
         ${kpiTeks('target', 'Mapel dilatih', formatAngka(dilatih) + ' dari ' + formatAngka(d.mapel.length), 'Matematika, Bahasa Indonesia, IPA')}
       </div>
-      <h3 class="judul-bagian">Perkembangan nilai</h3>
+      ${kartuDibawahTarget(d)}
+      ${d.target && d.target.siap && d.target.belumDiisi === 0 ? h`<div class="jarak-atas jarak-bawah">${kartuTargetSiswa(d)}</div>` : ''}
+      <div class="baris-bungkus judul-bagian-baris"><h3 class="judul-bagian">Perkembangan nilai</h3>
+        <button type="button" class="tombol tombol-garis tombol-kecil" data-aksi="saya-unduh-pdf" data-uji="saya-unduh"${d.selesai > 0 ? '' : mentah(' disabled')}>${ikon('download')}<span>Unduh perkembangan (PDF)</span></button></div>
+      <div id="saya-unduh-pesan" class="jarak-bawah" data-uji="saya-unduh-pesan" aria-live="polite"></div>
       <div class="kisi-mapel">${d.mapel.map(kartuMapel)}</div>
       <div class="dasbor-2 jarak-atas">
         <section aria-labelledby="bs-saran-j"><h3 class="judul-bagian" id="bs-saran-j">Rekomendasi Try Out Utama</h3>${kartuSaran(d.saran, d.berjalan)}</section>
@@ -4692,6 +4698,233 @@ AKSI['materi-siswa-buka'] = function (b) {
     const a = el('a[data-ms-tautan]', st);
     if (a) a.setAttribute('href', url);
   }).catch(function (e) { pbLaporGalat(st, e); });
+};
+
+
+const TG_MOTIVASI = {
+  dekat: [
+    'Tinggal sedikit lagi! Satu kali coba lagi bisa mencapai targetmu.',
+    'Hampir sampai! Periksa lagi soal yang salah, lalu coba lagi.',
+    'Sedikit lagi, kamu pasti bisa!'
+  ],
+  sedang: [
+    'Kamu sudah di jalur yang tepat. Pelajari pembahasannya, lalu ulangi.',
+    'Selisihnya masih bisa dikejar. Baca pembahasan sebelum mencoba lagi.',
+    'Terus berlatih, nilaimu bisa naik di percobaan berikutnya.'
+  ],
+  jauh: [
+    'Mulai dari soal yang salah, pelajari pembahasannya, lalu coba lagi pelan-pelan.',
+    'Tidak apa-apa belum sampai. Setiap percobaan membuatmu lebih siap.',
+    'Targetnya masih jauh, tetapi bisa didekati selangkah demi selangkah.'
+  ]
+};
+
+function tgPesan(kurang, kunci) {
+  const daftar = kurang <= 5 ? TG_MOTIVASI.dekat : (kurang <= 15 ? TG_MOTIVASI.sedang : TG_MOTIVASI.jauh);
+  let n = 0;
+  String(kunci || '').split('').forEach(function (c) { n += c.charCodeAt(0); });
+  return daftar[n % daftar.length];
+}
+
+function tgAngka(v) { return formatAngka(v, v % 1 === 0 ? 0 : 2); }
+
+function kartuTargetSiswa(d) {
+  const t = d.target;
+  if (!t || !t.siap) return '';
+  const belum = t.belumDiisi;
+  const isian = t.mapel.map(function (m) {
+    return h`<div class="isian target-isian mp-${m.kode}">
+      <label for="tg-${m.kode}"><span class="ikon-bulat mapel" aria-hidden="true">${ikon(IKON_MAPEL[m.kode] || 'book-open', 'ikon-sm')}</span><span>${m.nama}</span></label>
+      <div class="target-masuk"><input class="kontrol" id="tg-${m.kode}" type="number" inputmode="numeric" min="10" max="100" step="1" placeholder="Contoh: ${m.saran}" value="${m.target === null ? '' : m.target}" data-kode="${m.kode}" data-saran="${m.saran}" data-uji="tg-${m.kode}" autocomplete="off" aria-describedby="tg-bantu">
+      ${m.target === null ? h`<button type="button" class="tombol tombol-garis tombol-kecil" data-aksi="target-pakai-saran" data-kode="${m.kode}" data-uji="tg-saran-${m.kode}">Pakai ${m.saran}</button>` : ''}</div></div>`;
+  });
+  return h`<section class="kartu target-kartu" aria-labelledby="tg-judul" data-uji="tg-kartu" data-belum="${belum}">
+    <div class="kartu-judul"><span class="ikon-bulat">${ikon('target')}</span><h3 id="tg-judul">Target nilaimu</h3></div>
+    ${belum > 0 ? h`<div class="peringatan peringatan-info jarak-bawah" data-uji="tg-pengingat">${ikon('info')}<div><p>${belum === t.mapel.length ? 'Atur target nilai untuk setiap mata pelajaran.' : 'Masih ada ' + formatAngka(belum) + ' mata pelajaran tanpa target.'} Dengan target, kamu tahu paket mana yang perlu diulang. Kamu bebas mengisinya nanti.</p></div></div>` : ''}
+    <p class="bantu" id="tg-bantu">Isi angka 10 sampai 100. Kolom boleh dikosongkan bila belum ingin memasang target. Target tidak mengubah nilai maupun peringkat.</p>
+    <div class="target-kisi">${isian}</div>
+    <div class="target-aksi"><button type="button" class="tombol" data-aksi="target-simpan" data-uji="tg-simpan">${ikon('check')}<span>Simpan target</span></button><span class="bantu tanpa-margin" id="tg-pesan" role="status" aria-live="polite" data-uji="tg-pesan"></span></div>
+  </section>`;
+}
+
+function kartuPaketBelumTarget(x, sibuk) {
+  const persen = Math.max(0, Math.min(100, Math.round(x.terbaik / x.target * 100)));
+  return h`<article class="kartu paket-kartu mp-${x.mapel}" data-uji="tg-paket" data-id="${x.idPaket}">
+    <div class="judul-kartu"><span class="ikon-bulat mapel" aria-hidden="true">${ikon(IKON_MAPEL[x.mapel] || 'book-open', 'ikon-sm')}</span><h4>${x.namaPaket}</h4></div>
+    <div class="meta"><span class="lencana lencana-primer">${x.kategori}</span><span class="lencana">${MAPEL[x.mapel] || x.mapel}</span></div>
+    <div class="progres-baris target-bar"><div class="progres-jalur" role="progressbar" aria-label="Nilai terbaik dibanding target" aria-valuemin="0" aria-valuemax="${x.target}" aria-valuenow="${Math.min(x.terbaik, x.target)}" aria-valuetext="Nilai terbaik ${x.terbaikTeks} dari target ${x.target}"><span class="progres-isi" style="width:0" data-lebar="${persen}"></span></div><span class="progres-teks" data-uji="tg-kurang">−${tgAngka(x.kurang)}</span></div>
+    <div class="rincian"><span>${ikon('award', 'ikon-sm')} Terbaik <strong class="angka">${x.terbaikTeks}</strong></span><span>${ikon('target', 'ikon-sm')} Target <strong class="angka">${x.target}</strong></span><span>${ikon('refresh', 'ikon-sm')} Terakhir <strong class="angka">${x.terakhirTeks}</strong></span></div>
+    <p class="target-motivasi" data-uji="tg-motivasi">Tinggal ${tgAngka(x.kurang)} poin lagi. ${tgPesan(x.kurang, x.idPaket)}</p>
+    ${tombolMulaiPaket({ id: x.idPaket, nama: x.namaPaket, jumlahSoal: 0, durasiMenit: x.durasiMenit }, !!sibuk, false, true)}
+    ${sibuk ? h`<p class="bantu tanpa-margin">Selesaikan ujian yang sedang berjalan lebih dulu.</p>` : ''}</article>`;
+}
+
+function kartuDibawahTarget(d) {
+  const t = d.target;
+  if (!t || !t.siap || !t.mapel.some(function (m) { return m.target !== null; })) return '';
+  if (!t.dibawah.length) {
+    if (!d.selesai) return '';
+    return h`<section class="kartu target-bagus jarak-bawah" data-uji="tg-semua-capai"><div class="kartu-judul"><span class="ikon-bulat">${ikon('award')}</span><h3>Semua targetmu tercapai</h3></div>
+      <p class="tanpa-margin">Semua paket yang nilainya tampil sudah mencapai target. Hebat! Coba paket baru, atau naikkan targetmu agar terus tertantang.</p></section>`;
+  }
+  const lebih = t.jumlahDibawah - t.dibawah.length;
+  return h`<section aria-labelledby="tg-kejar-j" data-uji="tg-dibawah"><h3 class="judul-bagian" id="tg-kejar-j">Ayo kejar targetmu <span class="teks-redam">(${formatAngka(t.jumlahDibawah)} paket)</span></h3>
+    <div class="daftar-paket daftar-paket-sempit">${t.dibawah.map(function (x) { return kartuPaketBelumTarget(x, d.berjalan); })}</div>
+    ${lebih > 0 ? h`<p class="bantu" data-uji="tg-lebih">Dan ${formatAngka(lebih)} paket lainnya yang nilai terbaiknya juga belum mencapai target. Kerjakan yang di atas dulu; daftar ini terisi lagi setelah ada yang tercapai.</p>` : ''}
+  </section>`;
+}
+
+AKSI['target-pakai-saran'] = function (tombol) {
+  const kode = tombol.getAttribute('data-kode');
+  const kolom = el('#tg-' + kode);
+  if (!kolom) return;
+  kolom.value = kolom.getAttribute('data-saran') || '';
+  kolom.focus();
+  if (tombol.parentNode) tombol.parentNode.removeChild(tombol);
+};
+
+AKSI['target-simpan'] = function (tombol) {
+  const pesan = el('#tg-pesan');
+  const target = {};
+  let galat = '';
+  semua('input[data-kode][id^="tg-"]').forEach(function (kolom) {
+    const kode = kolom.getAttribute('data-kode');
+    const v = kolom.value.trim();
+    kolom.removeAttribute('aria-invalid');
+    if (v === '') { target[kode] = null; return; }
+    const n = Number(v.replace(',', '.'));
+    if (!isFinite(n) || n !== Math.floor(n) || n < 10 || n > 100) {
+      kolom.setAttribute('aria-invalid', 'true');
+      if (!galat) { galat = 'Target ' + (MAPEL[kode] || kode) + ' harus bilangan bulat 10 sampai 100.'; kolom.focus(); }
+      return;
+    }
+    target[kode] = n;
+  });
+  if (galat) { if (pesan) pesan.textContent = galat; return; }
+  if (pesan) pesan.textContent = '';
+  kerjakan(tombol, function () {
+    return panggil('target.simpan', { target: target }).then(function () {
+      toast('Target nilai tersimpan.', 'sukses');
+      navigateTo('dasbor', {}, { senyap: true, tanpaRiwayat: true });
+    });
+  }, 'Menyimpan…').catch(function (e) {
+    if (e && (e.kode === 'VALIDASI' || e.kode === 'BELUM_PASANG') && pesan) pesan.textContent = e.message;
+    else gagalUmum(e);
+  });
+};
+
+function htmlTargetHasil(t, nilai) {
+  if (!t) return '';
+  let ikonNama, kelas, teks;
+  if (t.barusajaTercapai) {
+    ikonNama = 'award'; kelas = 'tercapai';
+    teks = 'Target ' + t.target + ' tercapai! Selamat, kamu berhasil mencapai targetmu.';
+  } else if (isFinite(nilai) && nilai >= t.target) {
+    ikonNama = 'award'; kelas = 'tercapai';
+    teks = 'Nilaimu di atas target ' + t.target + ' lagi. Pertahankan ya!';
+  } else if (t.tercapai) {
+    ikonNama = 'check'; kelas = 'tercapai';
+    teks = 'Nilai terbaikmu (' + t.terbaikTeks + ') sudah mencapai target ' + t.target + '. Percobaan ini lebih rendah, tidak apa-apa.';
+  } else {
+    ikonNama = 'target'; kelas = 'belum';
+    teks = 'Target ' + t.target + ': kurang ' + tgAngka(t.kurang) + ' poin dari nilai terbaikmu (' + t.terbaikTeks + '). ' + tgPesan(t.kurang, t.target + ':' + t.terbaikTeks);
+  }
+  return h`<p class="hasil-target ${kelas}" data-uji="hasil-target" data-status="${kelas}">${ikon(ikonNama, 'ikon-sm')}<span>${teks}</span></p>`;
+}
+
+const SY_BATAS_BARIS_PDF = 200;
+
+function syPdf(d) {
+  const s = d.siswa;
+  const selesai = d.riwayat.filter(function (r) { return r.status === 'Selesai' || r.status === 'Waktu habis'; });
+  const bernilai = selesai.filter(function (r) { return typeof r.nilai === 'number'; });
+  const nilai = bernilai.map(function (r) { return r.nilai; });
+  const rerata = prkRerata(nilai);
+  const tertinggi = nilai.length ? Math.max.apply(null, nilai) : null;
+  const mapel = prkSusunMapel(d.riwayat);
+  const angka = function (v) { return v === null || v === undefined ? '-' : formatAngka(v, 2); };
+  const dok = pdfBuat({ judul: 'Perkembangan belajar: ' + s.nama, penulis: ekPenulis(), arah: 'tegak', kaki: namaApp() + ' · Perkembangan belajar siswa · dibuat ' + ekWaktuCetak() });
+  dok.judul('Perkembangan Belajar Siswa');
+  dok.teks(namaApp() + ' · dibuat ' + ekWaktuCetak(), { ukuran: 9, warna: PDF_WARNA.redam, jarakBawah: 6 });
+  dok.pasangan([['Nama siswa', s.nama], ['Sekolah', s.sekolah || '-'], ['Kelas', s.kelas || '-']], { kolom: 3 });
+  dok.kotakAngka([['Pengerjaan selesai', formatAngka(selesai.length)], ['Rata-rata nilai', angka(rerata)], ['Nilai tertinggi', angka(tertinggi)], ['Mata pelajaran', formatAngka(mapel.length)]]);
+
+  dok.teks('Ringkasan nilai per mata pelajaran', { ukuran: 11, tebal: true, jarakBawah: 3 });
+  if (mapel.length) {
+    dok.tabel({
+      ukuran: 9, maksBaris: 2,
+      kolom: [{ judul: 'Mata pelajaran', lebar: 3.2 }, { judul: 'Selesai', lebar: 1.2, rata: 'kanan' }, { judul: 'Rata-rata', lebar: 1.4, rata: 'kanan' }, { judul: 'Tertinggi', lebar: 1.4, rata: 'kanan' }, { judul: 'Terakhir', lebar: 1.4, rata: 'kanan' }],
+      baris: mapel.map(function (m) { return [m.nama, formatAngka(m.selesai), angka(m.rerata), angka(m.tertinggi), angka(m.terakhir)]; })
+    });
+  } else {
+    dok.teks('Belum ada pengerjaan selesai dengan nilai yang ditampilkan.', { ukuran: 9.5, warna: PDF_WARNA.redam });
+  }
+
+  if (d.target) {
+    const terbaikPaket = {};
+    bernilai.forEach(function (r) {
+      const k = r.idPaket || r.namaPaket;
+      if (!terbaikPaket[k] || r.nilai > terbaikPaket[k].nilai) terbaikPaket[k] = { nilai: r.nilai, mapel: r.mapel };
+    });
+    dok.teks('Target nilai', { ukuran: 11, tebal: true, jarakBawah: 3 });
+    dok.tabel({
+      ukuran: 9, maksBaris: 2,
+      kolom: [{ judul: 'Mata pelajaran', lebar: 3.2 }, { judul: 'Target', lebar: 1.2, rata: 'kanan' }, { judul: 'Nilai tertinggi', lebar: 1.8, rata: 'kanan' }, { judul: 'Paket mencapai target', lebar: 2.6, rata: 'kanan' }],
+      baris: d.target.map(function (m) {
+        const paket = Object.keys(terbaikPaket).filter(function (k) { return terbaikPaket[k].mapel === m.kode; });
+        const tinggi = paket.length ? Math.max.apply(null, paket.map(function (k) { return terbaikPaket[k].nilai; })) : null;
+        const capai = m.target === null ? null : paket.filter(function (k) { return terbaikPaket[k].nilai >= m.target; }).length;
+        return [m.nama, m.target === null ? 'Belum diatur' : formatAngka(m.target), angka(tinggi), capai === null ? '-' : formatAngka(capai) + ' dari ' + formatAngka(paket.length)];
+      })
+    });
+    dok.teks('Target adalah tujuan belajar pribadi dan tidak memengaruhi nilai maupun peringkat. Paket yang nilainya tidak ditampilkan guru tidak dihitung.', { ukuran: 8, warna: PDF_WARNA.redam });
+  }
+
+  mapel.forEach(function (m) {
+    const w = PRK_WARNA_MAPEL[m.kode] || {};
+    if (m.seri.length) dok.grafik({ judul: 'Grafik perkembangan nilai ' + m.nama + ' (Try Out Utama)', nama: m.nama, seri: m.seri, aksen: w.aksen, aksenTeks: w.teks, aksenLembut: w.lembut });
+    else {
+      dok.teks('Grafik perkembangan nilai ' + m.nama + ' (Try Out Utama)', { ukuran: 11, tebal: true, jarakBawah: 3 });
+      dok.teks('Belum ada Try Out Utama ' + m.nama + ' dengan nilai angka untuk digambar.', { ukuran: 9, warna: PDF_WARNA.redam });
+    }
+    if (m.latihan > 0) dok.teks(formatAngka(m.latihan) + ' pengerjaan Latihan Materi tidak digambar di grafik (tetap dihitung di ringkasan).', { ukuran: 8, warna: PDF_WARNA.redam });
+    if (m.terpotong) dok.teks('Grafik memuat ' + PRK_BATAS_SERI_PDF + ' Try Out Utama terakhir saja.', { ukuran: 8, warna: PDF_WARNA.redam });
+  });
+
+  const baris = bernilai.slice().sort(function (a, b) { return String(b.waktuSelesai || b.waktuMulai).localeCompare(String(a.waktuSelesai || a.waktuMulai)); });
+  dok.teks('Riwayat pengerjaan', { ukuran: 11, tebal: true, jarakBawah: 3 });
+  if (baris.length) {
+    dok.tabel({
+      ukuran: 8.5, maksBaris: 2,
+      kolom: [{ judul: 'Tanggal', lebar: 2.3 }, { judul: 'Mata pelajaran', lebar: 2.2 }, { judul: 'Paket', lebar: 3.6 }, { judul: 'Ke-', lebar: 0.8, rata: 'kanan' }, { judul: 'Nilai', lebar: 1.1, rata: 'kanan' }, { judul: 'Benar', lebar: 1, rata: 'kanan' }, { judul: 'Menit', lebar: 1, rata: 'kanan' }],
+      baris: baris.slice(0, SY_BATAS_BARIS_PDF).map(function (r) {
+        return [tanggalWIB(r.waktuSelesai || r.waktuMulai), MAPEL[r.mapel] || r.mapel, r.namaPaket, formatAngka(r.nomorUrut), r.nilaiTeks !== null && r.nilaiTeks !== undefined ? r.nilaiTeks : angka(r.nilai),
+          r.rinci ? formatAngka(r.rinci.benar) : '-', r.lamaMenit !== null && r.lamaMenit !== undefined ? formatAngka(r.lamaMenit) : '-'];
+      })
+    });
+    if (baris.length > SY_BATAS_BARIS_PDF) dok.teks('Tabel memuat ' + formatAngka(SY_BATAS_BARIS_PDF) + ' pengerjaan terbaru dari ' + formatAngka(baris.length) + '.', { ukuran: 8, warna: PDF_WARNA.redam });
+  } else {
+    dok.teks('Belum ada pengerjaan dengan nilai yang ditampilkan.', { ukuran: 9, warna: PDF_WARNA.redam });
+  }
+  const tersembunyi = selesai.length - bernilai.length;
+  if (tersembunyi > 0) dok.teks(formatAngka(tersembunyi) + ' pengerjaan selesai tidak dimuat karena nilainya tidak ditampilkan (diatur guru).', { ukuran: 8, warna: PDF_WARNA.redam });
+  dok.teks('Nilai pada skala 0-100. Rata-rata nilai dihitung dari semua pengerjaan yang selesai dan bernilai; ini berbeda dari rerata peringkat, yang dihitung dari rerata tiap paket.', { ukuran: 8, warna: PDF_WARNA.redam });
+  return dok.selesai();
+}
+
+AKSI['saya-unduh-pdf'] = function (tombol) {
+  const wadah = el('#saya-unduh-pesan');
+  if (wadah) pasang(wadah, '');
+  kerjakan(tombol, function () {
+    return panggil('ujian.riwayat', {}, { ulang: true }).then(function (riwayat) {
+      const pr = S.profil || {};
+      const t = bsSt.d && bsSt.d.target && bsSt.d.target.siap ? bsSt.d.target.mapel : null;
+      const d = { siswa: { nama: pr.namaLengkap || S.pengguna.nama, sekolah: pr.sekolah || '', kelas: pr.kelas || '' }, riwayat: riwayat, target: t };
+      return new Promise(function (selesai) { setTimeout(selesai, 0); }).then(function () {
+        ekLapor(wadah, ekNamaBerkas(['perkembangan', d.siswa.nama], 'pdf'), syPdf(d), 'application/pdf');
+      });
+    });
+  }, 'Menyiapkan PDF…').catch(function (e) { ekLaporGalat(wadah, e); });
 };
 
 
