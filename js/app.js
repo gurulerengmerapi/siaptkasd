@@ -1882,6 +1882,24 @@ function ruangBanner() {
   return h`<div class="banner banner-ruang" aria-hidden="true"><div class="banner-gambar kerangka"></div></div>`;
 }
 
+/** T10.1: alamat unduhan aplikasi Android (APK) dari js/config.js (APK_URL). Hanya https atau nama berkas .apk di situs ini; selain itu dianggap kosong. */
+function urlApk() {
+  const c = window.SIAP_CONFIG, u = c && typeof c.APK_URL === 'string' ? c.APK_URL.replace(/^\s+|\s+$/g, '') : '';
+  if (!u) return '';
+  if (/^https:\/\/[^\s"'<>]+$/i.test(u)) return u;
+  if (/^[A-Za-z0-9][A-Za-z0-9._\/-]*\.apk$/i.test(u) && u.indexOf('..') < 0) return u;
+  return '';
+}
+function htmlUnduhApp() {
+  const u = urlApk();
+  if (!u) return '';
+  return h`<section class="bagian unduh-app" id="unduh-app" aria-labelledby="h-unduh-app" data-uji="unduh-app"><div class="unduh-app-kartu">
+    <span class="ikon-bulat">${ikon('download')}</span>
+    <div class="unduh-app-teks"><h2 id="h-unduh-app">Pasang aplikasi Android</h2><p>Buka Siap TKA SD langsung dari layar utama ponsel. Setelah berkas APK terunduh, buka berkas itu dan izinkan pemasangan dari sumber ini bila diminta.</p></div>
+    <a class="tombol" href="${u}" rel="noopener noreferrer" data-uji="unduh-app-tombol">${ikon('download')}<span>Unduh aplikasi (APK)</span></a>
+  </div></section>`;
+}
+
 function renderBeranda(p, c) {
   const mapel = MAPEL_URUT.map(function (k) { return [k, MAPEL[k]]; });
   const fitur = [
@@ -1905,6 +1923,8 @@ function renderBeranda(p, c) {
           <div class="hero-banner" id="bn-wadah" data-uji="banner-wadah">${ruangBanner()}</div>
           <div class="hero-form">${htmlKartuMulai()}</div>
         </section>
+
+        ${htmlUnduhApp()}
 
         <section class="bagian" id="peringkat" aria-label="Peringkat"><div id="pr-wadah" data-uji="pr-wadah"><div class="pemuat" role="status"><span class="spinner" aria-hidden="true"></span><span>Memuat peringkat…</span></div></div></section>
 
@@ -6905,7 +6925,7 @@ function gbGambarDaftar() {
   if (!wadah) return;
   wadah.removeAttribute('aria-busy');
   const hit = el('#gb-hitung', api.el);
-  if (hit) hit.textContent = formatAngka(d.total, 0) + ' gambar · batas ' + formatAngka(d.kuota, 0) + ' per akun';
+  if (hit) hit.textContent = formatAngka(d.total, 0) + ' gambar · ' + (d.kuota === null || d.kuota === undefined ? 'tanpa batas' : 'batas ' + formatAngka(d.kuota, 0) + ' per akun');
   if (!d.total) {
     pasang(wadah, h`<div class="kosong"><span class="ikon-bulat netral">${ikon('image')}</span><h3>${gbSt.q ? 'Tidak ada gambar yang cocok' : 'Belum ada gambar'}</h3><p>${gbSt.q ? 'Ubah kata kunci pencarian.' : 'Gambar yang Anda unggah akan tersimpan di sini dan bisa dipakai lagi di soal lain.'}</p></div>`);
     pasang(el('#gb-halaman', api.el), h``);
